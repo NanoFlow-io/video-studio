@@ -1,0 +1,10 @@
+{
+  "name": "video-studio",
+  "private": true,
+  "description": "Renderer dependencies for Video Studio (pinned so renders are reproducible).",
+  "hyperframesVersion": "0.8.115",
+  "dependencies": {
+    "gsap": "3.14.2",
+    "hyperframes": "0.8.115"
+  }
+}

@@ -1,0 +1,19 @@
+# secrets
+.env
+.env.*
+!.env.example
+# installs and tools
+node_modules/
+tools/
+__pycache__/
+*.pyc
+.venv/
+# paid / generated media and builds (regenerate with your own keys; commit generated/ only if you mean to share it)
+projects/*/generated/
+projects/*/build/
+projects/*/poses/src/
+*.mp4
+*.wav
+!assets/sfx-kit/*.wav
+.DS_Store
+Thumbs.db

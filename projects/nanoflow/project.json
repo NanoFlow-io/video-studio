@@ -1,0 +1,1372 @@
+{
+ "name": "NanoFlow",
+ "brand": {
+  "logo": "brand/logo-full.webp",
+  "mark": "brand/mark.png"
+ },
+ "mascot": {
+  "reference": "mascot/reference.png",
+  "description": "a glossy 3D cartoon robot mascot with a purple domed helmet and an orange-tipped antenna, a black face visor with glowing curved happy eyes, round orange ear pieces, a white body with a magenta-to-orange chest stripe, purple hands and orange feet"
+ },
+ "poses": {
+  "wave": "waving hello with one hand raised, mid-step, cheerful",
+  "phone": "proudly holding up a modern smartphone in both hands, screen facing the viewer showing a simple play-button video thumbnail, excited; no words on the screen",
+  "clipboard": "holding a clipboard with three big green check marks on it, pointing at the top item with the other hand, confident; no writing on the clipboard",
+  "relax": "relaxed and content, leaning back with one hand behind its head and holding a white coffee mug in the other, legs casually crossed while standing",
+  "ladder": "standing on a small grey stepladder holding a wrench in one hand, turning in surprise toward a smartphone it holds out in the other hand, eyes shaped as wide surprised circles; full body including the ladder",
+  "tired": "exhausted, sitting slumped on a small stool, shoulders down, head drooping, holding an open laptop on its knees, eyes as tired flat half-closed lines; nothing on the laptop screen",
+  "headset": "wearing a slim black call-centre headset with a small microphone, one hand touching the earpiece, the other giving a thumbs up, friendly and attentive",
+  "mail": "cheerfully sorting mail, holding a neat stack of white envelopes in one arm and tossing one envelope with the other hand; no writing on the envelopes",
+  "star": "proudly holding a big glossy golden five-point star above its head with both hands, joyful",
+  "point": "standing side-on, pointing confidently to the right with one arm fully extended, as if presenting something, other hand on hip",
+  "chat": "holding up a big white rounded chat speech bubble with three dots in it, friendly, slightly tilted head",
+  "jump": "jumping happily mid-air with both arms raised in celebration, legs tucked"
+ },
+ "pose_aspect": 0.7466,
+ "palette": {
+  "primary": "#6d28d9",
+  "primary2": "#8b5cf6",
+  "secondary": "#d92677",
+  "accent": "#f08a24",
+  "ink": "#211d2b",
+  "ink2": "#5b5468",
+  "paper": "#fcfbf8",
+  "good": "#16a34a",
+  "bad": "#e5484d",
+  "grad": "linear-gradient(100deg,#7c3aed,#d92677 55%,#f08a24)"
+ },
+ "fonts": {
+  "title": "DM Sans",
+  "body": "Nunito",
+  "note": "Caveat"
+ },
+ "backgrounds": {
+  "peach": "#fde8d4",
+  "violet": "linear-gradient(160deg,#8b5cf6,#5b21b6)",
+  "night": "radial-gradient(1200px 900px at 30% 70%,#2c2147,#1b1526 70%)",
+  "paper": "#fcfbf8",
+  "lilac": "#ece6ff",
+  "mint": "#dcf5e8",
+  "sun": "#fff0c2",
+  "sky": "#dcecff",
+  "pink": "#ffe1ef",
+  "deep": "linear-gradient(150deg,#2a1a5e,#6d28d9)",
+  "end": "radial-gradient(1400px 900px at 50% 40%,#ffffff,#f3eefc)"
+ },
+ "solids": {
+  "peach": "#fde8d4",
+  "violet": "#7c4ae6",
+  "night": "#1b1526",
+  "paper": "#fcfbf8",
+  "lilac": "#ece6ff",
+  "mint": "#dcf5e8",
+  "sun": "#fff0c2",
+  "sky": "#dcecff",
+  "pink": "#ffe1ef",
+  "deep": "#3b1d86",
+  "end": "#f7f3fd"
+ },
+ "voice": {
+  "voice_id": "iP95p4xoKVk53GoZ742B",
+  "voice_name": "Chris (ElevenLabs premade)",
+  "model": "eleven_multilingual_v2",
+  "settings": {
+   "stability": 0.45,
+   "similarity_boost": 0.8,
+   "style": 0.25,
+   "use_speaker_boost": true,
+   "speed": 1.0
+  },
+  "lead_in": 0.5,
+  "tail": 2.6
+ },
+ "audio": {
+  "sfx_bus_db": 4.0,
+  "music_db": -26,
+  "duck_db": -9,
+  "peak_align": [
+   "whoosh_a",
+   "whoosh_b",
+   "whoosh_big",
+   "impact_slam",
+   "snap_click",
+   "tap",
+   "mail_pile",
+   "sms_send"
+  ]
+ },
+ "music": {
+  "bed_a": {
+   "prompt": "Instrumental only, no vocals. Light tech-commercial underscore, 108 bpm, plucky marimba and muted synth bass, starts bouncy for four seconds then becomes slightly hurried and tense with a ticking hi-hat and minor colour, sparse so a voiceover sits on top, ends on an unresolved suspended note.",
+   "ms": 20000
+  },
+  "bed_b": {
+   "prompt": "Instrumental only, no vocals. Bright upbeat friendly product launch music, 112 bpm, warm major key, claps, plucky synths, light piano, punchy kick, optimistic and confident, steady energy that stays under a voiceover, builds gently, ends on a clean resolved final chord with a short tail.",
+   "ms": 66000
+  }
+ },
+ "sfx": {
+  "phone_ring": {
+   "prompt": "modern smartphone ringtone, two short bright rings, clean, no music",
+   "seconds": 1.6
+  },
+  "missed_tone": {
+   "prompt": "short sad descending three note cartoon boop, soft, a missed opportunity",
+   "seconds": 0.9
+  },
+  "whoosh_a": {
+   "prompt": "fast clean air whoosh transition, short",
+   "seconds": 0.5
+  },
+  "whoosh_b": {
+   "prompt": "quick swish whoosh, bright, short",
+   "seconds": 0.5
+  },
+  "whoosh_big": {
+   "prompt": "big cinematic whoosh sweep with a soft riser, short",
+   "seconds": 1.0
+  },
+  "pop": {
+   "prompt": "bubbly cartoon pop, short",
+   "seconds": 0.3
+  },
+  "ding": {
+   "prompt": "single soft phone notification ding",
+   "seconds": 0.5
+  },
+  "mail_pile": {
+   "prompt": "pile of paper envelopes sliding and flopping onto a desk, papery",
+   "seconds": 1.0
+  },
+  "clock_tick": {
+   "prompt": "wall clock ticking slowly at night, four ticks, quiet room",
+   "seconds": 2.0
+  },
+  "crickets": {
+   "prompt": "soft night crickets ambience, gentle, distant",
+   "seconds": 2.5
+  },
+  "sad_blip": {
+   "prompt": "short sad descending two note muted trombone blip, playful cartoon",
+   "seconds": 1.0
+  },
+  "light_off": {
+   "prompt": "small desk lamp switch click off, quiet",
+   "seconds": 0.5
+  },
+  "warm_swell": {
+   "prompt": "warm swelling major chord with shimmering bells, a bright reveal moment",
+   "seconds": 2.4
+  },
+  "confetti": {
+   "prompt": "party popper burst with confetti falling, light",
+   "seconds": 0.9
+  },
+  "pickup": {
+   "prompt": "phone call connecting, soft click then a friendly two tone chirp",
+   "seconds": 0.6
+  },
+  "typing": {
+   "prompt": "quick light typing on a laptop keyboard",
+   "seconds": 1.2
+  },
+  "shuffle": {
+   "prompt": "cards being shuffled and sorted quickly on a table",
+   "seconds": 0.8
+  },
+  "slide_up": {
+   "prompt": "soft UI card sliding up into place with a light thump",
+   "seconds": 0.5
+  },
+  "sms_send": {
+   "prompt": "text message sent swoosh with a light blip, modern phone",
+   "seconds": 0.6
+  },
+  "sparkle": {
+   "prompt": "magical sparkle shimmer twinkle, short",
+   "seconds": 0.9
+  },
+  "star_chime": {
+   "prompt": "bright ascending chime for five stars lighting up one after another",
+   "seconds": 1.2
+  },
+  "chat_bubble": {
+   "prompt": "soft chat message bubble pop, friendly app sound",
+   "seconds": 0.4
+  },
+  "calendar_book": {
+   "prompt": "satisfying calendar booking confirmation, soft click and bright chime",
+   "seconds": 0.8
+  },
+  "snap_click": {
+   "prompt": "satisfying plastic connector snapping and locking into place, crisp click",
+   "seconds": 0.4
+  },
+  "cable_zip": {
+   "prompt": "quick electric cable zipping across with a light hum",
+   "seconds": 0.6
+  },
+  "tap": {
+   "prompt": "crisp soft finger tap on a phone screen",
+   "seconds": 0.3
+  },
+  "check_chime": {
+   "prompt": "short positive success chime, two bright notes",
+   "seconds": 0.6
+  },
+  "impact_slam": {
+   "prompt": "punchy cartoon impact slam with a little bass thump for big text landing",
+   "seconds": 0.6
+  },
+  "boing": {
+   "prompt": "short springy cartoon boing",
+   "seconds": 0.5
+  },
+  "final_chord": {
+   "prompt": "warm uplifting bright major chord on piano and soft synth pad, resolving, gentle",
+   "seconds": 3.0
+  },
+  "tiles_build": {
+   "prompt": "quick cascade of small wooden blocks clicking into place one after another",
+   "seconds": 1.0
+  },
+  "footstep": {
+   "prompt": "single light footstep of a small toy robot on a wooden floor, rubber sole, dry, close",
+   "seconds": 0.5
+  }
+ },
+ "transitions": [
+  {
+   "id": "reveal",
+   "enabled": false,
+   "scene": "S05",
+   "align": "before",
+   "seconds": 1.2,
+   "pose": "jump",
+   "bg": "paper",
+   "prompt": "The robot mascot leaps up joyfully and spins once in place on a plain bright studio background, smooth motion, static camera, no text"
+  }
+ ],
+ "scenes": [
+  {
+   "id": "S01",
+   "type": "incoming_call",
+   "pose": "ladder",
+   "bg": "peach",
+   "line": {
+    "text": "You're up a ladder when the phone rings.",
+    "vertical": true,
+    "pause": [
+     0.25,
+     0.2
+    ]
+   },
+   "data": {
+    "label": "INCOMING CALL",
+    "name": "New customer",
+    "sub": "Mobile · 8:42 AM"
+   },
+   "cues": [
+    {
+     "name": "tiles",
+     "at": "start+0.05",
+     "sfx": "el:tiles_build",
+     "gain": -13,
+     "note": "iso floor builds tile by tile"
+    },
+    {
+     "name": "bot",
+     "at": "start+0.3",
+     "sfx": "kit:pluck_001",
+     "gain": -10,
+     "note": "robot pops up on the stepladder"
+    },
+    {
+     "name": "ring",
+     "at": "phone",
+     "delta": -0.05,
+     "sfx": "el:phone_ring",
+     "gain": -9,
+     "note": "incoming-call card shakes, ring waves"
+    }
+   ]
+  },
+  {
+   "id": "S02",
+   "type": "missed_to_competitor",
+   "pose": "ladder",
+   "bg": "peach",
+   "line": {
+    "text": "You can't pick up, so the job goes to the next name on Google.",
+    "vertical": true,
+    "pause": [
+     0.45,
+     0.35
+    ]
+   },
+   "wipe": false,
+   "data": {
+    "incoming": "Incoming call",
+    "missed": "Missed call",
+    "search": "plumber near me",
+    "results": [
+     [
+      "Your business",
+      "Missed call"
+     ],
+     [
+      "Next business",
+      "Answers every call"
+     ],
+     [
+      "Another business",
+      "4.6 stars"
+     ]
+    ],
+    "winner": 1,
+    "stamp": "Booked",
+    "note": "the job went elsewhere"
+   },
+   "cues": [
+    {
+     "name": "wipe",
+     "at": "start",
+     "sfx": "el:whoosh_a",
+     "gain": -12,
+     "note": "wipe"
+    },
+    {
+     "name": "missed",
+     "at": "pick",
+     "sfx": "el:missed_tone",
+     "gain": -8,
+     "note": "call card turns grey: Missed call"
+    },
+    {
+     "name": "list",
+     "at": "job",
+     "sfx": "el:slide_up",
+     "gain": -9,
+     "note": "search results list slides in"
+    },
+    {
+     "name": "next",
+     "at": "next",
+     "sfx": "el:whoosh_b",
+     "gain": -12,
+     "note": "the call flies to the next business"
+    },
+    {
+     "name": "booked",
+     "at": "Google",
+     "sfx": "kit:drop_001",
+     "gain": -8,
+     "note": "'Booked' lands on the other business"
+    }
+   ]
+  },
+  {
+   "id": "S03",
+   "type": "problem_stack",
+   "pose": "phone",
+   "bg": "violet",
+   "line": {
+    "text": "By the time you're back in the truck, your inbox is full, a review is still waiting for a reply, and your Instagram hasn't posted since spring.",
+    "vertical": false,
+    "pause": [
+     0.4,
+     0.0
+    ]
+   },
+   "data": {
+    "title": "Back in the truck",
+    "title_color": "#ffffff",
+    "inbox": "Inbox",
+    "inbox_sub": "Unread",
+    "inbox_count": 64,
+    "full": "Full",
+    "review_title": "New review",
+    "review_sub": "Awaiting your reply · 3 days",
+    "social_label": "INSTAGRAM",
+    "social_title": "Last post",
+    "social_value": "April"
+   },
+   "cues": [
+    {
+     "name": "wipe",
+     "at": "start",
+     "sfx": "el:whoosh_b",
+     "gain": -12,
+     "note": "violet wipe"
+    },
+    {
+     "name": "inbox",
+     "at": "inbox",
+     "sfx": "el:mail_pile",
+     "gain": -3,
+     "note": "envelopes pile onto the inbox card"
+    },
+    {
+     "name": "full",
+     "at": "full",
+     "sfx": "el:impact_slam",
+     "gain": -12,
+     "note": "'full' slams"
+    },
+    {
+     "name": "review",
+     "at": "review",
+     "sfx": "el:ding",
+     "gain": -9,
+     "note": "review card: awaiting reply"
+    },
+    {
+     "name": "social",
+     "at": "Instagram",
+     "sfx": "el:slide_up",
+     "gain": -9,
+     "note": "social card: last post in spring"
+    },
+    {
+     "name": "stale",
+     "at": "spring",
+     "sfx": "el:sad_blip",
+     "gain": -11,
+     "note": "social card greys out, cobweb"
+    }
+   ]
+  },
+  {
+   "id": "S04",
+   "type": "night_admin",
+   "pose": "tired",
+   "bg": "night",
+   "line": {
+    "text": "So your evenings go on admin.",
+    "vertical": true,
+    "pause": [
+     1.3,
+     1.1
+    ]
+   },
+   "data": {
+    "chip": "Evenings",
+    "word": "admin"
+   },
+   "cues": [
+    {
+     "name": "wipe",
+     "at": "start",
+     "sfx": "el:whoosh_big",
+     "gain": -13,
+     "note": "night falls"
+    },
+    {
+     "name": "night",
+     "at": "start+0.15",
+     "sfx": "el:crickets",
+     "gain": -20,
+     "note": "crickets"
+    },
+    {
+     "name": "tick",
+     "at": "evenings",
+     "sfx": "el:clock_tick",
+     "gain": -10,
+     "note": "clock hands run on into the night"
+    },
+    {
+     "name": "word",
+     "at": "admin",
+     "sfx": "el:impact_slam",
+     "gain": -13,
+     "note": "'admin' drops in"
+    },
+    {
+     "name": "off",
+     "at": "end+0.45",
+     "sfx": "el:light_off",
+     "gain": -9,
+     "note": "held beat: lamp clicks off, all dims"
+    }
+   ]
+  },
+  {
+   "id": "S05",
+   "type": "reveal",
+   "pose": "jump",
+   "bg": "paper",
+   "line": {
+    "text": "Meet NanoFlow, the AI assistant for service businesses.",
+    "vertical": true,
+    "pause": [
+     0.6,
+     0.45
+    ]
+   },
+   "wipe": false,
+   "turn": true,
+   "captions": false,
+   "data": {
+    "tagline": "The AI assistant for",
+    "tagline_accent": "service businesses"
+   },
+   "cues": [
+    {
+     "name": "whoosh",
+     "at": "Meet",
+     "delta": -0.12,
+     "sfx": "el:whoosh_big",
+     "gain": -10,
+     "note": "wipe to paper, sunburst"
+    },
+    {
+     "name": "swell",
+     "at": "Meet",
+     "sfx": "el:warm_swell",
+     "gain": -10,
+     "note": "warm swell under the reveal"
+    },
+    {
+     "name": "logo",
+     "at": "NanoFlow",
+     "sfx": "el:confetti",
+     "gain": -9,
+     "note": "logo lands, confetti"
+    },
+    {
+     "name": "tag",
+     "at": "assistant",
+     "sfx": "el:sparkle",
+     "gain": -13,
+     "note": "tagline reveals"
+    },
+    {
+     "name": "jump",
+     "at": "service",
+     "sfx": "el:boing",
+     "gain": -12,
+     "note": "robot jumps"
+    }
+   ]
+  },
+  {
+   "id": "S06",
+   "type": "call_answered",
+   "pose": "headset",
+   "bg": "lilac",
+   "line": {
+    "text": "When you're busy or closed, it answers the call, qualifies the job, and sends you a transcript with the next step.",
+    "vertical": true,
+    "pause": [
+     0.45,
+     0.35
+    ]
+   },
+   "data": {
+    "title": "Calls",
+    "title_accent": "answered",
+    "incoming": "Incoming call",
+    "caller": "New customer",
+    "busy": "You: on a job",
+    "closed": "Closed",
+    "answered": "Answered by NanoFlow",
+    "answered_sub": "You were on a job",
+    "details_title": "Job details",
+    "details": [
+     [
+      "Name",
+      "Sarah K."
+     ],
+     [
+      "Job",
+      "AC not cooling"
+     ],
+     [
+      "Area",
+      "Maple Grove"
+     ],
+     [
+      "When",
+      "Tomorrow AM"
+     ]
+    ],
+    "transcript_title": "Transcript",
+    "transcript": "Caller: Our AC stopped cooling this morning.\nNanoFlow: Sorry to hear that. What's the address, and when suits you?",
+    "next": "Next step: send an estimate"
+   },
+   "cues": [
+    {
+     "name": "wipe",
+     "at": "start",
+     "sfx": "el:whoosh_a",
+     "gain": -12,
+     "note": "lilac wipe"
+    },
+    {
+     "name": "busy",
+     "at": "busy",
+     "sfx": "el:phone_ring",
+     "gain": -15,
+     "note": "'on a job' chip, phone rings"
+    },
+    {
+     "name": "closed",
+     "at": "closed",
+     "sfx": "kit:switch_001",
+     "gain": -10,
+     "note": "'closed' sign flips"
+    },
+    {
+     "name": "answer",
+     "at": "answers",
+     "sfx": "el:pickup",
+     "gain": -6,
+     "note": "call card goes green: answered"
+    },
+    {
+     "name": "qual",
+     "at": "qualifies",
+     "sfx": "el:check_chime",
+     "gain": -11,
+     "note": "checklist ticks"
+    },
+    {
+     "name": "transcript",
+     "at": "transcript",
+     "sfx": "el:typing",
+     "gain": -6,
+     "note": "transcript types out"
+    },
+    {
+     "name": "next",
+     "at": "next",
+     "sfx": "el:pop",
+     "gain": -9,
+     "note": "'Next step' chip"
+    }
+   ]
+  },
+  {
+   "id": "S07",
+   "type": "inbox_sort",
+   "pose": "mail",
+   "bg": "mint",
+   "line": {
+    "text": "It sorts your inbox by priority and drafts the replies.",
+    "vertical": false,
+    "pause": [
+     0.4,
+     0.0
+    ]
+   },
+   "data": {
+    "title": "Inbox",
+    "title_accent": "sorted",
+    "floats": [
+     "#16a34a",
+     "#8b5cf6",
+     "#ffffff"
+    ],
+    "card_title": "Inbox",
+    "items": [
+     [
+      "Newsletter",
+      "Monthly supplier deals",
+      "Low",
+      "#e9e6ef",
+      "#5b5468"
+     ],
+     [
+      "Sarah K.",
+      "Leak under the kitchen sink",
+      "Urgent",
+      "#fde2e2",
+      "#c0262d"
+     ],
+     [
+      "Promo",
+      "Last chance: 20% off",
+      "Low",
+      "#e9e6ef",
+      "#5b5468"
+     ],
+     [
+      "Mike R.",
+      "Quote for a new water heater?",
+      "Quote",
+      "#fdebd6",
+      "#b45309"
+     ],
+     [
+      "Supplier",
+      "Invoice #2291",
+      "Invoice",
+      "#e3ecff",
+      "#1d4ed8"
+     ]
+    ],
+    "order": [
+     1,
+     3,
+     4,
+     0,
+     2
+    ],
+    "drafts": [
+     1,
+     3
+    ],
+    "draft_label": "Draft ready"
+   },
+   "cues": [
+    {
+     "name": "wipe",
+     "at": "start",
+     "sfx": "el:whoosh_b",
+     "gain": -12,
+     "note": "mint wipe"
+    },
+    {
+     "name": "sort",
+     "at": "sorts",
+     "sfx": "el:shuffle",
+     "gain": -4,
+     "note": "rows shuffle into priority order"
+    },
+    {
+     "name": "priority",
+     "at": "priority",
+     "sfx": "el:pop",
+     "gain": -10,
+     "note": "priority tags pop"
+    },
+    {
+     "name": "drafts",
+     "at": "drafts",
+     "sfx": "el:typing",
+     "gain": -7,
+     "note": "'Draft ready' chips"
+    },
+    {
+     "name": "ok",
+     "at": "replies",
+     "sfx": "kit:confirmation_001",
+     "gain": -12,
+     "note": "drafts settle"
+    }
+   ]
+  },
+  {
+   "id": "S08",
+   "type": "rank_list",
+   "pose": "clipboard",
+   "bg": "peach",
+   "line": {
+    "text": "It ranks every call, email and message, so the jobs worth taking reach you first.",
+    "vertical": true,
+    "pause": [
+     0.45,
+     0.35
+    ]
+   },
+   "data": {
+    "title": "Best jobs",
+    "title_accent": "first",
+    "take": "Take it",
+    "cards": [
+     {
+      "cue": "call",
+      "icon": "phone",
+      "color": "#6d28d9",
+      "title": "AC replacement",
+      "sub": "Call · ready to book"
+     },
+     {
+      "cue": "email",
+      "icon": "mail",
+      "color": "#8b5cf6",
+      "title": "Water heater quote",
+      "sub": "Email · this month"
+     },
+     {
+      "cue": "msg",
+      "icon": "msg",
+      "color": "#b8b1c6",
+      "title": "Quick price question",
+      "sub": "Message · just browsing"
+     }
+    ]
+   },
+   "cues": [
+    {
+     "name": "wipe",
+     "at": "start",
+     "sfx": "el:whoosh_a",
+     "gain": -12,
+     "note": "peach wipe"
+    },
+    {
+     "name": "call",
+     "at": "call",
+     "sfx": "kit:click_003",
+     "gain": -1,
+     "note": "call card enters"
+    },
+    {
+     "name": "email",
+     "at": "email",
+     "sfx": "kit:click_003",
+     "gain": -1,
+     "rate": 1.06,
+     "note": "email card enters"
+    },
+    {
+     "name": "msg",
+     "at": "message",
+     "sfx": "kit:click_003",
+     "gain": -1,
+     "rate": 1.12,
+     "note": "message card enters"
+    },
+    {
+     "name": "rank",
+     "at": "jobs",
+     "sfx": "el:shuffle",
+     "gain": -4,
+     "note": "cards re-rank, best first"
+    },
+    {
+     "name": "first",
+     "at": "first",
+     "sfx": "el:check_chime",
+     "gain": -10,
+     "note": "#1 'Take it' tag"
+    }
+   ]
+  },
+  {
+   "id": "S09",
+   "type": "review_split",
+   "pose": "star",
+   "bg": "sun",
+   "line": {
+    "text": "After each job, it asks for a rating. Happy customers go to Google. Unhappy ones come to you first.",
+    "vertical": false,
+    "pause": [
+     0.45,
+     0.0
+    ]
+   },
+   "data": {
+    "title": "Reviews",
+    "title_accent": "handled",
+    "floats": [
+     "#f5b700",
+     "#8b5cf6",
+     "#ffffff"
+    ],
+    "done": "Job complete",
+    "sms_label": "TEXT MESSAGE",
+    "sms": "Thanks for choosing us! How did we do?",
+    "good_title": "Google review",
+    "good_sub": "Happy customers go here",
+    "bad_title": "Private note to you",
+    "bad_sub": "Unhappy ones come to you"
+   },
+   "cues": [
+    {
+     "name": "wipe",
+     "at": "start",
+     "sfx": "el:whoosh_b",
+     "gain": -12,
+     "note": "sun wipe"
+    },
+    {
+     "name": "done",
+     "at": "job",
+     "sfx": "kit:drop_001",
+     "gain": -8,
+     "note": "'Job complete' chip"
+    },
+    {
+     "name": "sms",
+     "at": "asks",
+     "sfx": "el:sms_send",
+     "gain": -9,
+     "note": "rating text bubble"
+    },
+    {
+     "name": "stars",
+     "at": "rating",
+     "sfx": "el:star_chime",
+     "gain": -10,
+     "note": "stars light up"
+    },
+    {
+     "name": "happy",
+     "at": "Happy",
+     "sfx": "el:pop",
+     "gain": -6,
+     "note": "happy path: 5 stars"
+    },
+    {
+     "name": "good",
+     "at": "Google",
+     "sfx": "el:check_chime",
+     "gain": -11,
+     "note": "Google review card"
+    },
+    {
+     "name": "unhappy",
+     "at": "Unhappy",
+     "sfx": "kit:pluck_001",
+     "gain": -5,
+     "note": "unhappy path: 2 stars"
+    },
+    {
+     "name": "bad",
+     "at": "first",
+     "sfx": "el:slide_up",
+     "gain": -9,
+     "note": "private note to you"
+    }
+   ]
+  },
+  {
+   "id": "S10",
+   "type": "chat_booking",
+   "pose": "chat",
+   "bg": "sky",
+   "line": {
+    "text": "Your website gets a chat assistant that books estimates around the clock.",
+    "vertical": false,
+    "pause": [
+     0.45,
+     0.0
+    ]
+   },
+   "data": {
+    "title": "Chat that",
+    "title_accent": "books",
+    "floats": [
+     "#3b82f6",
+     "#8b5cf6",
+     "#ffffff"
+    ],
+    "site": "yourbusiness.com",
+    "header": "Chat with us",
+    "question": "Can someone look at my furnace this week?",
+    "answer": "Sure. I have Thursday at 10 AM for an estimate. Shall I book it?",
+    "booked": "Estimate booked",
+    "booked_sub": "Thu 10:00 AM",
+    "clock": "Day or night"
+   },
+   "cues": [
+    {
+     "name": "wipe",
+     "at": "start",
+     "sfx": "el:whoosh_a",
+     "gain": -12,
+     "note": "sky wipe"
+    },
+    {
+     "name": "site",
+     "at": "website",
+     "sfx": "el:slide_up",
+     "gain": -8,
+     "note": "browser window slides up"
+    },
+    {
+     "name": "chat",
+     "at": "chat",
+     "sfx": "el:chat_bubble",
+     "gain": -6,
+     "note": "customer bubble"
+    },
+    {
+     "name": "reply",
+     "at": "assistant",
+     "sfx": "el:chat_bubble",
+     "gain": -6,
+     "rate": 1.1,
+     "note": "assistant bubble"
+    },
+    {
+     "name": "book",
+     "at": "books",
+     "sfx": "el:calendar_book",
+     "gain": -3,
+     "note": "estimate booked card"
+    },
+    {
+     "name": "clock",
+     "at": "clock",
+     "sfx": "kit:glass_001",
+     "gain": -10,
+     "note": "sun and moon swap: around the clock"
+    }
+   ]
+  },
+  {
+   "id": "S11",
+   "type": "content_reels",
+   "pose": "phone",
+   "bg": "pink",
+   "line": {
+    "text": "And your jobs become reels and carousels, starring you or a presenter you choose.",
+    "vertical": true,
+    "pause": [
+     0.45,
+     0.35
+    ]
+   },
+   "data": {
+    "title": "Content",
+    "title_accent": "made",
+    "floats": [
+     "#d92677",
+     "#8b5cf6",
+     "#ffffff"
+    ],
+    "images": [
+     "images/social-hvac.webp",
+     "images/social-roof.webp",
+     "images/social-bath.webp"
+    ],
+    "reel_label": "Reel",
+    "slides": [
+     "Before",
+     "During",
+     "After"
+    ],
+    "chip_a": "Starring you",
+    "chip_b": "or a presenter you choose"
+   },
+   "cues": [
+    {
+     "name": "wipe",
+     "at": "start",
+     "sfx": "el:whoosh_b",
+     "gain": -12,
+     "note": "pink wipe"
+    },
+    {
+     "name": "reels",
+     "at": "reels",
+     "sfx": "el:whoosh_a",
+     "gain": -7,
+     "note": "reels fan in"
+    },
+    {
+     "name": "carousel",
+     "at": "carousels",
+     "sfx": "el:shuffle",
+     "gain": -5,
+     "note": "carousel slides"
+    },
+    {
+     "name": "a",
+     "at": "you",
+     "sfx": "el:pop",
+     "gain": -9,
+     "note": "'Starring you' chip"
+    },
+    {
+     "name": "b",
+     "at": "presenter",
+     "sfx": "el:pop",
+     "gain": -9,
+     "rate": 1.1,
+     "note": "'or a presenter' chip"
+    }
+   ]
+  },
+  {
+   "id": "S12",
+   "type": "integrations_hub",
+   "pose": "point",
+   "bg": "lilac",
+   "line": {
+    "text": "It connects to Housecall Pro or Jobber, Google Business and your email.",
+    "vertical": false,
+    "pause": [
+     0.5,
+     0.0
+    ]
+   },
+   "data": {
+    "title": "Plugs",
+    "title_accent": "in",
+    "ok": "Connected",
+    "tiles": [
+     {
+      "cue": "hcp",
+      "label": "Housecall Pro"
+     },
+     {
+      "cue": "jobber",
+      "label": "Jobber"
+     },
+     {
+      "cue": "gb",
+      "label": "Google Business"
+     },
+     {
+      "cue": "email",
+      "label": "Email"
+     }
+    ]
+   },
+   "cues": [
+    {
+     "name": "wipe",
+     "at": "start",
+     "sfx": "el:whoosh_a",
+     "gain": -12,
+     "note": "lilac wipe"
+    },
+    {
+     "name": "hub",
+     "at": "connects",
+     "sfx": "kit:maximize_001",
+     "gain": -9,
+     "note": "hub appears"
+    },
+    {
+     "name": "hcp",
+     "at": "Housecall",
+     "sfx": "el:snap_click",
+     "gain": -2,
+     "note": "Housecall Pro snaps in"
+    },
+    {
+     "name": "jobber",
+     "at": "Jobber",
+     "sfx": "el:snap_click",
+     "gain": -2,
+     "rate": 1.06,
+     "note": "Jobber snaps in"
+    },
+    {
+     "name": "gb",
+     "at": "Google",
+     "sfx": "el:snap_click",
+     "gain": -2,
+     "rate": 1.12,
+     "note": "Google Business snaps in"
+    },
+    {
+     "name": "email",
+     "at": "email",
+     "sfx": "el:snap_click",
+     "gain": -2,
+     "rate": 1.18,
+     "note": "Email snaps in"
+    },
+    {
+     "name": "ok",
+     "at": "email",
+     "delta": 0.4,
+     "sfx": "kit:confirmation_001",
+     "gain": -11,
+     "note": "hub glows: connected"
+    }
+   ]
+  },
+  {
+   "id": "S13",
+   "type": "phone_approve",
+   "pose": "relax",
+   "bg": "paper",
+   "line": {
+    "text": "Everything waits on one screen. One tap to approve. Nothing goes out until you say so.",
+    "vertical": true,
+    "pause": [
+     0.55,
+     0.45
+    ]
+   },
+   "data": {
+    "title": "One",
+    "title_accent": "tap",
+    "screen_title": "Overview",
+    "screen_sub": "3 things need you",
+    "items": [
+     [
+      "Reel ready",
+      "Tuesday's roof job"
+     ],
+     [
+      "Reply drafted",
+      "Sarah K."
+     ],
+     [
+      "Review reply",
+      "5 stars, Mike R."
+     ]
+    ],
+    "approve": "Approve",
+    "approved": "Approved",
+    "lock": "Nothing goes out until you approve"
+   },
+   "cues": [
+    {
+     "name": "wipe",
+     "at": "start",
+     "sfx": "el:whoosh_b",
+     "gain": -12,
+     "note": "paper wipe"
+    },
+    {
+     "name": "phone",
+     "at": "Everything",
+     "sfx": "el:slide_up",
+     "gain": -8,
+     "note": "phone with the Overview slides up"
+    },
+    {
+     "name": "tap",
+     "at": "tap",
+     "sfx": "el:tap",
+     "gain": 1,
+     "note": "finger taps Approve"
+    },
+    {
+     "name": "approve",
+     "at": "approve",
+     "sfx": "el:check_chime",
+     "gain": -9,
+     "note": "items tick green"
+    },
+    {
+     "name": "lock",
+     "at": "Nothing",
+     "sfx": "kit:switch_001",
+     "gain": -6,
+     "note": "lock chip: nothing goes out until you approve"
+    }
+   ]
+  },
+  {
+   "id": "S14",
+   "type": "recap",
+   "pose": "relax",
+   "bg": "deep",
+   "line": {
+    "text": "Your posts made. Your jobs ranked. Your time back.",
+    "vertical": true,
+    "pause": [
+     0.5,
+     0.4
+    ]
+   },
+   "captions": false,
+   "data": {
+    "lines": [
+     "Your posts made.",
+     "Your jobs ranked.",
+     "Your time back."
+    ]
+   },
+   "cues": [
+    {
+     "name": "wipe",
+     "at": "start",
+     "sfx": "el:whoosh_big",
+     "gain": -12,
+     "note": "violet wipe"
+    },
+    {
+     "name": "l1",
+     "at": "posts",
+     "sfx": "el:impact_slam",
+     "gain": -9,
+     "note": "'Your posts made' slams"
+    },
+    {
+     "name": "l2",
+     "at": "jobs",
+     "sfx": "el:impact_slam",
+     "gain": -9,
+     "rate": 1.06,
+     "note": "'Your jobs ranked' slams"
+    },
+    {
+     "name": "l3",
+     "at": "time",
+     "sfx": "el:impact_slam",
+     "gain": -9,
+     "rate": 1.12,
+     "note": "'Your time back' slams"
+    },
+    {
+     "name": "sparkle",
+     "at": "back",
+     "sfx": "el:sparkle",
+     "gain": -13,
+     "note": "sparkle"
+    }
+   ]
+  },
+  {
+   "id": "S15",
+   "type": "end_card",
+   "pose": "wave",
+   "bg": "end",
+   "line": {
+    "text": "NanoFlow. Join the beta at nanoflow dot io.",
+    "vertical": true,
+    "pause": [
+     0.0,
+     0.0
+    ]
+   },
+   "captions": false,
+   "data": {
+    "tagline": "The AI assistant for | service businesses",
+    "button": "Join the beta",
+    "url": "nanoflow.io",
+    "note": "nothing goes out until you approve it"
+   },
+   "cues": [
+    {
+     "name": "wipe",
+     "at": "start",
+     "sfx": "el:whoosh_a",
+     "gain": -12,
+     "note": "paper end card"
+    },
+    {
+     "name": "logo",
+     "at": "NanoFlow",
+     "sfx": "el:confetti",
+     "gain": -5,
+     "note": "logo lands, confetti"
+    },
+    {
+     "name": "button",
+     "at": "Join",
+     "sfx": "el:pop",
+     "gain": -8,
+     "note": "'Join the beta' button"
+    },
+    {
+     "name": "url",
+     "at": "nanoflow",
+     "sfx": "el:typing",
+     "gain": -5,
+     "note": "nanoflow.io types out"
+    },
+    {
+     "name": "chord",
+     "at": "io",
+     "delta": 0.45,
+     "sfx": "el:final_chord",
+     "gain": -8,
+     "note": "glow, hold"
+    }
+   ]
+  }
+ ]
+}

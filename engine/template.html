@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>{{TITLE}}</title>
+<link rel="stylesheet" href="assets/fonts/fonts.css">
+<script src="assets/gsap.min.js"></script>
+<script src="beats.js"></script>
+<script>window.CUT = "{{CUT}}"; window.PROJECT = {{PROJECT_JSON}};</script>
+<style>
+:root{ {{CSS_VARS}} }
+html,body{margin:0;padding:0;width:{{W}}px;height:{{H}}px;overflow:hidden;background:var(--paper)}
+#root{position:relative;width:{{W}}px;height:{{H}}px;overflow:hidden;background:var(--paper);font-family:var(--f-body),sans-serif;color:var(--ink)}
+.scene{position:absolute;inset:0;overflow:hidden;visibility:hidden}
+.abs{position:absolute;left:0;top:0}
+.bg{position:absolute;inset:0}
+.title{position:absolute;left:0;top:0;font-family:var(--f-title);font-weight:700;letter-spacing:-.03em;line-height:1.02;white-space:nowrap;color:var(--ink)}
+.grad{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.panel{position:absolute;left:0;top:0;transform-origin:50% 50%}
+.card{position:absolute;background:#fff;border-radius:28px;border:2px solid rgba(33,29,43,.08);box-shadow:0 40px 80px -34px rgba(33,29,43,.45);overflow:hidden}
+.card h4{margin:0;font-family:var(--f-title);font-weight:700;font-size:34px;letter-spacing:-.01em}
+.card .sub{font-family:var(--f-body);font-weight:700;font-size:23px;color:var(--ink2)}
+.chip{position:absolute;display:inline-flex;align-items:center;gap:12px;white-space:nowrap;font-family:var(--f-body);font-weight:800;font-size:28px;line-height:1;padding:15px 26px;border-radius:999px;background:var(--ink);color:#fff;box-shadow:0 16px 30px -16px rgba(33,29,43,.6)}
+.chip.light{background:#fff;color:var(--ink);border:2px solid rgba(33,29,43,.12)}
+.chip.good{background:var(--good)}
+.chip.accent{background:var(--accent)}
+.chip.primary{background:var(--primary)}
+.dot{width:14px;height:14px;border-radius:50%;display:inline-block}
+.ic{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;flex-shrink:0;color:#fff}
+.ic svg{width:26px;height:26px}
+.row{position:absolute;left:24px;right:24px;height:84px;border-radius:18px;background:#f6f3fb;display:flex;align-items:center;gap:16px;padding:0 18px;font-family:var(--f-body);font-weight:800;font-size:26px}
+.row small{display:block;font-weight:700;font-size:20px;color:var(--ink2);margin-top:2px}
+.tag{margin-left:auto;padding:8px 14px;border-radius:999px;font-family:var(--f-body);font-weight:800;font-size:16px;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+.bot{position:absolute;left:0;top:0}
+.bot img{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:contain;object-position:50% 100%}
+.bot .sh{position:absolute;left:18%;right:18%;bottom:-2%;height:7%;border-radius:50%;background:radial-gradient(closest-side,rgba(33,29,43,.28),transparent)}
+.note{position:absolute;left:0;top:0;font-family:var(--f-note),cursive;font-weight:700;font-size:54px;line-height:1;white-space:nowrap}
+#wipe{position:absolute;left:0;top:0;width:{{WW}}px;height:{{H}}px;visibility:hidden;z-index:50}
+#wipe .lead{position:absolute;top:0;width:90px;height:100%}
+#caps{position:absolute;left:0;top:0;z-index:40}
+.cap{position:absolute;left:0;top:0;font-family:var(--f-title);font-weight:700;font-size:62px;letter-spacing:-.02em;line-height:1;white-space:nowrap;color:#fff;background:rgba(33,29,43,.82);padding:14px 26px 18px;border-radius:22px}
+.transition{position:absolute;left:0;top:0;width:{{W}}px;height:{{H}}px;object-fit:cover;z-index:45}
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0" data-width="{{W}}" data-height="{{H}}" data-duration="{{DUR}}" data-fps="30">
+{{SCENES}}
+{{TRANSITIONS}}
+  <div id="caps"></div>
+  <div id="wipe"><div class="lead"></div></div>
+  <audio id="mix" data-start="0" data-duration="{{DUR}}" data-track-index="9" src="assets/audio/mix.wav"></audio>
+</div>
+<script>
+{{ENGINE}}
+</script>
+</body>
+</html>
