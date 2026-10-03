@@ -76,7 +76,9 @@ def mix(p, cut):
         f = int(0.35 * SR); a[-f:] *= np.linspace(1, 0, f)[:, None]
         fi = int(0.3 * SR); a[:fi] *= np.linspace(0, 1, fi)[:, None]
         _place(mus, a, 0.0)
-        b = _load(md / "bed_b.mp3")[: N - int(turn["start"] * SR)]
+        b = _load(md / "bed_b.mp3")
+        while len(b) < N - int(turn["start"] * SR): b = np.concatenate([b, b])
+        b = b[: N - int(turn["start"] * SR)]
         fo = min(len(b), int(2.2 * SR)); b[-fo:] *= np.linspace(1, 0, fo)[:, None]
         _place(mus, b, turn["start"])
     elif music:

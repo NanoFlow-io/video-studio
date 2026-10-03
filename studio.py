@@ -120,7 +120,7 @@ def cmd_build(a):
     if missing: sys.exit(f"Missing poses: {', '.join(sorted(missing))}. Run `python studio.py poses {a.name}` first.")
     if not a.offline:
         require(env, "ELEVENLABS_API_KEY", "voice, sound and music")
-        print("voiceover"); vo.generate(p, env, force=a.force)
+        print("voiceover"); vo.generate(p, env, force=a.force and not a.only)   # --only targets sounds/music, not the voice
         print("sound and music"); audio.generate(p, env, force=set(filter(None, a.only.split(","))) if a.force else ())
     for c in cuts(a):
         vo.assemble(p, c); beats.build(p, c); mix.mix(p, c); cutmod.build(p, c)
