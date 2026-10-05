@@ -1,0 +1,480 @@
+{
+ "name": "NanoFlow Reel",
+ "style": "entertainment",
+ "_note": "Brand Kit reel template (Hook A, Named Pain Moment). Vertical cut only. Every file in media/ is a labelled PLACEHOLDER: replace each with a real capture from the NanoFlow demo tenant (no real customer data) before rendering for use.",
+ "brand": {
+  "logo": "brand/logo-full.webp",
+  "mark": "brand/mark.png"
+ },
+ "mascot": {
+  "reference": "mascot/reference.png",
+  "description": "a glossy 3D cartoon robot mascot with a purple domed helmet and an orange-tipped antenna, a black face visor with glowing curved happy eyes, round orange ear pieces, a white body with a magenta-to-orange chest stripe, purple hands and orange feet"
+ },
+ "poses": {
+  "wave": "waving hello with one hand raised, mid-step, cheerful",
+  "phone": "proudly holding up a modern smartphone in both hands, screen facing the viewer showing a simple play-button video thumbnail, excited; no words on the screen",
+  "clipboard": "holding a clipboard with three big green check marks on it, pointing at the top item with the other hand, confident; no writing on the clipboard",
+  "relax": "relaxed and content, leaning back with one hand behind its head and holding a white coffee mug in the other, legs casually crossed while standing",
+  "ladder": "standing on a small grey stepladder holding a wrench in one hand, turning in surprise toward a smartphone it holds out in the other hand, eyes shaped as wide surprised circles; full body including the ladder",
+  "tired": "exhausted, sitting slumped on a small stool, shoulders down, head drooping, holding an open laptop on its knees, eyes as tired flat half-closed lines; nothing on the laptop screen",
+  "headset": "wearing a slim black call-centre headset with a small microphone, one hand touching the earpiece, the other giving a thumbs up, friendly and attentive",
+  "mail": "cheerfully sorting mail, holding a neat stack of white envelopes in one arm and tossing one envelope with the other hand; no writing on the envelopes",
+  "star": "proudly holding a big glossy golden five-point star above its head with both hands, joyful",
+  "point": "standing side-on, pointing confidently to the right with one arm fully extended, as if presenting something, other hand on hip",
+  "chat": "holding up a big white rounded chat speech bubble with three dots in it, friendly, slightly tilted head",
+  "jump": "jumping happily mid-air with both arms raised in celebration, legs tucked"
+ },
+ "pose_aspect": 0.7466,
+ "palette": {
+  "primary": "#6d28d9",
+  "primary2": "#8b5cf6",
+  "secondary": "#d92677",
+  "accent": "#f08a24",
+  "ink": "#211d2b",
+  "ink2": "#5b5468",
+  "paper": "#fcfbf8",
+  "good": "#16a34a",
+  "bad": "#e5484d",
+  "grad": "linear-gradient(100deg,#7c3aed,#d92677 55%,#f08a24)"
+ },
+ "fonts": {
+  "title": "DM Sans",
+  "body": "Nunito",
+  "note": "Caveat"
+ },
+ "backgrounds": {
+  "peach": "#fde8d4",
+  "violet": "linear-gradient(160deg,#8b5cf6,#5b21b6)",
+  "night": "radial-gradient(1200px 900px at 30% 70%,#2c2147,#1b1526 70%)",
+  "paper": "#fcfbf8",
+  "lilac": "#ece6ff",
+  "mint": "#dcf5e8",
+  "sun": "#fff0c2",
+  "sky": "#dcecff",
+  "pink": "#ffe1ef",
+  "deep": "linear-gradient(150deg,#2a1a5e,#6d28d9)",
+  "end": "radial-gradient(1400px 900px at 50% 40%,#ffffff,#f3eefc)"
+ },
+ "solids": {
+  "peach": "#fde8d4",
+  "violet": "#7c4ae6",
+  "night": "#1b1526",
+  "paper": "#fcfbf8",
+  "lilac": "#ece6ff",
+  "mint": "#dcf5e8",
+  "sun": "#fff0c2",
+  "sky": "#dcecff",
+  "pink": "#ffe1ef",
+  "deep": "#3b1d86",
+  "end": "#f7f3fd"
+ },
+ "voice": {
+  "voice_id": "iP95p4xoKVk53GoZ742B",
+  "voice_name": "Chris (ElevenLabs premade)",
+  "model": "eleven_multilingual_v2",
+  "settings": {
+   "stability": 0.45,
+   "similarity_boost": 0.8,
+   "style": 0.25,
+   "use_speaker_boost": true,
+   "speed": 1.0
+  },
+  "lead_in": 0.5,
+  "tail": 2.6
+ },
+ "audio": {
+  "sfx_bus_db": 4.0,
+  "music_db": -26,
+  "duck_db": -9,
+  "peak_align": [
+   "whoosh_a",
+   "whoosh_b",
+   "whoosh_big",
+   "impact_slam",
+   "snap_click",
+   "tap",
+   "mail_pile",
+   "sms_send"
+  ]
+ },
+ "music": {
+  "bed_a": {
+   "prompt": "Instrumental only, no vocals. Light tech-commercial underscore, 108 bpm, plucky marimba and muted synth bass, starts bouncy for four seconds then becomes slightly hurried and tense with a ticking hi-hat and minor colour, sparse so a voiceover sits on top, ends on an unresolved suspended note.",
+   "ms": 20000
+  },
+  "bed_b": {
+   "prompt": "Instrumental only, no vocals. Bright upbeat friendly product launch music, 112 bpm, warm major key, claps, plucky synths, light piano, punchy kick, optimistic and confident, steady energy that stays under a voiceover, builds gently, ends on a clean resolved final chord with a short tail.",
+   "ms": 66000
+  }
+ },
+ "sfx": {
+  "phone_ring": {
+   "prompt": "modern smartphone ringtone, two short bright rings, clean, no music",
+   "seconds": 1.6
+  },
+  "missed_tone": {
+   "prompt": "short sad descending three note cartoon boop, soft, a missed opportunity",
+   "seconds": 0.9
+  },
+  "whoosh_a": {
+   "prompt": "fast clean air whoosh transition, short",
+   "seconds": 0.5
+  },
+  "whoosh_b": {
+   "prompt": "quick swish whoosh, bright, short",
+   "seconds": 0.5
+  },
+  "whoosh_big": {
+   "prompt": "big cinematic whoosh sweep with a soft riser, short",
+   "seconds": 1.0
+  },
+  "pop": {
+   "prompt": "bubbly cartoon pop, short",
+   "seconds": 0.3
+  },
+  "ding": {
+   "prompt": "single soft phone notification ding",
+   "seconds": 0.5
+  },
+  "mail_pile": {
+   "prompt": "pile of paper envelopes sliding and flopping onto a desk, papery",
+   "seconds": 1.0
+  },
+  "clock_tick": {
+   "prompt": "wall clock ticking slowly at night, four ticks, quiet room",
+   "seconds": 2.0
+  },
+  "crickets": {
+   "prompt": "soft night crickets ambience, gentle, distant",
+   "seconds": 2.5
+  },
+  "sad_blip": {
+   "prompt": "short sad descending two note muted trombone blip, playful cartoon",
+   "seconds": 1.0
+  },
+  "light_off": {
+   "prompt": "small desk lamp switch click off, quiet",
+   "seconds": 0.5
+  },
+  "warm_swell": {
+   "prompt": "warm swelling major chord with shimmering bells, a bright reveal moment",
+   "seconds": 2.4
+  },
+  "confetti": {
+   "prompt": "party popper burst with confetti falling, light",
+   "seconds": 0.9
+  },
+  "pickup": {
+   "prompt": "phone call connecting, soft click then a friendly two tone chirp",
+   "seconds": 0.6
+  },
+  "typing": {
+   "prompt": "quick light typing on a laptop keyboard",
+   "seconds": 1.2
+  },
+  "shuffle": {
+   "prompt": "cards being shuffled and sorted quickly on a table",
+   "seconds": 0.8
+  },
+  "slide_up": {
+   "prompt": "soft UI card sliding up into place with a light thump",
+   "seconds": 0.5
+  },
+  "sms_send": {
+   "prompt": "text message sent swoosh with a light blip, modern phone",
+   "seconds": 0.6
+  },
+  "sparkle": {
+   "prompt": "magical sparkle shimmer twinkle, short",
+   "seconds": 0.9
+  },
+  "star_chime": {
+   "prompt": "bright ascending chime for five stars lighting up one after another",
+   "seconds": 1.2
+  },
+  "chat_bubble": {
+   "prompt": "soft chat message bubble pop, friendly app sound",
+   "seconds": 0.4
+  },
+  "calendar_book": {
+   "prompt": "satisfying calendar booking confirmation, soft click and bright chime",
+   "seconds": 0.8
+  },
+  "snap_click": {
+   "prompt": "satisfying plastic connector snapping and locking into place, crisp click",
+   "seconds": 0.4
+  },
+  "cable_zip": {
+   "prompt": "quick electric cable zipping across with a light hum",
+   "seconds": 0.6
+  },
+  "tap": {
+   "prompt": "crisp soft finger tap on a phone screen",
+   "seconds": 0.3
+  },
+  "check_chime": {
+   "prompt": "short positive success chime, two bright notes",
+   "seconds": 0.6
+  },
+  "impact_slam": {
+   "prompt": "punchy cartoon impact slam with a little bass thump for big text landing",
+   "seconds": 0.6
+  },
+  "boing": {
+   "prompt": "short springy cartoon boing",
+   "seconds": 0.5
+  },
+  "final_chord": {
+   "prompt": "warm uplifting bright major chord on piano and soft synth pad, resolving, gentle",
+   "seconds": 3.0
+  },
+  "tiles_build": {
+   "prompt": "quick cascade of small wooden blocks clicking into place one after another",
+   "seconds": 1.0
+  },
+  "footstep": {
+   "prompt": "single light footstep of a small toy robot on a wooden floor, rubber sole, dry, close",
+   "seconds": 0.5
+  }
+ },
+ "scenes": [
+  {
+   "id": "R01",
+   "type": "hook",
+   "pose": "ladder",
+   "line": {
+    "text": "You're up a ladder, the phone rings, and that job calls someone else. Unless this picks up.",
+    "pause": [
+     0.45,
+     0.4
+    ]
+   },
+   "data": {
+    "pill": "Missed call, 10:12 AM",
+    "media": "media/hook-frame.png",
+    "proof": "media/proof-call-answered.png",
+    "words": [
+     {
+      "text": "Ladder",
+      "at": "ladder"
+     },
+     {
+      "text": "Rings",
+      "at": "rings"
+     },
+     {
+      "text": "Someone else",
+      "at": "someone",
+      "tone": "pain"
+     },
+     {
+      "text": "Picks up",
+      "at": "picks",
+      "tone": "payoff"
+     }
+    ]
+   },
+   "cues": [
+    {
+     "name": "ring",
+     "at": "start",
+     "sfx": "el:phone_ring",
+     "gain": -10,
+     "note": "phone rings from frame 0"
+    },
+    {
+     "name": "turn",
+     "at": "this",
+     "delta": -0.05,
+     "sfx": "el:impact_slam",
+     "gain": -8,
+     "note": "real 'Call answered' card slams in"
+    },
+    {
+     "name": "handoff",
+     "at": "end",
+     "sfx": "el:whoosh_a",
+     "gain": -14,
+     "note": "frame shrinks into the b-roll panel",
+     "delta": -0.15
+    }
+   ]
+  },
+  {
+   "id": "R02",
+   "type": "broll",
+   "pose": "headset",
+   "line": {
+    "text": "It's NanoFlow. When you're busy or closed, it answers the call.",
+    "pause": [
+     0.35,
+     0.3
+    ]
+   },
+   "data": {
+    "media": "media/broll-call-answered.png",
+    "focus": [
+     0.32,
+     0.55
+    ],
+    "caption": "Answers the call",
+    "side": "right"
+   },
+   "cues": [
+    {
+     "name": "zoom",
+     "at": "answers",
+     "sfx": null,
+     "note": "zoom lands on the answered card"
+    }
+   ]
+  },
+  {
+   "id": "R03",
+   "type": "broll",
+   "pose": "clipboard",
+   "line": {
+    "text": "You get a transcript of what the caller needed.",
+    "pause": [
+     0.3,
+     0.25
+    ]
+   },
+   "data": {
+    "media": "media/broll-transcript.png",
+    "focus": [
+     0.68,
+     0.55
+    ],
+    "caption": "A transcript"
+   },
+   "cues": [
+    {
+     "name": "zoom",
+     "at": "needed",
+     "sfx": null
+    }
+   ]
+  },
+  {
+   "id": "R04",
+   "type": "broll",
+   "pose": "point",
+   "line": {
+    "text": "And the next step, so you know who to call back first.",
+    "pause": [
+     0.3,
+     0.25
+    ]
+   },
+   "data": {
+    "media": "media/broll-next-step.png",
+    "focus": [
+     0.32,
+     0.6
+    ],
+    "caption": "The next step"
+   },
+   "cues": [
+    {
+     "name": "zoom",
+     "at": "next",
+     "sfx": null
+    }
+   ]
+  },
+  {
+   "id": "R05",
+   "type": "broll",
+   "pose": "phone",
+   "line": {
+    "text": "Review replies and posts wait in your overview. One tap approves them.",
+    "pause": [
+     0.4,
+     0.35
+    ]
+   },
+   "data": {
+    "media": "media/broll-approve.png",
+    "focus": [
+     0.68,
+     0.6
+    ],
+    "caption": "One tap approves"
+   },
+   "cues": [
+    {
+     "name": "zoom",
+     "at": "tap",
+     "sfx": null
+    },
+    {
+     "name": "tap",
+     "at": "approves",
+     "sfx": "el:tap",
+     "gain": -8,
+     "note": "the approve tap"
+    }
+   ]
+  },
+  {
+   "id": "R06",
+   "type": "end_card",
+   "pose": "wave",
+   "bg": "end",
+   "line": {
+    "text": "NanoFlow. Join the beta at nanoflow dot io.",
+    "pause": [
+     0.0,
+     0.0
+    ]
+   },
+   "captions": false,
+   "data": {
+    "tagline": "Picks up when | you can't",
+    "button": "Join the beta",
+    "url": "nanoflow.io",
+    "note": "the AI assistant for service businesses"
+   },
+   "cues": [
+    {
+     "name": "wipe",
+     "at": "start",
+     "sfx": "el:whoosh_a",
+     "gain": -12,
+     "note": "paper end card"
+    },
+    {
+     "name": "logo",
+     "at": "NanoFlow",
+     "sfx": "el:confetti",
+     "gain": -5,
+     "note": "logo lands, confetti"
+    },
+    {
+     "name": "button",
+     "at": "Join",
+     "sfx": "el:pop",
+     "gain": -8,
+     "note": "'Join the beta' button"
+    },
+    {
+     "name": "url",
+     "at": "nanoflow",
+     "sfx": "el:typing",
+     "gain": -5,
+     "note": "nanoflow.io types out",
+     "occ": 1
+    },
+    {
+     "name": "chord",
+     "at": "io",
+     "delta": 0.45,
+     "sfx": "el:final_chord",
+     "gain": -8,
+     "note": "glow, hold"
+    }
+   ]
+  }
+ ]
+}
