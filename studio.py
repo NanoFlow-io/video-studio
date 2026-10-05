@@ -10,9 +10,10 @@
   python studio.py build <name>               voiceover, sound, music, beats, mix, pages (both cuts)
   python studio.py render <name>              render MP4s (after build)
   python studio.py all <name>                 build + checks + render + checks
-Common flags: --cut landscape|vertical|both, --force (rebuy generated media), --only a,b
+Common flags: --cut landscape|vertical|both, --force (rebuy generated media), --only a,b,
+  --offline (no API calls), --dry-timings (silent layout preview with synthetic timings, no API calls)
 """
-import argparse, getpass, json, shutil, subprocess, sys
+import argparse, getpass, json, os, shutil, subprocess, sys
 from pathlib import Path
 
 if sys.version_info < (3, 9):
@@ -20,8 +21,17 @@ if sys.version_info < (3, 9):
 from studio.common import ROOT, Project, load_env, write_env, require  # noqa: E402
 
 
-def cuts(a):
-    return ["landscape", "vertical"] if a.cut == "both" else [a.cut]
+def cuts(a, p=None):
+    want = ["landscape", "vertical"] if a.cut == "both" else [a.cut]
+    if p is not None and p.vertical_only and "landscape" in want:
+        print(f"  landscape: skipped ({p.name} is entertainment style, which has the vertical cut only)")
+        want = [c for c in want if c != "landscape"]
+    return want
+
+
+def dry(a):
+    """--dry-timings (or STUDIO_DRY_TIMINGS=1): synthetic word times and silent audio, for layout previews only."""
+    return bool(getattr(a, "dry_timings", False) or os.environ.get("STUDIO_DRY_TIMINGS", "") not in ("", "0"))
 
 
 def cmd_setup(a):
@@ -115,28 +125,35 @@ def cmd_transitions(a):
 
 def cmd_build(a):
     from studio import vo, audio, beats, mix, cuts as cutmod
-    p, env = Project(a.name), load_env()
+    p, env, dr = Project(a.name), load_env(), dry(a)
     missing = [n for n in {s["pose"] for s in p.data["scenes"]} if not (p.dir / "poses" / f"{n}.webp").exists()]
     if missing: sys.exit(f"Missing poses: {', '.join(sorted(missing))}. Run `python studio.py poses {a.name}` first.")
-    if not a.offline:
+    problems = beats.validate(p)   # before anything is bought
+    if problems: sys.exit("project.json problems:\n  " + "\n  ".join(problems))
+    if dr:
+        print("DRY TIMINGS: synthetic word times (%.1f words/s) and silent audio, no API calls. Layout preview only." % vo.DRY_WPS)
+    elif not a.offline:
         require(env, "ELEVENLABS_API_KEY", "voice, sound and music")
         print("voiceover"); vo.generate(p, env, force=a.force and not a.only)   # --only targets sounds/music, not the voice
         print("sound and music"); audio.generate(p, env, force=set(filter(None, a.only.split(","))) if a.force else ())
-    for c in cuts(a):
-        vo.assemble(p, c); beats.build(p, c); mix.mix(p, c); cutmod.build(p, c)
+    for c in cuts(a, p):
+        vo.assemble(p, c, dry=dr); beats.build(p, c); mix.mix(p, c, dry=dr); cutmod.build(p, c)
 
 
 def cmd_render(a):
     from studio import render, verify
     p = Project(a.name)
-    for c in cuts(a):
+    for c in cuts(a, p):
+        bj = p.build / f"beats-{c}.json"
+        if bj.exists() and json.loads(bj.read_text(encoding="utf-8")).get("dry"):
+            print(f"  {c}: built with --dry-timings (synthetic timings, silent). This render is a layout preview, not a deliverable.")
         verify.page(p, c); render.render(p, c, a.quality); verify.video(p, c)
 
 
 def cmd_verify(a):
     from studio import verify
     p = Project(a.name)
-    for c in cuts(a):
+    for c in cuts(a, p):
         verify.page(p, c)
         if p.render_path(c).exists(): verify.video(p, c, [x for x in a.cues.split(",") if x])
 
@@ -158,6 +175,8 @@ def main():
         s.add_argument("--only", default="", help="comma list of pose / transition / sound names")
         s.add_argument("--cutout", action="store_true", help="poses: always run local background removal")
         s.add_argument("--offline", action="store_true", help="build: reuse generated media only, no API calls")
+        s.add_argument("--dry-timings", action="store_true", help="build: fake word timings (2.6 words/s) and silent audio, "
+                       "no API calls; layout preview only (also STUDIO_DRY_TIMINGS=1)")
         s.add_argument("--quality", default="looks", help="render quality: draft, looks, delivery")
         s.add_argument("--cues", default="", help="verify: cue ids to sync-check, e.g. S02.missed,S14.l1")
     a = ap.parse_args()

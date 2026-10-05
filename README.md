@@ -20,16 +20,17 @@ The repo includes the NanoFlow explainer as a complete worked example in `projec
 7. [project.json reference](#projectjson-reference)
 8. [Scenes, lines and cues](#scenes-lines-and-cues)
 9. [Scene type reference](#scene-type-reference)
-10. [Mascot poses](#mascot-poses)
-11. [Transition clips](#transition-clips)
-12. [Sound and music](#sound-and-music)
-13. [Costs and caching](#costs-and-caching)
-14. [Checks](#checks)
-15. [Command reference](#command-reference)
-16. [Troubleshooting](#troubleshooting)
-17. [Swapping providers](#swapping-providers)
-18. [Repo layout](#repo-layout)
-19. [Licences](#licences)
+10. [Entertainment style (Brand Kit reel)](#entertainment-style-brand-kit-reel)
+11. [Mascot poses](#mascot-poses)
+12. [Transition clips](#transition-clips)
+13. [Sound and music](#sound-and-music)
+14. [Costs and caching](#costs-and-caching)
+15. [Checks](#checks)
+16. [Command reference](#command-reference)
+17. [Troubleshooting](#troubleshooting)
+18. [Swapping providers](#swapping-providers)
+19. [Repo layout](#repo-layout)
+20. [Licences](#licences)
 
 ## What you need
 
@@ -206,6 +207,7 @@ Every project lives in `projects/<name>/` and is described by `project.json`. Pa
 | Field | Type | Description |
 |---|---|---|
 | `name` | text | Shown in page titles. |
+| `style` | text | `explainer` (default) or `entertainment`. Entertainment projects build the vertical cut only. See [Entertainment style](#entertainment-style-brand-kit-reel). |
 | `brand.logo` | path | Full logo, used on the reveal scene and the end card. |
 | `brand.mark` | path | Square icon, used in the centre of the integrations hub. |
 | `mascot.reference` | path | The mascot image every pose is generated from. |
@@ -523,6 +525,59 @@ Cues: `logo`, `button`, `url`, `chord` (the final flourish).
 
 Every type lays itself out for both cuts. In landscape, the mascot stands on the left, the title sits top left, and the scene's panel fills the right. In vertical, the title is at the top, the panel in the middle, the caption below it and the mascot at the bottom. Long text can overflow its card: keep on-screen copy close in length to the example, and check the snapshots described in [Checks](#checks).
 
+## Entertainment style (Brand Kit reel)
+
+Besides the animated explainer, the studio makes the NanoFlow Brand Kit reel: a vertical video with a full-screen hook, then real screen captures with one line of caption underneath and the mascot standing across the join. The template is `projects/nanoflow-reel`. It sets `"style": "entertainment"`, which builds the vertical cut only: the landscape cut is skipped with a message, even with `--cut both`.
+
+The files in `projects/nanoflow-reel/media/` are labelled placeholders. Replace each one with a real capture from a demo account (no real customer names, numbers or addresses) before you render anything for use.
+
+### Layout
+
+| Area | Position | Contents |
+|---|---|---|
+| B-roll panel | top 80%, 1080x1536, full bleed | The scene's `media`, slowly zooming toward `focus` |
+| Caption panel | bottom 384 px | Cream `#f5efe4` with a 60 px violet grid. One line of caption in DM Sans 900, 96 px shrinking to fit (44 px at the least), ink, with the word being spoken lit orange |
+| Mascot | about 520 px tall, feet on the join at y 1536 | Head and arms in the b-roll, feet in the caption panel. Anchored left (x 40 to 400) or right (x 680 to 1040). The caption sits on the other side |
+
+Media files must sit in the project's `media/`, `images/` or `brand/` folder. Images (`.png`, `.jpg`, `.webp`) and `.mp4` clips both work. A clip is a timed video that plays from the start of its scene, like the transition clips, and holds its last frame if it is shorter than the scene. Clips are muted: the mix owns the sound.
+
+Reel scenes cut hard (`wipe` defaults to `false` for `hook` and `broll`; set `"wipe": true` to get the colour wipe) and hide the two-word vertical captions (the pill and caption panel replace them; set `"captions": true` to bring them back). Both types are vertical only.
+
+### hook
+
+The full-screen opener, following the Brand Kit timing grid. Frame 0 is a finished picture: the `media` full bleed (or the cream grid when there is none), already drifting slowly, the mascot large and mid-action in the scene's `pose`, and the caption pill arriving by 0.12 s. Big keywords swap in on their spoken words in the upper band. On the `turn` cue the `proof` image slams in with a small shake, on the side away from the mascot. On the hand-off the frame shrinks into the b-roll panel, the caption panel slides up underneath, the pill and keywords leave, and the mascot drops onto the join on the side the next `broll` scene uses, so the cut into the body is seamless.
+
+| Data | Description |
+|---|---|
+| `pill` | Caption pill text, six words at most. White, radius 28, DM Sans 900 62 px, centred between y 1000 and 1100 |
+| `words` | Big keywords: a list of `{text, at, tone}`. `text` is one to three words, `at` is a word from the line (matched like a cue's `at`, with optional `occ`) or a number of seconds after the scene starts. `tone` is `pain` (magenta, the palette's `secondary`), `payoff` (violet, `primary`) or left out (ink). One keyword shows at a time, DM Sans 900 up to 210 px, fitted to the width on at most two lines; each replaces the one before |
+| `media` | Optional frame-0 picture or clip |
+| `proof` | Optional image of a real capture that slams in on `turn` |
+| `focus` | Optional `[x, y]` (0 to 1) the slow drift moves toward. Default the centre |
+
+Cues: `turn` (required when there is a `proof`), `handoff` (optional; without it the hand-off starts 0.1 s before the scene ends). The hand-off takes up to 0.4 s and must finish by the end of the scene, so put `handoff` a little before the end of the line, for example `{"name": "handoff", "at": "end", "delta": -0.15}`, and give the line a pause of about 0.4 s. The keywords' times appear in the sound sheet as `kw0`, `kw1`, and so on.
+
+### broll
+
+One cut of the body.
+
+| Data | Description |
+|---|---|
+| `media` | Required. The image or clip shown in the b-roll panel |
+| `caption` | Required. One short line, about two to four words, because it shares the panel width with the mascot. Each caption word lights orange while the voice says it: words are matched to the line's words, exactly first and then by a shared start of at least four letters (`answers` lights for "answer"). Words the voice does not say stay ink |
+| `focus` | Optional `[x, y]` (0 to 1) of the thing the voice names. The zoom (to 1.18x) moves it toward the middle without showing an edge. Frame it on the side away from the mascot. Default the centre |
+| `side` | Optional `left` or `right` for the mascot. Without it, sides alternate from the previous `broll` scene, starting on the left |
+
+Cues: `zoom` (optional). With it the zoom lands on that word; without it the zoom runs slowly across the whole scene. On every cut the mascot pops in slightly in the scene's `pose`; use a different pose from the scene before.
+
+### end_card
+
+The same end card as the explainer. See [end_card](#end_card).
+
+### Checks before anything is bought
+
+`build` checks these before it makes any API call, and stops with a list: a `hook` or `broll` media or proof file that does not exist (or is not an image or `.mp4`, or is outside `media/`, `images/` or `brand/`), a missing required cue (`turn` on a hook with a proof), a `side` other than `left` or `right`, a `focus` outside 0 to 1, a missing `pill` or `caption`, a pill longer than six words, a keyword longer than three words, an unknown `tone`, and a reel scene with `line.vertical` set to `false`.
+
 ## Mascot poses
 
 Each entry in `poses` describes one pose:
@@ -666,6 +721,16 @@ cd projects/acme/build/out/acme-16x9
 node ../../../../../node_modules/hyperframes/bin/hyperframes.mjs snapshot . --at 2.5,10,30 --no-end
 ```
 
+### Layout previews before the voice exists
+
+`--dry-timings` builds the pages without any voiceover, so you can check a layout before buying anything:
+
+```bash
+python studio.py build acme --dry-timings          # or set STUDIO_DRY_TIMINGS=1
+```
+
+It makes no API calls and reads no generated media. Every line gets fake word times at an even 2.6 words a second, the voice and the mix are silence, and the pages, timing files and sound sheet are built from those. Use it with the snapshot command above, or render it with `python studio.py render acme` (the render says it is a dry build). It is a layout preview only: real voices are faster or slower than 2.6 words a second and never evenly spaced, so cue times, scene lengths and lit words move once the real voice is in. Run a normal `build` before rendering anything for use.
+
 ## Command reference
 
 | Command | What it does |
@@ -690,6 +755,7 @@ Options:
 | `--only a,b` | poses, transitions, build, all | Limit generation to these pose, clip or sound names |
 | `--cutout` | poses | Always run local background removal |
 | `--offline` | build, all | Use cached media only and make no API calls |
+| `--dry-timings` | build, all | Fake word timings (2.6 words a second) and silent audio, no API calls. Layout previews only. See [Checks](#checks) |
 | `--quality draft`, `--quality looks`, `--quality delivery` | render, all | Encoding quality. Default looks. |
 
 ## Troubleshooting
@@ -756,8 +822,12 @@ assets/
   sfx-kit/                 Kenney interface sounds, with licence
 projects/
   nanoflow/
-    project.json           the example video
+    project.json           the example explainer
     mascot/ poses/ brand/ images/
+  nanoflow-reel/
+    project.json           the Brand Kit reel template (entertainment style, vertical only)
+    media/                 placeholder b-roll, hook and proof images (replace with real captures)
+    mascot/ poses/ brand/
     generated/             purchased media cache (git-ignored)
     build/                 build output and renders (git-ignored)
 package.json               pinned HyperFrames and GSAP
@@ -772,4 +842,4 @@ requirements.txt           Python packages
 - **Interface sounds** in `assets/sfx-kit/` are CC0 (public domain), from [Kenney](https://kenney.nl/assets/interface-sounds).
 - **HyperFrames** (Apache 2.0) and **GSAP** (GreenSock Standard "no charge" licence) are installed by `npm install` under their own licences and are not part of this repository.
 - **Generated media**, meaning the voice, sound effects, music, poses and clips you create, is governed by the terms of the provider that generated it.
-- **NanoFlow example assets.** The NanoFlow name, logo, mascot artwork and photographs in `projects/nanoflow/` belong to NanoFlow. They are included as an example only and are not covered by the MIT licence. Please do not use them in your own videos.
+- **NanoFlow example assets.** The NanoFlow name, logo, mascot artwork and photographs in `projects/nanoflow/` and `projects/nanoflow-reel/` belong to NanoFlow. They are included as an example only and are not covered by the MIT licence. Please do not use them in your own videos.

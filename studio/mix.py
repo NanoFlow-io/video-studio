@@ -39,10 +39,14 @@ def _write(path, x):
                    input=(np.clip(x, -1, 1) * 32767).astype("<i2").tobytes(), check=True)
 
 
-def mix(p, cut):
+def mix(p, cut, dry=False):
     A = p.data.get("audio", {})
     B = json.loads((p.build / f"beats-{cut}.json").read_text(encoding="utf-8"))
     N = int(B["duration"] * SR)
+    if dry:   # --dry-timings: a silent track of the right length; no generated sound or music is read
+        _write(p.build / f"mix-{cut}.wav", np.zeros((N, 2), np.float32))
+        print(f"  mix {cut}: DRY {N / SR:.2f} s of silence (layout preview only)")
+        return
     vo = np.zeros((N, 2), np.float32); _place(vo, _load(p.build / f"vo-{cut}.wav"), 0.0)
 
     sfx = np.zeros((N, 2), np.float32); cache = {}; peak_names = set(A.get("peak_align", []))

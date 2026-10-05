@@ -60,6 +60,11 @@ class Project:
         for d in (self.gen, self.build):
             d.mkdir(exist_ok=True)
 
+    @property
+    def vertical_only(self):
+        """Entertainment-style projects (the Brand Kit reel) have only the 9:16 cut."""
+        return self.data.get("style") == "entertainment"
+
     def path(self, rel):
         return self.dir / rel
 

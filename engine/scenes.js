@@ -438,21 +438,128 @@ TYPES.end_card = function(sc, s, d, C){
   tl.to(btn, { scale: 1.05, duration: 0.3, yoyo: true, repeat: 1, ease: "sine.inOut" }, C("chord"));
 };
 
+/* ===================== ENTERTAINMENT STYLE (Brand Kit reel, vertical only) =====================
+   Layout: b-roll panel = top 1080x1536 (full bleed media, slow zoom to data.focus); caption panel = bottom
+   1080x384 (cream, 60 px violet grid, one line, spoken word lit); Nano ~520 px tall standing on the seam at
+   y 1536, anchored left (x 40-400) or right (x 680-1040), caption on the side away from him. */
+var REEL = { seam: 1536, capH: 384, botH: 520, botBy: 1646, anchor: { left: 220, right: 860 },
+  capX: { left: [430, 1040], right: [40, 650] }, lit: COL.accent || "#f08a24", zoom: 1.18 };
+var H_FULL = 1920, NOWIPE = { hook: 1, broll: 1 }, NOCAPS = { hook: 1, broll: 1 }, SIDE = {};
+var FITS = [];   /* text fitted to a width; re-fitted once the web fonts have loaded */
+function doFit(f){ var el = f.el;
+  for(var sz = f.big; sz >= f.small; sz -= 2){ el.style.fontSize = sz + "px";
+    if(el.scrollWidth <= f.w + 1 && el.offsetHeight <= sz * f.lh * f.lines + 4) return; } }
+function fitText(el, w, big, small, lines, lh){ var f = { el: el, w: w, big: big, small: small, lines: lines || 1, lh: lh || 1 }; FITS.push(f); doFit(f); return el; }
+if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ FITS.forEach(doFit); });
+function nrm(w){ return String(w).toLowerCase().replace(/[^a-z0-9']/g, ""); }
+function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
+
+/* the static media slot cuts.py writes into the section (an .mp4 is a timed <video> already inside it) */
+function mediaSlot(sc, s, d, h){
+  var slot = $("slot-" + s.id) || mk(sc, "div", "mslot", '<div class="mzoom"></div>');
+  slot.style.height = h + "px";
+  var z = slot.firstChild;
+  if(d.media && !/\.mp4$/i.test(d.media)) mk(z, "img", null).src = ASSET + d.media;
+  if(!d.media) z.className += " cream";
+  return slot; }
+/* slow zoom of the media layer toward focus [x, y] (0..1 of the panel), never showing an edge */
+function zoomTo(z, focus, ph, t0, t1, k, ease){
+  var vw = W / k, vh = ph / k, left = clamp(focus[0] * W - vw / 2, 0, W - vw), top = clamp(focus[1] * ph - vh / 2, 0, ph - vh);
+  gsap.set(z, { transformOrigin: "0 0" });
+  tl.fromTo(z, { scale: 1, x: 0, y: 0 }, { scale: k, x: -left * k, y: -top * k, duration: Math.max(0.3, t1 - t0), ease: ease }, t0); }
+function capPanel(sc){ var c = mk(sc, "div", "rpanel cream"); gsap.set(c, { x: 0, y: REEL.seam }); return c; }
+function idle(r, t0, t1){ var img = r.querySelector("img"), n = Math.max(1, Math.floor((t1 - t0) / 1.1));
+  tl.to(img, { y: -10, duration: 0.55, ease: "sine.inOut", yoyo: true, repeat: n * 2 - 1 }, t0); }
+/* one line of caption; each caption word lights orange while the voice says it (word timings from the beats) */
+function litCaption(sc, s, text, side){
+  var x = REEL.capX[side], el = mk(sc, "div", "rcap", String(text).split(/\s+/).map(function(w){ return "<span>" + esc(w) + "</span>"; }).join(" "));
+  fitText(el, x[1] - x[0], 96, 44, 1, 1);
+  at(el, (x[0] + x[1]) / 2, REEL.seam + REEL.capH / 2);
+  var spoken = B.words.filter(function(w){ return w.scene === s.id; }), used = {};
+  function find(cw, loose){ for(var j = 0; j < spoken.length; j++){ if(used[j]) continue; var sw = nrm(spoken[j].w);
+    if(sw === cw || (loose && Math.min(sw.length, cw.length) >= 4 && (sw.indexOf(cw) === 0 || cw.indexOf(sw) === 0))) return j; } return -1; }
+  [].forEach.call(el.children, function(sp){ var cw = nrm(sp.textContent); if(!cw) return;
+    var j = find(cw, false); if(j < 0) j = find(cw, true); if(j < 0) return; used[j] = 1;
+    var w = spoken[j], nx = spoken[j + 1], t1 = Math.min(nx ? nx.s : w.e + 0.25, s.end);
+    tl.set(sp, { color: REEL.lit }, w.s); tl.set(sp, { color: COL.ink }, Math.max(t1, w.s + 0.05)); });
+  return el; }
+
+/* data: media, focus?, caption, side?   cues: zoom (optional, when the zoom lands) */
+TYPES.broll = function(sc, s, d, C){
+  if(!V) throw new Error("broll (" + s.id + ") is vertical only");
+  var side = SIDE[s.id], slot = mediaSlot(sc, s, d, REEL.seam);
+  var land = C.has("zoom") ? C("zoom") : s.end;
+  zoomTo(slot.firstChild, d.focus || [0.5, 0.5], REEL.seam, s.start, land, REEL.zoom, C.has("zoom") ? "power2.inOut" : "sine.inOut");
+  capPanel(sc);
+  litCaption(sc, s, d.caption || "", side);
+  var r = bot(sc, s.pose, { cx: REEL.anchor[side], by: REEL.botBy, h: REEL.botH });
+  gsap.set(r, { transformOrigin: "50% 100%" });
+  tl.fromTo(r, { scale: 0.84 }, { scale: 1, duration: 0.24, ease: "back.out(2.6)" }, s.start);   /* hard cut, small pop-in */
+  idle(r, s.start + 0.3, s.end);
+};
+
+/* data: pill, words [{text, at, tone}], media?, proof?, focus?   cues: turn (proof slams in), handoff (optional) */
+TYPES.hook = function(sc, s, d, C){
+  if(!V) throw new Error("hook (" + s.id + ") is vertical only");
+  var side = (s.next && SIDE[s.next]) || (d.side === "left" ? "left" : "right");
+  var H = Math.min(C.has("handoff") ? C("handoff") : s.end - 0.1, s.end - 0.1), dur = clamp(s.end - H, 0.1, 0.4);
+  /* frame 0 is a finished picture: media (or the cream grid) full bleed, already drifting */
+  var slot = mediaSlot(sc, s, d, H_FULL);
+  if(d.media) zoomTo(slot.firstChild, d.focus || [0.5, 0.5], H_FULL, s.start, H, 1.08, "none");
+  tl.to(slot, { height: REEL.seam, duration: dur, ease: "power3.inOut" }, H);
+  if(d.proof){
+    var pr = mk(slot, "div", "rproof", '<img src="' + ASSET + d.proof + '" alt="">', "left:" + (side === "right" ? 390 : 690) + "px;top:71%");
+    gsap.set(pr, { xPercent: -50, yPercent: -50 });
+    slam(pr, C("turn"), 1.7); shake(pr, C("turn") + 0.08, 12); }
+  var cp = capPanel(sc); gsap.set(cp, { y: H_FULL });
+  tl.to(cp, { y: REEL.seam, duration: dur, ease: "power3.inOut" }, H);
+  /* Nano mid-action, large and low on the next cut's side, then lands across the seam */
+  var bh = 760, bw = bh * (P.pose_aspect || 0.7466), cx = clamp(REEL.anchor[side], bw / 2 - 40, W - bw / 2 + 40);
+  var r = bot(sc, s.pose, { cx: cx, by: 1880, h: bh });
+  idle(r, s.start, H);
+  tl.fromTo(r, { rotation: -2 }, { rotation: 2, duration: 0.5, ease: "sine.inOut", yoyo: true, repeat: Math.max(0, Math.floor((H - s.start) / 0.5) - 1) }, s.start);
+  var sw = REEL.botH * (P.pose_aspect || 0.7466);
+  tl.to(r, { width: sw, height: REEL.botH, x: REEL.anchor[side] - sw / 2, y: REEL.botBy - REEL.botH, rotation: 0, duration: dur, ease: "power3.inOut" }, H);
+  /* big keywords, upper band, one at a time (each up to 3 words), swapped at their spoken word */
+  var tone = { pain: COL.secondary, payoff: COL.primary };
+  var words = d.words || [];
+  words.forEach(function(w, i){
+    var el = mk(sc, "div", "rkw", esc(w.text), "color:" + (tone[w.tone] || COL.ink));
+    fitText(el, 1000, 210, 100, 2, 0.92); at(el, 540, 470); gsap.set(el, { autoAlpha: 0 });
+    var t0 = C("kw" + i), t1 = i + 1 < words.length ? C("kw" + (i + 1)) : H - 0.1;
+    tl.fromTo(el, { autoAlpha: 1, scale: 1.14 }, { scale: 1, duration: 0.12, ease: "power2.out" }, t0);
+    if(i + 1 < words.length) tl.set(el, { autoAlpha: 0 }, Math.max(t1, t0 + 0.05));
+    else tl.to(el, { autoAlpha: 0, duration: 0.15 }, Math.max(t1, t0 + 0.1)); });
+  /* caption pill: in by 0.12 s, out across the hand-off */
+  var pill = mk(sc, "div", "rpill", esc(d.pill || ""));
+  fitText(pill, 1000, 62, 40, 1, 1); at(pill, 540, 1050);
+  tl.fromTo(pill, { autoAlpha: 0, scale: 0.85 }, { autoAlpha: 1, scale: 1, duration: 0.12, ease: "back.out(2)" }, s.start);
+  tl.to(pill, { autoAlpha: 0, duration: 0.15 }, H - 0.1);
+};
+
 /* ============================ BUILD ============================ */
 var defs = {}; P.scenes.forEach(function(s){ defs[s.id] = s; });
+(function(){ var prev = null;   /* broll sides: data.side, else alternate from the previous broll (start left) */
+  B.scenes.forEach(function(s){ var def = defs[s.id]; if(!def || def.type !== "broll") return;
+    var sd = def.data && def.data.side;
+    if(sd !== "left" && sd !== "right") sd = prev === "left" ? "right" : "left";
+    SIDE[s.id] = sd; prev = sd; }); })();
 B.scenes.forEach(function(s, k){
   var def = defs[s.id], sc = $(s.id);
   if(!def || !sc) throw new Error("scene " + s.id + " missing from project or page");
   if(!TYPES[def.type]) throw new Error("unknown scene type " + def.type + " in " + s.id);
-  var S = { id: s.id, start: s.start, end: s.end, pose: def.pose, bg: def.bg, seed: 11 + k * 10 };
+  var S = { id: s.id, start: s.start, end: s.end, pose: def.pose, bg: def.bg, seed: 11 + k * 10, next: B.scenes[k + 1] && B.scenes[k + 1].id };
   var C = function(name){ var id = s.id + "." + name; if(!(id in CUE)) throw new Error("missing cue " + id + " (type " + def.type + ")"); return CUE[id]; };
+  C.has = function(name){ return (s.id + "." + name) in CUE; };
   TYPES[def.type](sc, S, def.data || {}, C);
-  if(k > 0 && def.wipe !== false) wipe(s.start, (P.solids && P.solids[def.bg]) || "#ffffff", k % 2 ? COL.accent : COL.primary);
+  var wp = def.wipe != null ? def.wipe !== false : !NOWIPE[def.type];   /* reel scenes hard-cut unless wipe: true */
+  if(k > 0 && wp) wipe(s.start, (P.solids && P.solids[def.bg]) || "#ffffff", k % 2 ? COL.accent : COL.primary);
 });
 
-/* vertical captions, two words at a time; scenes with "captions": false are skipped */
+/* vertical captions, two words at a time; scenes with "captions": false are skipped, and so are the
+   reel types (hook has its pill, broll its caption panel) unless they set "captions": true */
 if(V && L.cap){
-  var skip = {}; P.scenes.forEach(function(s){ if(s.captions === false) skip[s.id] = 1; });
+  var skip = {}; P.scenes.forEach(function(s){ if(s.captions === false || (NOCAPS[s.type] && s.captions !== true)) skip[s.id] = 1; });
   var caps = $("caps"), words = B.words.filter(function(w){ return !skip[w.scene]; }), groups = [];
   for(var i = 0; i < words.length; ){ var g = [words[i]];
     if(i + 1 < words.length && words[i + 1].scene === words[i].scene && !/[.,]$/.test(words[i].w)) g.push(words[i + 1]);
