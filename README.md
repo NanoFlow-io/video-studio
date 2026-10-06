@@ -185,6 +185,7 @@ project.json + mascot image
    |-- voiceover .......... ElevenLabs, one request per line, returns audio plus the time of every character
    |-- assemble ........... lines joined with set pauses, separately for each cut (the vertical cut skips some lines)
    |-- beats .............. every cue resolved to a time: "the word 'missed' in scene S02" becomes 3.27 s
+   |-- media fit .......... reel clips checked against their scene windows (long enough, continuing, not repeated)
    |-- sound and music .... ElevenLabs sound effects and two music beds, generated once and cached
    |-- mix ................ voice + music (ducked under the voice) + every sound effect at its cue
    |-- pages .............. one self-contained HTML page per cut, animated with GSAP on a paused timeline
@@ -550,7 +551,7 @@ The files in `projects/nanoflow-reel/media/` are labelled placeholders. Replace 
 | Caption panel | bottom 384 px | Plain off-white (the palette's `paper`), with the logo (`brand.logo`) 260 px wide in the bottom-right corner, clear of the mascot and of the caption text the apps lay over the bottom left. One line of caption in DM Sans 900, 96 px shrinking to fit (44 px at the least), ink, with the word being spoken lit orange |
 | Mascot | about 520 px tall, feet on the join at y 1536 | Head and arms in the b-roll, feet in the caption panel. Anchored left (x 40 to 400) or right (x 680 to 1040). The caption sits on the other side |
 
-Media files must sit in the project's `media/`, `images/` or `brand/` folder. Images (`.png`, `.jpg`, `.webp`) and `.mp4` clips both work. A clip is a timed video that plays from the start of its scene, like the transition clips, and holds its last frame if it is shorter than the scene. Clips are muted: the mix owns the sound.
+Media files must sit in the project's `media/`, `images/` or `brand/` folder. Images (`.png`, `.jpg`, `.webp`) and `.mp4` clips both work. A clip is a timed video that plays from the start of its scene, like the transition clips, starting `media_in` seconds into the file (default 0). A clip must cover its whole scene from that point: when it is shorter, the build stops and says by how much (see [Footage fit and continuity](#footage-fit-and-continuity)). Clips are muted: the mix owns the sound.
 
 Reel scenes cut hard (`wipe` defaults to `false` for `hook` and `broll`; set `"wipe": true` to get the colour wipe) and hide the two-word vertical captions (the pill and caption panel replace them; set `"captions": true` to bring them back). Both types are vertical only.
 
@@ -563,6 +564,8 @@ The full-screen opener, following the Brand Kit timing grid. Frame 0 is a finish
 | `pill` | Caption pill text, six words at most. White, radius 28, DM Sans 900 62 px, centred between y 1000 and 1100 |
 | `words` | Big keywords: a list of `{text, at, tone}`. `text` is one to three words, `at` is a word from the line (matched like a cue's `at`, with optional `occ`) or a number of seconds after the scene starts. `tone` is `pain` (magenta, the palette's `secondary`), `payoff` (violet, `primary`) or left out (ink). One keyword shows at a time, DM Sans 900 up to 210 px, fitted to the width on at most two lines; each replaces the one before |
 | `media` | Optional frame-0 picture or clip |
+| `media_in` | Optional. For a clip, the second of the file to start from. Default 0 |
+| `replay` | Optional. `true` marks an intentional replay of footage already shown (see [Footage fit and continuity](#footage-fit-and-continuity)) |
 | `proof` | Optional image of a real capture that slams in on `turn` |
 | `focus` | Optional `[x, y]` (0 to 1) the slow drift moves toward. Default the centre |
 
@@ -575,6 +578,8 @@ One cut of the body.
 | Data | Description |
 |---|---|
 | `media` | Required. The image or clip shown in the b-roll panel |
+| `media_in` | Optional. For a clip, the second of the file to start from. Default 0. Use it to continue a clip from the scene before |
+| `replay` | Optional. `true` marks an intentional replay of footage already shown |
 | `caption` | Required. One short line, about two to four words, because it shares the panel width with the mascot. Each caption word lights orange while the voice says it: words are matched to the line's words, exactly first and then by a shared start of at least four letters (`answers` lights for "answer"). Words the voice does not say stay ink |
 | `focus` | Optional `[x, y]` (0 to 1) of the thing the voice names. The zoom (to 1.18x) moves it toward the middle without showing an edge. Frame it on the side away from the mascot. Default the centre |
 | `side` | Optional `left` or `right` for the mascot. Without it, sides alternate from the previous `broll` scene, starting on the left |
@@ -587,7 +592,20 @@ The same end card as the explainer. See [end_card](#end_card).
 
 ### Checks before anything is bought
 
-`build` checks these before it makes any API call, and stops with a list: a `hook` or `broll` media or proof file that does not exist (or is not an image or `.mp4`, or is outside `media/`, `images/` or `brand/`), a missing required cue (`turn` on a hook with a proof), a `side` other than `left` or `right`, a `focus` outside 0 to 1, a missing `pill` or `caption`, a pill longer than six words, a keyword longer than three words, an unknown `tone`, and a reel scene with `line.vertical` set to `false`.
+`build` checks these before it makes any API call, and stops with a list: a `hook` or `broll` media or proof file that does not exist (or is not an image or `.mp4`, or is outside `media/`, `images/` or `brand/`), a missing required cue (`turn` on a hook with a proof), a `side` other than `left` or `right`, a `focus` outside 0 to 1, a missing `pill` or `caption`, a pill longer than six words, a keyword longer than three words, an unknown `tone`, a `media_in` that is not a number of seconds of 0 or more (or is set on a scene whose media is not an `.mp4`), a `replay` that is not `true` or `false`, and a reel scene with `line.vertical` set to `false`.
+
+### Footage fit and continuity
+
+Clip lengths depend on the scene windows, which only exist once the voice is timed, so this check runs in every `build` right after the beats and before the mix and the page. For each `hook` and `broll` scene whose media is an `.mp4`:
+
+- **Fit.** The clip's usable length is its duration minus `media_in`. When that is more than one frame (1/30 s) shorter than the scene, or `media_in` is at or past the end of the clip, the build stops. The message gives the scene, the file, both lengths and the shortfall. Fix it with a longer clip, an earlier `media_in` or a shorter line or pause.
+- **Continuity.** When a scene shows the same footage as the scene right before it, it must carry on where that scene stopped: its `media_in` must equal the previous scene's `media_in` plus the previous scene's length, within 0.1 s. Otherwise the clip would visibly restart, and the build stops with the value to use, for example `R03 restarts media/r02.mp4 at 0s; to continue from R02 set data.media_in to 4.618 (or data.replay: true for an intentional replay)`.
+- **Repeats.** The same footage used again later, with other scenes in between, is reported as a warning (`possible repeated payoff: R05 reuses the source of R02`), because a payoff shot shown twice loses its punch. The build continues.
+- **Replays.** `"replay": true` on a scene says the reuse is intended. It passes both checks and is listed as a replay.
+
+"The same footage" means the same file contents, not the same name: each clip is identified by the SHA-256 of its bytes, so a renamed or copied file is still recognised.
+
+Every build writes `build/media-fit-<cut>.json`, with each clip's file, SHA-256, duration, `media_in`, usable and needed seconds, whether it passed, whether it is a replay, and which earlier scene showed the same footage, plus the problems and warnings. The build prints one line, for example `media vertical: 5 clips fit; restarts: none; warnings: none`. In a `--dry-timings` build the scene lengths are not real, so problems are printed as warnings and the build continues.
 
 ## Mascot poses
 
@@ -695,6 +713,8 @@ The mix places every sound at its exact sample position and treats each layer se
 - **Limiter.** A soft limiter catches peaks above -3 dB, and the result is normalised to -1 dB.
 
 After mixing, the build lists any cue whose sound is more than 14 dB below the voice and music around it, since such sounds may be hard to hear. Very short clicks often appear on that list even when they are audible, because the check measures average level over a quarter of a second. Listen before you change gains.
+
+**Held sound report.** Each held sound (a cue with `until` or `dur`) is also measured against the voice, on the same signals the mix uses: the normalised voice and the held sound after its gain, looping, fade and duck, before the limiter. For every word spoken during the sound it compares the voice level with the sound level over the samples where the narrator is actually voicing (words with less than 30 ms of voicing are skipped), and keeps the worst word. It also reports the worst 50 ms stretch of voicing, and the sound's own level in the pauses between words, where it is meant to be heard. The build prints one line per held sound, for example `sound R01.ring: voiced margin >= 21.3 dB (worst 50 ms 9.9 dB), pauses -27.5 dBFS; measurement only, listen on a phone`, and writes the details to `build/sound-report-<cut>.json`. Two flags can appear: `masking_risk` when the worst word is less than 12 dB above the sound, and `may_not_be_felt` when the sound is quieter than -42 dBFS in the pauses. The report is a measurement, not a listen: it never stops the build and does not change the mix. Check the result on a phone speaker before you change `gain` or `duck`.
 
 ## Costs and caching
 
@@ -820,8 +840,9 @@ studio/
   media.py                 mascot poses and transition clips
   vo.py                    voiceover per line, assembled per cut
   beats.py                 cue resolution and validation, sound sheets
+  mediafit.py              reel clip fit and continuity checks
   audio.py                 sound effect and music generation
-  mix.py                   the mix
+  mix.py                   the mix and the held sound report
   cuts.py                  builds the HTML page for each cut
   render.py                runs the pinned renderer
   verify.py                page, frame and sync checks
@@ -844,6 +865,7 @@ projects/
 package.json               pinned HyperFrames and GSAP
 requirements.txt           Python packages
 .env.example               template for your keys
+tests/                     unit tests: .venv/bin/python -m unittest discover -s tests
 ```
 
 ## Licences

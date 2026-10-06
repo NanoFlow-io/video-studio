@@ -42,6 +42,14 @@ def validate(p):
                     problems.append(f"{sid} ({t}): data.{key} file not found: {d[key]} (paths are relative to {p.dir})")
                 elif f.suffix.lower() not in MEDIA_EXT or (key == "proof" and f.suffix.lower() == ".mp4"):
                     problems.append(f"{sid} ({t}): data.{key} must be {'an image' if key == 'proof' else 'an image or an .mp4'}: {d[key]}")
+        if t in VERTICAL_ONLY and d.get("media_in") is not None:   # playback offset into an .mp4 source (seconds)
+            mi = d["media_in"]
+            if not isinstance(mi, (int, float)) or isinstance(mi, bool) or mi < 0:
+                problems.append(f"{sid} ({t}): data.media_in must be a number of seconds, 0 or more, not {mi!r}")
+            elif not str(d.get("media") or "").lower().endswith(".mp4"):
+                problems.append(f"{sid} ({t}): data.media_in only applies when data.media is an .mp4")
+        if t in VERTICAL_ONLY and d.get("replay") is not None and not isinstance(d["replay"], bool):
+            problems.append(f"{sid} ({t}): data.replay must be true or false, not {d['replay']!r}")
         if t in VERTICAL_ONLY and d.get("side") not in (None, "left", "right"):
             problems.append(f"{sid} ({t}): data.side must be 'left' or 'right', not {d.get('side')!r}")
         if t == "broll":

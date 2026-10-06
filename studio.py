@@ -124,7 +124,7 @@ def cmd_transitions(a):
 
 
 def cmd_build(a):
-    from studio import vo, audio, beats, mix, cuts as cutmod
+    from studio import vo, audio, beats, mix, mediafit, cuts as cutmod
     p, env, dr = Project(a.name), load_env(), dry(a)
     missing = [n for n in {s["pose"] for s in p.data["scenes"]} if not (p.dir / "poses" / f"{n}.webp").exists()]
     if missing: sys.exit(f"Missing poses: {', '.join(sorted(missing))}. Run `python studio.py poses {a.name}` first.")
@@ -137,7 +137,9 @@ def cmd_build(a):
         print("voiceover"); vo.generate(p, env, force=a.force and not a.only)   # --only targets sounds/music, not the voice
         print("sound and music"); audio.generate(p, env, force=set(filter(None, a.only.split(","))) if a.force else ())
     for c in cuts(a, p):
-        vo.assemble(p, c, dry=dr); beats.build(p, c); mix.mix(p, c, dry=dr); cutmod.build(p, c)
+        vo.assemble(p, c, dry=dr); B = beats.build(p, c)
+        mediafit.run(p, c, B)   # footage fit and continuity: stops before the mix and the page
+        mix.mix(p, c, dry=dr); cutmod.build(p, c)
 
 
 def cmd_render(a):
