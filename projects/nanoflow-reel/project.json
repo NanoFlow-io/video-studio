@@ -423,7 +423,7 @@
    "pose": "wave",
    "bg": "end",
    "line": {
-    "text": "NanoFlow. Join the beta at nanoflow dot io.",
+    "text": "NanoFlow. Find out more at nanoflow dot io.",
     "pause": [
      0.0,
      0.0
@@ -432,7 +432,7 @@
    "captions": false,
    "data": {
     "tagline": "Picks up when | you can't",
-    "button": "Join the beta",
+    "button": "Find out more",
     "url": "nanoflow.io",
     "note": "the AI assistant for service businesses"
    },
@@ -453,10 +453,10 @@
     },
     {
      "name": "button",
-     "at": "Join",
+     "at": "Find",
      "sfx": "el:pop",
      "gain": -8,
-     "note": "'Join the beta' button"
+     "note": "'Find out more' button"
     },
     {
      "name": "url",
@@ -470,9 +470,8 @@
      "name": "chord",
      "at": "io",
      "delta": 0.45,
-     "sfx": "el:final_chord",
-     "gain": -8,
-     "note": "glow, hold"
+     "sfx": null,
+     "note": "silent timing hold for the closing glow; no chime by default"
     }
    ]
   }

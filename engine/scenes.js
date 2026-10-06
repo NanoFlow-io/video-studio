@@ -63,8 +63,11 @@ function confetti(parent, cx, cy, n, t, seed){
     tl.set(e, { autoAlpha: 1 }, t);
     tl.to(e, { x: cx + Math.cos(ang) * sp, duration: 2.2, ease: "power2.out" }, t);
     tl.to(e, { y: cy + Math.sin(ang) * sp * 0.75, duration: 0.6, ease: "power2.out" }, t);
-    tl.to(e, { y: cy + 1100, duration: 1.7, ease: "power1.in" }, t + 0.6);
-    tl.to(e, { rotation: (R() - 0.5) * 1080, rotationX: R() * 720, duration: 2.3, ease: "none" }, t); } }
+    /* falls past the bottom edge of the frame, fading only over the last few frames */
+    var fall = 1.7 * Math.max(1, (H + 60 - cy) / 1100);
+    tl.to(e, { y: H + 60, duration: fall, ease: "power1.in" }, t + 0.6);
+    tl.to(e, { autoAlpha: 0, duration: 0.12, ease: "none" }, t + 0.48 + fall);
+    tl.to(e, { rotation: (R() - 0.5) * 1080, rotationX: R() * 720, duration: 0.6 + fall, ease: "none" }, t); } }
 function floats(parent, seed, n, colors, t0, t1){
   var R = rng(seed);
   for(var i = 0; i < n; i++){ var s = 14 + R() * 30;
@@ -440,7 +443,7 @@ TYPES.end_card = function(sc, s, d, C){
 
 /* ===================== ENTERTAINMENT STYLE (Brand Kit reel, vertical only) =====================
    Layout: b-roll panel = top 1080x1536 (full bleed media, slow zoom to data.focus); caption panel = bottom
-   1080x384 (cream, 60 px violet grid, one line, spoken word lit); Nano ~520 px tall standing on the seam at
+   1080x384 (plain paper, small logo bottom right, one line, spoken word lit); Nano ~520 px tall standing on the seam at
    y 1536, anchored left (x 40-400) or right (x 680-1040), caption on the side away from him. */
 var REEL = { seam: 1536, capH: 384, botH: 520, botBy: 1646, anchor: { left: 220, right: 860 },
   capX: { left: [430, 1040], right: [40, 650] }, lit: COL.accent || "#f08a24", zoom: 1.18 };
@@ -467,7 +470,9 @@ function zoomTo(z, focus, ph, t0, t1, k, ease){
   var vw = W / k, vh = ph / k, left = clamp(focus[0] * W - vw / 2, 0, W - vw), top = clamp(focus[1] * ph - vh / 2, 0, ph - vh);
   gsap.set(z, { transformOrigin: "0 0" });
   tl.fromTo(z, { scale: 1, x: 0, y: 0 }, { scale: k, x: -left * k, y: -top * k, duration: Math.max(0.3, t1 - t0), ease: ease }, t0); }
-function capPanel(sc){ var c = mk(sc, "div", "rpanel cream"); gsap.set(c, { x: 0, y: REEL.seam }); return c; }
+/* caption panel: plain paper, the brand wordmark small in the bottom-right corner (clear of Nano, who stands on
+   the seam, and of the username/caption text the apps lay over the bottom left) */
+function capPanel(sc){ var c = mk(sc, "div", "rpanel", '<img class="rlogo" src="' + ASSET + P.brand.logo + '" alt="">'); gsap.set(c, { x: 0, y: REEL.seam }); return c; }
 function idle(r, t0, t1){ var img = r.querySelector("img"), n = Math.max(1, Math.floor((t1 - t0) / 1.1));
   tl.to(img, { y: -10, duration: 0.55, ease: "sine.inOut", yoyo: true, repeat: n * 2 - 1 }, t0); }
 /* one line of caption; each caption word lights orange while the voice says it (word timings from the beats) */

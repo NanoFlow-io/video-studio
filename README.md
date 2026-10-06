@@ -510,7 +510,7 @@ Cues: `l1`, `l2`, `l3`, one per line.
 
 ### end_card
 
-The logo pops in with confetti, the tagline appears, a large button bounces in, the web address types out, and a handwritten note settles at the bottom.
+The logo pops in with confetti that falls to the bottom of the frame, the tagline appears, a large button bounces in, the web address types out, and a handwritten note settles at the bottom.
 
 | Data | Description |
 |---|---|
@@ -519,7 +519,7 @@ The logo pops in with confetti, the tagline appears, a large button bounces in, 
 | `url` | Web address that types out |
 | `note` | Optional handwritten note |
 
-Cues: `logo`, `button`, `url`, `chord` (the final flourish).
+Cues: `logo`, `button`, `url`, `chord` (the final flourish: the note settles and the button pulses). The `chord` cue is a timing marker; the reel template leaves it silent (`"sfx": null`). Give it an `sfx` only when a project wants a closing chime.
 
 ### Layout
 
@@ -536,7 +536,7 @@ The files in `projects/nanoflow-reel/media/` are labelled placeholders. Replace 
 | Area | Position | Contents |
 |---|---|---|
 | B-roll panel | top 80%, 1080x1536, full bleed | The scene's `media`, slowly zooming toward `focus` |
-| Caption panel | bottom 384 px | Cream `#f5efe4` with a 60 px violet grid. One line of caption in DM Sans 900, 96 px shrinking to fit (44 px at the least), ink, with the word being spoken lit orange |
+| Caption panel | bottom 384 px | Plain off-white (the palette's `paper`), with the logo (`brand.logo`) 260 px wide in the bottom-right corner, clear of the mascot and of the caption text the apps lay over the bottom left. One line of caption in DM Sans 900, 96 px shrinking to fit (44 px at the least), ink, with the word being spoken lit orange |
 | Mascot | about 520 px tall, feet on the join at y 1536 | Head and arms in the b-roll, feet in the caption panel. Anchored left (x 40 to 400) or right (x 680 to 1040). The caption sits on the other side |
 
 Media files must sit in the project's `media/`, `images/` or `brand/` folder. Images (`.png`, `.jpg`, `.webp`) and `.mp4` clips both work. A clip is a timed video that plays from the start of its scene, like the transition clips, and holds its last frame if it is shorter than the scene. Clips are muted: the mix owns the sound.
