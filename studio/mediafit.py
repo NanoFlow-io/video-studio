@@ -109,5 +109,8 @@ def run(p, cut, beats):
     for w in rep["warnings"]:
         print(f"    warning: {w}")
     if rep["problems"]:
+        # an earlier page would still look built and could be rendered: remove it (earlier renders stay)
+        stale = p.out_dir(cut) / "index.html"
+        if stale.exists(): stale.unlink()
         raise SystemExit("media fit problems:\n  " + "\n  ".join(rep["problems"]))
     return rep

@@ -605,7 +605,7 @@ Clip lengths depend on the scene windows, which only exist once the voice is tim
 
 "The same footage" means the same file contents, not the same name: each clip is identified by the SHA-256 of its bytes, so a renamed or copied file is still recognised.
 
-Every build writes `build/media-fit-<cut>.json`, with each clip's file, SHA-256, duration, `media_in`, usable and needed seconds, whether it passed, whether it is a replay, and which earlier scene showed the same footage, plus the problems and warnings. The build prints one line, for example `media vertical: 5 clips fit; restarts: none; warnings: none`. In a `--dry-timings` build the scene lengths are not real, so problems are printed as warnings and the build continues.
+When the check stops a build, it also removes that cut's earlier page (`build/out/<name>-<tag>/index.html`), so a stale page cannot be rendered by mistake; earlier renders stay. Every build writes `build/media-fit-<cut>.json`, with each clip's file, SHA-256, duration, `media_in`, usable and needed seconds, whether it passed, whether it is a replay, and which earlier scene showed the same footage, plus the problems and warnings. The build prints one line, for example `media vertical: 5 clips fit; restarts: none; warnings: none`. In a `--dry-timings` build the scene lengths are not real, so problems are printed as warnings and the build continues.
 
 ## Mascot poses
 

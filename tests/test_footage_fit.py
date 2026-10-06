@@ -94,10 +94,15 @@ class MediaFit(unittest.TestCase):
 
     def test_run_writes_report_and_stops(self):
         with tempfile.TemporaryDirectory() as b:
-            p = SimpleNamespace(dir=self.base, build=Path(b), data={"scenes": [{"id": "R02", "type": "broll", "data": {"media": "media/a.mp4"}}]})
+            out = Path(b) / "out" / "x-9x16"; out.mkdir(parents=True); (out / "index.html").write_text("stale page")
+            (out / "renders").mkdir(); (out / "renders" / "x-9x16.mp4").write_text("earlier render")
+            p = SimpleNamespace(dir=self.base, build=Path(b), data={"scenes": [{"id": "R02", "type": "broll", "data": {"media": "media/a.mp4"}}]},
+                                out_dir=lambda cut: out)
             with self.assertRaises(SystemExit) as e:
                 mediafit.run(p, "vertical", {"dry": False, "scenes": [sc("R02", 0, 5.0)]})
             self.assertIn("media fit problems:", str(e.exception))
+            self.assertFalse((out / "index.html").exists())   # a stale page cannot be rendered
+            self.assertTrue((out / "renders" / "x-9x16.mp4").exists())   # earlier renders stay
             rep = __import__("json").loads((Path(b) / "media-fit-vertical.json").read_text())
             self.assertEqual(sorted(rep), ["cut", "dry", "problems", "scenes", "warnings"]); self.assertEqual(len(rep["problems"]), 1)
             mediafit.run(p, "vertical", {"dry": True, "scenes": [sc("R02", 0, 5.0)]})   # dry: warns, no stop
