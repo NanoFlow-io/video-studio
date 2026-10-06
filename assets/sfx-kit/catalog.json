@@ -1,0 +1,12 @@
+{
+ "default": {"license": "CC0, Kenney Interface Sounds (LICENSE-Kenney.txt)", "loop": false},
+ "sounds": {
+  "phone_vibrate": {
+   "title": "Phone vibrating on a counter",
+   "description": "Incoming-call buzz pattern (buzz, short gap, buzz, long gap; one 2.0 s cycle) of a phone on a hard surface. No ringtone. Loops seamlessly: hold it with a cue's until or dur for as long as a ringing phone is on screen.",
+   "loop": true,
+   "license": "NanoFlow original, synthesised locally by studio/make_phone_vibrate.py (no provider, no cost)",
+   "suggested": {"gain": -24, "duck": -16, "until": "cut"}
+  }
+ }
+}

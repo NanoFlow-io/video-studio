@@ -1,7 +1,8 @@
 """Mix voice + music + every SFX cue at its exact sample position, per cut -> build/mix-<cut>.wav.
 Music: bed_a until the held beat before the "turn" scene, silence, bed_b from the turn (one bed if there is
 no turn). Music sits at a fixed loudness and ducks under the voice. Fast transients (whooshes, slams) are
-placed by their loudest moment so the hit lands on the cut. Ends with a soft limiter."""
+placed by their loudest moment so the hit lands on the cut. A cue with a stop time (`until`/`dur`) holds its
+sound for that span, looped, faded at the stop and optionally ducked under the voice. Ends with a soft limiter."""
 import json, subprocess
 import numpy as np
 from .common import ROOT, SR
@@ -49,6 +50,20 @@ def mix(p, cut, dry=False):
         return
     vo = np.zeros((N, 2), np.float32); _place(vo, _load(p.build / f"vo-{cut}.wav"), 0.0)
 
+    gate = None   # 0..1 "voice is speaking" envelope, shared by the music and any held sound that ducks
+
+    def voice_gate():
+        nonlocal gate
+        if gate is None:
+            win = int(0.02 * SR)
+            e = np.sqrt(np.convolve((vo ** 2).mean(axis=1), np.ones(win) / win, mode="same"))
+            speaking = (e > _db(-38)).astype(np.float32)
+            gate = np.empty_like(speaking); cur = 0.0
+            att, rel = 1 - np.exp(-1 / (0.04 * SR)), 1 - np.exp(-1 / (0.35 * SR))
+            for i in range(len(speaking)):
+                cur += (speaking[i] - cur) * (att if speaking[i] > cur else rel); gate[i] = cur
+        return gate
+
     sfx = np.zeros((N, 2), np.float32); cache = {}; peak_names = set(A.get("peak_align", []))
     for c in B["cues"]:
         if not c["sfx"]: continue
@@ -65,7 +80,22 @@ def mix(p, cut, dry=False):
                 e = np.convolve(np.abs(a).max(axis=1), np.ones(960) / 960, mode="same"); pk = int(np.argmax(e)) / SR
             cache[path] = (a, pk)
         clip, pk = cache[path]
-        _place(sfx, _rate(clip, c["rate"]) * _db(c["gain_db"] + A.get("sfx_bus_db", 4.0)), max(0.0, c["t"] - pk / c["rate"]))
+        clip = _rate(clip, c["rate"]) * _db(c["gain_db"] + A.get("sfx_bus_db", 4.0))
+        if c.get("stop") is not None:
+            # held sound (cue `until`/`dur`): repeat (loop) or cut to the span, fade out at the stop, duck under the voice
+            i0, n = int(round(c["t"] * SR)), int(round((c["stop"] - c["t"]) * SR))
+            if c.get("loop", True) and len(clip) < n:
+                clip = np.concatenate([clip] * (n // len(clip) + 1))
+            clip = clip[:n].copy()
+            f = min(len(clip), int(c.get("fade", 0.08) * SR))
+            if f: clip[-f:] *= np.linspace(1, 0, f)[:, None]
+            if c.get("duck_db"):
+                # look ahead 80 ms so the sound is already down when a word starts
+                la = int(0.08 * SR); g = voice_gate(); g = np.maximum(g, np.concatenate([g[la:], np.zeros(la, np.float32)]))[i0:i0 + len(clip)]
+                clip[:len(g)] *= (_db(c["duck_db"]) ** g)[:, None]
+            _place(sfx, clip, c["t"])
+            continue
+        _place(sfx, clip, max(0.0, c["t"] - pk / c["rate"]))
 
     mus = np.zeros((N, 2), np.float32)
     music = p.data.get("music", {})
@@ -92,14 +122,7 @@ def mix(p, cut, dry=False):
         _place(mus, b, 0.0)
     if np.abs(mus).max() > 0:
         mus *= _db(A.get("music_db", -26)) / _rms(mus[np.abs(mus).max(axis=1) > 1e-4])
-        win = int(0.02 * SR)
-        e = np.sqrt(np.convolve((vo ** 2).mean(axis=1), np.ones(win) / win, mode="same"))
-        speaking = (e > _db(-38)).astype(np.float32)
-        g = np.empty_like(speaking); cur = 0.0
-        att, rel = 1 - np.exp(-1 / (0.04 * SR)), 1 - np.exp(-1 / (0.35 * SR))
-        for i in range(len(speaking)):
-            cur += (speaking[i] - cur) * (att if speaking[i] > cur else rel); g[i] = cur
-        mus *= (_db(A.get("duck_db", -9)) ** g)[:, None]
+        mus *= (_db(A.get("duck_db", -9)) ** voice_gate())[:, None]
 
     vo *= _db(-1) / max(1e-6, np.abs(vo).max())
     m = vo + sfx + mus

@@ -2,6 +2,7 @@
 (or to the scene start / line end), so one cue list resolves onto both cut clocks.
 Writes build/beats-<cut>.json, build/beats-<cut>.js (window.BEATS) and build/sound-sheet-<cut>.md."""
 import json, re
+from pathlib import Path
 
 # cue names each scene type reads (the engine throws on a missing one; checked here first)
 REQUIRED = {
@@ -14,6 +15,7 @@ REQUIRED = {
     # entertainment style (Brand Kit reel). hook also needs `turn` when it has a `proof`; `zoom` and `handoff` are optional
     "hook": [], "broll": [],
 }
+ANCHOR_RE = re.compile(r"^(start|end|cut)([+-]\d+(?:\.\d+)?)?$")
 MEDIA_EXT = {".png", ".jpg", ".jpeg", ".webp", ".mp4"}
 VERTICAL_ONLY = {"hook", "broll"}
 MEDIA_DIRS = {"media", "images", "brand"}
@@ -29,6 +31,8 @@ def validate(p):
         if t in VERTICAL_ONLY and s["line"].get("vertical", True) is False:
             problems.append(f"{sid} ({t}): this type is vertical only, so line.vertical cannot be false")
         names = {c["name"] for c in s.get("cues", [])}
+        for c in s.get("cues", []):
+            problems += [f"{sid}.{c.get('name')}: {m}" for m in cue_problems(c)]
         for key in ("media", "proof"):
             if t in VERTICAL_ONLY and d.get(key) is not None:
                 f = p.dir / d[key]
@@ -65,6 +69,32 @@ def validate(p):
     return problems
 
 
+KIT = Path(__file__).resolve().parent.parent / "assets" / "sfx-kit"
+
+
+def cue_problems(c):
+    """Field checks for one cue (sound reference and the held-sound controls)."""
+    out, sfx = [], c.get("sfx")
+    if sfx:   # null or "" is silence
+        src, _, name = str(sfx).partition(":")
+        if src not in ("el", "kit") or not re.fullmatch(r"[a-z0-9_]+", name or ""):
+            out.append(f"sfx must be el:<name>, kit:<name> or null, not {sfx!r}")
+        elif src == "kit" and not (KIT / f"{name}.wav").is_file():
+            out.append(f"sfx {sfx}: no {name}.wav in assets/sfx-kit")
+    num = lambda k: isinstance(c.get(k), (int, float)) and not isinstance(c.get(k), bool)
+    if c.get("loop") is not None and not isinstance(c["loop"], bool):
+        out.append("loop must be true or false")
+    if c.get("fade") is not None and not (num("fade") and 0 <= c["fade"] <= 3):
+        out.append("fade must be 0 to 3 seconds")
+    if c.get("duck") is not None and not (num("duck") and -40 <= c["duck"] <= 0):
+        out.append("duck must be 0 to -40 dB")
+    if c.get("until") is not None and not (isinstance(c["until"], str) and c["until"].strip()):
+        out.append("until must be an anchor string, e.g. \"cut\", \"end+0.3\", a word, or \"R02:cut\"")
+    if any(c.get(k) is not None for k in ("loop", "fade", "duck")) and c.get("until") is None and c.get("dur") is None:
+        out.append("loop, fade and duck only apply to a held sound: add until or dur")
+    return out
+
+
 def scene_cues(s):
     """The scene's cues plus implicit silent cues for hook keywords (kw0, kw1, ...) from data.words[].at."""
     cs = list(s.get("cues", []))
@@ -91,6 +121,42 @@ def build(p, cut):
     for k, s in enumerate(out_scenes):
         s["end"] = out_scenes[k + 1]["start"] if k + 1 < len(out_scenes) else duration
     sc = {s["id"]: s for s in out_scenes}
+
+    def anchor(sid, a, occ=0):
+        """(time, word) for an anchor in scene sid, or an error string. Anchors: a word of the line, `start` (scene
+        start), `end` (last word of the line), `cut` (the scene's cut to the next one), each with an optional +/- s."""
+        m = ANCHOR_RE.match(str(a))
+        if m:
+            base = {"start": sc[sid]["start"], "end": lines[sid]["end"], "cut": sc[sid]["end"]}[m.group(1)]
+            return base + float(m.group(2) or 0), None
+        ws = [w for w in V["words"] if w["scene"] == sid and norm(w["w"]).startswith(norm(str(a)))]
+        if len(ws) <= occ:
+            return f"word '{a}' not found in the {sid} line"
+        return ws[occ]["s"], ws[occ]["w"]
+
+    def sustain(sid, c, t):
+        """Stop time for a held sound (`until` and/or `dur`), clamped to the video; (None, None) for a one-shot."""
+        if c.get("until") is None and c.get("dur") is None:
+            return None, None
+        ends = []
+        if c.get("until") is not None:
+            u = str(c["until"]); usid, _, ua = u.rpartition(":")
+            usid = usid or sid
+            if usid not in sc:
+                return None, f"until '{u}': scene {usid} is not in this cut"
+            hit = anchor(usid, ua, c.get("until_occ", 0))
+            if isinstance(hit, str):
+                return None, f"until '{u}': {hit}"
+            ends.append(hit[0])
+        if c.get("dur") is not None:
+            if not isinstance(c["dur"], (int, float)) or c["dur"] <= 0:
+                return None, f"dur must be a positive number of seconds, not {c['dur']!r}"
+            ends.append(t + c["dur"])
+        stop = round(min(min(ends), duration), 3)
+        if stop <= t:
+            return None, f"stops at {stop:.2f} s, which is not after its start ({t:.2f} s)"
+        return stop, None
+
     cues, problems = [], validate(p)
     for s in scenes:
         names = {c["name"] for c in s.get("cues", [])}
@@ -99,18 +165,20 @@ def build(p, cut):
             need += [f"l{i + 1}" for i in range(len(s["data"]["lines"]))]
         problems += [f"{s['id']} ({s['type']}) needs a cue named '{n}'" for n in need if n not in names]
         for c in scene_cues(s):
-            a = c["at"]
-            if a.startswith("start") or a.startswith("end"):
-                base, _, off = a.partition("+")
-                t = (sc[s["id"]]["start"] if base == "start" else lines[s["id"]]["end"]) + (float(off) if off else 0.0); word = None
-            else:
-                ws = [w for w in V["words"] if w["scene"] == s["id"] and norm(w["w"]).startswith(norm(a))]
-                occ = c.get("occ", 0)
-                if len(ws) <= occ:
-                    problems.append(f"{s['id']}.{c['name']}: word '{a}' not found in the line"); continue
-                t, word = ws[occ]["s"], ws[occ]["w"]
-            cues.append({"id": f"{s['id']}.{c['name']}", "scene": s["id"], "t": round(t + c.get("delta", 0.0), 3), "word": word,
-                         "note": c.get("note", ""), "sfx": c.get("sfx"), "gain_db": c.get("gain", -10), "rate": c.get("rate", 1.0)})
+            cid = f"{s['id']}.{c['name']}"
+            hit = anchor(s["id"], c["at"], c.get("occ", 0))
+            if isinstance(hit, str):
+                problems.append(f"{cid}: {hit}"); continue
+            t, word = hit
+            t = round(t + c.get("delta", 0.0), 3)
+            cue = {"id": cid, "scene": s["id"], "t": t, "word": word,
+                   "note": c.get("note", ""), "sfx": c.get("sfx"), "gain_db": c.get("gain", -10), "rate": c.get("rate", 1.0)}
+            stop, why = sustain(s["id"], c, t)
+            if why:
+                problems.append(f"{cid}: {why}"); continue
+            if stop is not None:
+                cue.update(stop=stop, loop=c.get("loop", True), fade=float(c.get("fade", 0.08)), duck_db=float(c.get("duck", 0.0)))
+            cues.append(cue)
     if problems:
         raise SystemExit("project.json cue problems:\n  " + "\n  ".join(problems))
     out = {"cut": cut, "dry": bool(V.get("dry")), "duration": duration, "scenes": out_scenes, "lines": V["lines"], "words": V["words"], "cues": cues}
@@ -118,7 +186,8 @@ def build(p, cut):
     (p.build / f"beats-{cut}.js").write_text("window.BEATS = " + json.dumps(out) + ";\n", encoding="utf-8")
     fmt = lambda t: f"{int(t // 60)}:{t % 60:05.2f}"
     md = [f"# Sound sheet: {p.data['name']} ({cut})", "", "| Time | Word | Cue | Visual beat | Sound | Gain dB |", "|---|---|---|---|---|---|"]
-    md += [f"| {fmt(c['t'])} | {c['word'] or '(cut or motion)'} | {c['id']} | {c['note']} | {c['sfx'] or ''}{'' if c['rate'] == 1 else ' x' + format(c['rate'], '.2f')} | {c['gain_db']} |"
+    held = lambda c: f" until {fmt(c['stop'])}{' (loop' if c['loop'] else ' (once'}{', duck ' + format(c['duck_db'], 'g') + ' dB' if c['duck_db'] else ''})" if c.get("stop") is not None else ""
+    md += [f"| {fmt(c['t'])} | {c['word'] or '(cut or motion)'} | {c['id']} | {c['note']} | {c['sfx'] or ''}{'' if c['rate'] == 1 else ' x' + format(c['rate'], '.2f')}{held(c)} | {c['gain_db']} |"
            for c in sorted(cues, key=lambda c: c["t"])]
     (p.build / f"sound-sheet-{cut}.md").write_text("\n".join(md) + "\n", encoding="utf-8")
     print(f"  beats {cut}: {duration:.2f} s, {len(out_scenes)} scenes, {len(cues)} cues{' (DRY timings)' if out['dry'] else ''}")
