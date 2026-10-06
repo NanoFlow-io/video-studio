@@ -79,5 +79,5 @@ def transitions(p, env, only=(), force=False):
                 prov.video(start, t["prompt"], raw, "16:9" if cut == "landscape" else "9:16")
                 # keep the requested slice, fitted to the cut, silent (the mix owns the audio)
                 ffmpeg("-ss", t.get("from", 0.3), "-i", raw, "-t", t.get("seconds", 1.2),
-                       "-vf", f"scale={w}:{h}:force_original_aspect_ratio=increase,crop={w}:{h},fps=30", "-an", "-c:v", "libx264", "-crf", "18", "-pix_fmt", "yuv420p", dst)
+                       "-vf", f"scale={w}:{h}:force_original_aspect_ratio=increase,crop={w}:{h},fps=30", "-an", "-c:v", "libx264", "-crf", "18", "-pix_fmt", "yuv420p", "-map_metadata", "0", "-movflags", "+use_metadata_tags", dst)   # keeps the clip's AIGC label
             print(f"  transition {t['id']} {cut}: {dst}")

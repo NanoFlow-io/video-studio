@@ -143,13 +143,29 @@ def cmd_build(a):
 
 
 def cmd_render(a):
-    from studio import render, verify
+    from studio import render, verify, provenance
     p = Project(a.name)
     for c in cuts(a, p):
         bj = p.build / f"beats-{c}.json"
         if bj.exists() and json.loads(bj.read_text(encoding="utf-8")).get("dry"):
             print(f"  {c}: built with --dry-timings (synthetic timings, silent). This render is a layout preview, not a deliverable.")
-        verify.page(p, c); render.render(p, c, a.quality); verify.video(p, c)
+        verify.page(p, c); render.render(p, c, a.quality); provenance.run(p, c); verify.video(p, c)
+
+
+def cmd_render_remote(a):
+    """Render on the render server (tools/remote-render.sh), then carry the source provenance into the export."""
+    from studio import provenance
+    p = Project(a.name)
+    for c in cuts(a, p):
+        subprocess.run(["bash", "tools/remote-render.sh", str(p.out_dir(c).relative_to(ROOT))], cwd=ROOT, check=True)
+        provenance.run(p, c)
+
+
+def cmd_provenance(a):
+    from studio import provenance
+    p = Project(a.name)
+    for c in cuts(a, p):
+        provenance.run(p, c)
 
 
 def cmd_verify(a):
@@ -170,7 +186,7 @@ def main():
     sp.add_parser("setup"); sp.add_parser("check"); sp.add_parser("voices")
     n = sp.add_parser("new"); n.add_argument("name"); n.add_argument("--mascot", required=True); n.add_argument("--logo", required=True)
     n.add_argument("--mark"); n.add_argument("--describe", help="one line describing the mascot's look (helps keep poses on-model)")
-    for name in ("poses", "transitions", "build", "render", "verify", "all"):
+    for name in ("poses", "transitions", "build", "render", "render-remote", "provenance", "verify", "all"):
         s = sp.add_parser(name); s.add_argument("name")
         s.add_argument("--cut", default="both", choices=["landscape", "vertical", "both"])
         s.add_argument("--force", action="store_true", help="regenerate paid media instead of reusing it")
@@ -182,7 +198,7 @@ def main():
         s.add_argument("--quality", default="looks", help="render quality: draft, looks, delivery")
         s.add_argument("--cues", default="", help="verify: cue ids to sync-check, e.g. S02.missed,S14.l1")
     a = ap.parse_args()
-    globals()["cmd_" + a.cmd](a)
+    globals()["cmd_" + a.cmd.replace("-", "_")](a)
 
 
 if __name__ == "__main__":

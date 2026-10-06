@@ -607,6 +607,10 @@ Clip lengths depend on the scene windows, which only exist once the voice is tim
 
 When the check stops a build, it also removes that cut's earlier page (`build/out/<name>-<tag>/index.html`), so a stale page cannot be rendered by mistake; earlier renders stay. Every build writes `build/media-fit-<cut>.json`, with each clip's file, SHA-256, duration, `media_in`, usable and needed seconds, whether it passed, whether it is a replay, and which earlier scene showed the same footage, plus the problems and warnings. The build prints one line, for example `media vertical: 5 clips fit; restarts: none; warnings: none`. In a `--dry-timings` build the scene lengths are not real, so problems are printed as warnings and the build continues.
 
+### AI provenance labels
+
+Kling clips carry an AIGC label in the file (the machine-readable label China's GB 45438 standard defines). Re-encoding a clip with plain ffmpeg drops it, so use `data.media_in` instead of trimming a copy; when a copy must be re-encoded, add `-map_metadata 0 -movflags +use_metadata_tags`, as the studio's own transition step does. After every render (`render`, `render-remote`, or `python studio.py provenance <name> --cut vertical` on its own) the studio copies the labels of the clips the cut uses into the export, unchanged: `AIGC` is the first labelled clip's label exactly as it was and `aigc_sources` lists every distinct label in scene order. It is a metadata-only remux; the picture and sound are checked packet-identical before the file is replaced, and nothing is written when no clip is labelled. The result is in `build/provenance-<cut>.json`. Release review binds to the labelled file, so label before releasing.
+
 ## Mascot poses
 
 Each entry in `poses` describes one pose:
