@@ -436,7 +436,7 @@ TYPES.end_card = function(sc, s, d, C){
   var url = mk(sc, "div", "title", "", "font-size:" + (V ? 84 : 76) + "px");
   at(url, cx, V ? 1010 : 720, -50, 0); typeText(url, d.url, C("url"), 0.5);
   if(d.note){ var note = mk(sc, "div", "note", esc(d.note), "color:" + COL.secondary + ";font-size:" + (V ? 56 : 52) + "px"); at(note, cx, V ? 1150 : 860, -50, 0); enter(note, C("chord") - 0.6, { y: 30 }); }
-  var r = bot(sc, s.pose, V ? { cx: 540, by: 1800, h: 560 } : { cx: 1640, by: 1040, h: 620 }); botIn(r, s, V ? { y: 300 } : { x: 400 });
+  if(!FOOTAGE){ var r = bot(sc, s.pose, V ? { cx: 540, by: 1800, h: 560 } : { cx: 1640, by: 1040, h: 620 }); botIn(r, s, V ? { y: 300 } : { x: 400 }); }
   confetti(sc, cx, V ? 420 : 250, 60, C("logo"), 9);
   tl.to(btn, { scale: 1.05, duration: 0.3, yoyo: true, repeat: 1, ease: "sine.inOut" }, C("chord"));
 };
@@ -448,6 +448,27 @@ TYPES.end_card = function(sc, s, d, C){
 var REEL = { seam: 1536, capH: 384, botH: 520, botBy: 1646, anchor: { left: 220, right: 860 },
   capX: { left: [430, 1040], right: [40, 650] }, lit: COL.accent || "#f08a24", zoom: 1.18 };
 var H_FULL = 1920, NOWIPE = { hook: 1, broll: 1 }, NOCAPS = { hook: 1, broll: 1 }, SIDE = {};
+/* Footage-led reel (project.layout "footage", 2026-10-08): footage full frame, no Nano, a small logo watermark, captions
+   over the picture in the lower third (clear of the bottom 15% the apps cover), logo end card without Nano. */
+var FOOTAGE = P.layout === "footage";
+var FOOT = { capY: 1380, capW: 960, markY: 300 };
+function watermark(sc){ var m = mk(sc, "div", "abs", '<img src="' + ASSET + P.brand.logo + '" alt="" style="width:100%;display:block">',
+  "width:210px;padding:12px 16px;border-radius:16px;background:rgba(255,255,255,0.86);opacity:0.92");
+  gsap.set(m, { x: W - 40, y: FOOT.markY, xPercent: -100, yPercent: 0 }); return m; }
+/* footage caption: up to two lines over the picture, white with a dark edge, the spoken word lit */
+function footCaption(sc, s, text){
+  var el = mk(sc, "div", "rcap", String(text).split(/\s+/).map(function(w){ return "<span>" + esc(w) + "</span>"; }).join(" "),
+    "color:#fff;text-align:center;white-space:normal;width:" + FOOT.capW + "px;line-height:1.08;-webkit-text-stroke:9px rgba(0,0,0,0.88);paint-order:stroke fill;text-shadow:0 4px 18px rgba(0,0,0,0.55)");
+  fitText(el, FOOT.capW, 84, 46, 2, 1.08);
+  at(el, 540, FOOT.capY);
+  var spoken = B.words.filter(function(w){ return w.scene === s.id; }), used = {};
+  function find(cw, loose){ for(var j = 0; j < spoken.length; j++){ if(used[j]) continue; var sw = nrm(spoken[j].w);
+    if(sw === cw || (loose && Math.min(sw.length, cw.length) >= 4 && (sw.indexOf(cw) === 0 || cw.indexOf(sw) === 0))) return j; } return -1; }
+  [].forEach.call(el.children, function(sp){ var cw = nrm(sp.textContent); if(!cw) return;
+    var j = find(cw, false); if(j < 0) j = find(cw, true); if(j < 0) return; used[j] = 1;
+    var w = spoken[j], nx = spoken[j + 1], t1 = Math.min(nx ? nx.s : w.e + 0.25, s.end);
+    tl.set(sp, { color: REEL.lit }, w.s); tl.set(sp, { color: "#fff" }, Math.max(t1, w.s + 0.05)); });
+  return el; }
 var FITS = [];   /* text fitted to a width; re-fitted once the web fonts have loaded */
 function doFit(f){ var el = f.el;
   for(var sz = f.big; sz >= f.small; sz -= 2){ el.style.fontSize = sz + "px";
@@ -492,6 +513,12 @@ function litCaption(sc, s, text, side){
 /* data: media, focus?, caption, side?   cues: zoom (optional, when the zoom lands) */
 TYPES.broll = function(sc, s, d, C){
   if(!V) throw new Error("broll (" + s.id + ") is vertical only");
+  if(FOOTAGE){
+    var fslot = mediaSlot(sc, s, d, H_FULL), fland = C.has("zoom") ? C("zoom") : s.end;
+    zoomTo(fslot.firstChild, d.focus || [0.5, 0.5], H_FULL, s.start, fland, REEL.zoom, C.has("zoom") ? "power2.inOut" : "sine.inOut");
+    watermark(sc);
+    footCaption(sc, s, d.caption || "");
+    return; }
   var side = SIDE[s.id], slot = mediaSlot(sc, s, d, REEL.seam);
   var land = C.has("zoom") ? C("zoom") : s.end;
   zoomTo(slot.firstChild, d.focus || [0.5, 0.5], REEL.seam, s.start, land, REEL.zoom, C.has("zoom") ? "power2.inOut" : "sine.inOut");
@@ -506,6 +533,26 @@ TYPES.broll = function(sc, s, d, C){
 /* data: pill, words [{text, at, tone}], media?, proof?, focus?   cues: turn (proof slams in), handoff (optional) */
 TYPES.hook = function(sc, s, d, C){
   if(!V) throw new Error("hook (" + s.id + ") is vertical only");
+  if(FOOTAGE){
+    var fs = mediaSlot(sc, s, d, H_FULL);
+    if(d.media) zoomTo(fs.firstChild, d.focus || [0.5, 0.5], H_FULL, s.start, s.end, 1.08, "none");
+    if(d.proof){
+      var fpr = mk(fs, "div", "rproof", '<img src="' + ASSET + d.proof + '" alt="">', "left:540px;top:64%");
+      gsap.set(fpr, { xPercent: -50, yPercent: -50 }); slam(fpr, C("turn"), 1.7); shake(fpr, C("turn") + 0.08, 12); }
+    watermark(sc);
+    var ftone = { pain: COL.secondary, payoff: COL.primary }, fwords = d.words || [];
+    fwords.forEach(function(w, i){
+      var el = mk(sc, "div", "rkw", esc(w.text), "color:" + (ftone[w.tone] || "#fff") + ";-webkit-text-stroke:12px rgba(0,0,0,0.88);paint-order:stroke fill;text-shadow:0 6px 24px rgba(0,0,0,0.5)");
+      fitText(el, 1000, 210, 100, 2, 0.92); at(el, 540, 560); gsap.set(el, { autoAlpha: 0 });
+      var t0 = C("kw" + i), t1 = i + 1 < fwords.length ? C("kw" + (i + 1)) : s.end - 0.1;
+      tl.fromTo(el, { autoAlpha: 1, scale: 1.14 }, { scale: 1, duration: 0.12, ease: "power2.out" }, t0);
+      if(i + 1 < fwords.length) tl.set(el, { autoAlpha: 0 }, Math.max(t1, t0 + 0.05));
+      else tl.to(el, { autoAlpha: 0, duration: 0.15 }, Math.max(t1, t0 + 0.1)); });
+    var fpill = mk(sc, "div", "rpill", esc(d.pill || ""));
+    fitText(fpill, 1000, 62, 40, 1, 1); at(fpill, 540, FOOT.capY);
+    if(d.pill){ tl.fromTo(fpill, { autoAlpha: 0, scale: 0.85 }, { autoAlpha: 1, scale: 1, duration: 0.12, ease: "back.out(2)" }, s.start);
+      tl.to(fpill, { autoAlpha: 0, duration: 0.15 }, s.end - 0.1); } else gsap.set(fpill, { autoAlpha: 0 });
+    return; }
   var side = (s.next && SIDE[s.next]) || (d.side === "left" ? "left" : "right");
   var H = Math.min(C.has("handoff") ? C("handoff") : s.end - 0.1, s.end - 0.1), dur = clamp(s.end - H, 0.1, 0.4);
   /* frame 0 is a finished picture: media (or the cream grid) full bleed, already drifting */

@@ -54,7 +54,7 @@ def build(p, cut):
     html = (tpl.replace("{{TITLE}}", f"{p.data['name']} ({cut})").replace("{{CUT}}", cut).replace("{{W}}", str(w)).replace("{{H}}", str(h))
                .replace("{{WW}}", str(round(w * 1.7))).replace("{{DUR}}", str(B["duration"])).replace("{{SCENES}}", scenes)
                .replace("{{TRANSITIONS}}", "\n".join(trans)).replace("{{CSS_VARS}}", _css_vars(p))
-               .replace("{{PROJECT_JSON}}", json.dumps({k: p.data.get(k) for k in ("name", "style", "brand", "palette", "backgrounds", "solids", "pose_aspect", "scenes")}))
+               .replace("{{PROJECT_JSON}}", json.dumps({k: p.data.get(k) for k in ("name", "style", "layout", "brand", "palette", "backgrounds", "solids", "pose_aspect", "scenes")}))
                .replace("{{ENGINE}}", (ROOT / "engine" / "scenes.js").read_text(encoding="utf-8")))
     (d / "index.html").write_text(html, encoding="utf-8")
     (d / "package.json").write_text(json.dumps({"private": True, "hyperframesVersion": HF_VERSION}, indent=1), encoding="utf-8")
