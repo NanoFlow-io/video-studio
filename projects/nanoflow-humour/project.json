@@ -80,13 +80,13 @@
    "use_speaker_boost": true,
    "speed": 1.0
   },
-  "lead_in": 0.5,
-  "tail": 2.6
+  "lead_in": 0.3,
+  "tail": 1.2
  },
  "audio": {
   "sfx_bus_db": 4.0,
-  "music_db": -26,
-  "duck_db": -9,
+  "music_db": -24,
+  "duck_db": -10,
   "peak_align": [
    "whoosh_a",
    "whoosh_b",
@@ -99,13 +99,9 @@
   ]
  },
  "music": {
-  "bed_a": {
-   "prompt": "Instrumental only, no vocals. Light tech-commercial underscore, 108 bpm, plucky marimba and muted synth bass, starts bouncy for four seconds then becomes slightly hurried and tense with a ticking hi-hat and minor colour, sparse so a voiceover sits on top, ends on an unresolved suspended note.",
-   "ms": 20000
-  },
-  "bed_b": {
-   "prompt": "Instrumental only, no vocals. Bright upbeat friendly product launch music, 112 bpm, warm major key, claps, plucky synths, light piano, punchy kick, optimistic and confident, steady energy that stays under a voiceover, builds gently, ends on a clean resolved final chord with a short tail.",
-   "ms": 66000
+  "bed_playful": {
+   "prompt": "Instrumental only, no vocals. Playful upbeat comedy bed, 118 bpm, bouncy pizzicato strings and plucked ukulele, light finger snaps and a soft punchy kick, cheeky walking bassline, bright major key, sparse in the midrange so a voiceover sits clearly on top, steady rhythm with no big build, ends on a clean short button.",
+   "ms": 16000
   }
  },
  "sfx": {
@@ -248,7 +244,7 @@
     "text": "Be your own boss, they said.",
     "pause": [
      0.15,
-     1.15
+     0.35
     ]
    },
    "data": {
@@ -274,7 +270,7 @@
     "text": "You'll never be happier.",
     "pause": [
      0.15,
-     1.2
+     0.35
     ]
    },
    "data": {
@@ -297,7 +293,7 @@
     "text": "Looks like they were right.",
     "pause": [
      0.15,
-     1.8
+     1.2
     ]
    },
    "data": {
