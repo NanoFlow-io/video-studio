@@ -588,11 +588,31 @@ Cues: `zoom` (optional). With it the zoom lands on that word; without it the zoo
 
 ### end_card
 
-The same end card as the explainer. See [end_card](#end_card).
+The same end card as the explainer. See [end_card](#end_card). For a joke reel, `"clean": true` gives the logo and tagline only (see [Humour treatment](#humour-treatment)).
+
+### Humour treatment
+
+For a relatable joke reel: real footage carries the joke, a comic headline sits on the opening shot, and a clean end card closes it. It uses the footage layout (`"layout": "footage"` in project.json): the footage fills the frame, Nano is hidden, a small logo watermark sits top right (210 px wide, top at y 300), captions sit over the picture in the lower third, and the end card has no Nano. Projects that use neither field below build exactly as before: the humour code (`engine/humour.js`) is only added to the page when a scene uses it.
+
+**Headline** (`hook`, footage layout only). Set `data.headline` and the hook shows a comic headline instead of the pill (`pill` becomes optional and is not shown).
+
+| Field | Description |
+|---|---|
+| `text` | Required. The headline, six words at most. Large DM Sans at its heaviest weight (1000), fitted to the width on at most two lines, white with a thick black outline and a hard black drop shadow, on a hand-painted yellow (#ffd23f) brushstroke tilted slightly. The trailing punctuation is pink (the palette's `secondary`), or the last word when there is no punctuation, with a short pink swoosh under the last word |
+| `pos` | Optional `[x, y]`, fractions of the 1080x1920 frame, for the centre of the headline. Default `[0.5, 0.2]`. The headline is kept inside the frame |
+| `width` | Optional fraction of the frame width the text may use, 0.2 to 1. Default 0.86 |
+| `size` | Optional largest font size in px, 40 to 300. Default 150; the text shrinks to fit `width` |
+| `accent` | Optional, `pink` (the default and only option for now) |
+
+The headline is fully visible from frame 0, with no fade or scale-in. The only motion is a small wobble that starts 0.4 s in and never hides it. It stays until the hook ends. The watermark stays: the default position overlaps it, so on real footage pick a clear area and set `pos` (and a smaller `width` for a corner). Look at a still of the clip at the hook's `media_in` first, for example `ffmpeg -ss 0 -i media/clip.mp4 -frames:v 1 still.png`, and keep the headline off faces, hands and anything the joke depends on. Leave `words` empty: big keywords would sit on top of it.
+
+**Clean end card** (`end_card`, `"clean": true`). Only the logo, popping in on the `logo` cue, and the tagline, split into two lines at ` | `, larger (up to 96 px, fitted to the width) and entering just after the logo, on the scene's background. No button, web address, confetti, floating shapes or note. Only the `logo` cue is required; other cues may stay and are ignored. In the footage layout Nano is hidden; in the other layouts Nano still stands at the bottom. Put the `logo` cue on the word that names the brand, and remember the card shows only the background until then.
+
+**Template.** `projects/nanoflow-humour` is the starting point: a footage-layout hook with the headline `Know this feeling?`, two `broll` beats with captions, and a clean end card with the tagline `Running a business is no joke. | NanoFlow gets you.`. R03 has a long vertical pause (1.8 s) so the punchline and the reaction land before the closing line. Its media files are labelled placeholders. In real use R01 to R03 usually play one continuous clip: point them at the same `.mp4` and set each `media_in` to continue from the scene before (the build prints the value to use). Use this template for a joke or relatable moment carried by real footage; use `nanoflow-reel` when the reel demonstrates the product with screen captures and Nano.
 
 ### Checks before anything is bought
 
-`build` checks these before it makes any API call, and stops with a list: a `hook` or `broll` media or proof file that does not exist (or is not an image or `.mp4`, or is outside `media/`, `images/` or `brand/`), a missing required cue (`turn` on a hook with a proof), a `side` other than `left` or `right`, a `focus` outside 0 to 1, a missing `pill` or `caption`, a pill longer than six words, a keyword longer than three words, an unknown `tone`, a `media_in` that is not a number of seconds of 0 or more (or is set on a scene whose media is not an `.mp4`), a `replay` that is not `true` or `false`, and a reel scene with `line.vertical` set to `false`.
+`build` checks these before it makes any API call, and stops with a list: a `hook` or `broll` media or proof file that does not exist (or is not an image or `.mp4`, or is outside `media/`, `images/` or `brand/`), a missing required cue (`turn` on a hook with a proof), a `side` other than `left` or `right`, a `focus` outside 0 to 1, a missing `pill` or `caption`, a pill longer than six words (the pill is optional when the hook has a `headline`), a headline without text, longer than six words, with a `pos` outside 0 to 1, a `width` outside 0.2 to 1, a `size` outside 40 to 300 or an unknown `accent`, a headline outside the footage layout or on a scene other than a hook, a `clean` that is not `true` or `false` or is set on a scene other than an end card, a keyword longer than three words, an unknown `tone`, a `media_in` that is not a number of seconds of 0 or more (or is set on a scene whose media is not an `.mp4`), a `replay` that is not `true` or `false`, and a reel scene with `line.vertical` set to `false`.
 
 ### Footage fit and continuity
 
@@ -853,6 +873,7 @@ studio/
 engine/
   template.html            page template
   scenes.js                the scene library: layouts, motion, captions
+  humour.js                the humour treatment (headline, clean end card), added only for projects that use it
 assets/
   fonts/                   DM Sans, Nunito, Caveat, with licences
   sfx-kit/                 Kenney interface sounds, with licence
@@ -866,6 +887,10 @@ projects/
     mascot/ poses/ brand/
     generated/             purchased media cache (git-ignored)
     build/                 build output and renders (git-ignored)
+  nanoflow-humour/
+    project.json           the humour reel template (footage layout, headline, clean end card)
+    media/                 placeholder footage frames (replace with real footage)
+    mascot/ poses/ brand/
 package.json               pinned HyperFrames and GSAP
 requirements.txt           Python packages
 .env.example               template for your keys
@@ -879,4 +904,4 @@ tests/                     unit tests: .venv/bin/python -m unittest discover -s 
 - **Interface sounds** in `assets/sfx-kit/` are CC0 (public domain), from [Kenney](https://kenney.nl/assets/interface-sounds).
 - **HyperFrames** (Apache 2.0) and **GSAP** (GreenSock Standard "no charge" licence) are installed by `npm install` under their own licences and are not part of this repository.
 - **Generated media**, meaning the voice, sound effects, music, poses and clips you create, is governed by the terms of the provider that generated it.
-- **NanoFlow example assets.** The NanoFlow name, logo, mascot artwork and photographs in `projects/nanoflow/` and `projects/nanoflow-reel/` belong to NanoFlow. They are included as an example only and are not covered by the MIT licence. Please do not use them in your own videos.
+- **NanoFlow example assets.** The NanoFlow name, logo, mascot artwork and photographs in `projects/nanoflow/`, `projects/nanoflow-reel/` and `projects/nanoflow-humour/` belong to NanoFlow. They are included as an example only and are not covered by the MIT licence. Please do not use them in your own videos.
