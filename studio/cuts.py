@@ -27,6 +27,25 @@ def slot_html(s, dd):
     return f'<div class="mslot" id="slot-{s["id"]}"><div class="mzoom">{vid}</div></div>'
 
 
+HUMOUR_AT = "/* ============================ BUILD ============================ */"
+
+
+def uses_humour(data):
+    """True when a scene uses the humour treatment: data.headline on a hook or data.clean on an end card."""
+    return any((s.get("data") or {}).get("headline") or (s.get("data") or {}).get("clean") is True for s in data.get("scenes", []))
+
+
+def engine_js(data):
+    """The engine inlined into the page: scenes.js, with engine/humour.js spliced in before the build section only for
+    projects that use it, so every other project's page stays byte-identical."""
+    js = (ROOT / "engine" / "scenes.js").read_text(encoding="utf-8")
+    if not uses_humour(data):
+        return js
+    if js.count(HUMOUR_AT) != 1:
+        raise SystemExit("engine/scenes.js: the build section marker is missing, so engine/humour.js cannot be added")
+    return js.replace(HUMOUR_AT, (ROOT / "engine" / "humour.js").read_text(encoding="utf-8") + HUMOUR_AT)
+
+
 def build(p, cut):
     w, h, tag = CUTS[cut]
     B = json.loads((p.build / f"beats-{cut}.json").read_text(encoding="utf-8"))
@@ -55,7 +74,7 @@ def build(p, cut):
                .replace("{{WW}}", str(round(w * 1.7))).replace("{{DUR}}", str(B["duration"])).replace("{{SCENES}}", scenes)
                .replace("{{TRANSITIONS}}", "\n".join(trans)).replace("{{CSS_VARS}}", _css_vars(p))
                .replace("{{PROJECT_JSON}}", json.dumps({k: p.data.get(k) for k in ("name", "style", "layout", "brand", "palette", "backgrounds", "solids", "pose_aspect", "scenes")}))
-               .replace("{{ENGINE}}", (ROOT / "engine" / "scenes.js").read_text(encoding="utf-8")))
+               .replace("{{ENGINE}}", engine_js(p.data)))
     (d / "index.html").write_text(html, encoding="utf-8")
     (d / "package.json").write_text(json.dumps({"private": True, "hyperframesVersion": HF_VERSION}, indent=1), encoding="utf-8")
     shutil.copy(p.build / f"beats-{cut}.js", d / "beats.js")

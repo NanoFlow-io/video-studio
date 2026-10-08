@@ -15,6 +15,40 @@ REQUIRED = {
     # entertainment style (Brand Kit reel). hook also needs `turn` when it has a `proof`; `zoom` and `handoff` are optional
     "hook": [], "broll": [],
 }
+HEADLINE_ACCENTS = ("pink",)
+
+
+def required(s):
+    """Cue names a scene needs. A clean end card (data.clean: true) shows only the logo and the tagline, so it needs
+    only `logo`; cues it does not use are allowed."""
+    if s["type"] == "end_card" and (s.get("data") or {}).get("clean") is True:
+        return ["logo"]
+    return REQUIRED.get(s["type"], [])
+
+
+def headline_problems(sid, h, layout):
+    """Checks for a hook's data.headline (comic headline, footage layout)."""
+    if not isinstance(h, dict):
+        return [f"{sid} (hook): data.headline must be an object with at least text, not {h!r}"]
+    out, num = [], lambda v: isinstance(v, (int, float)) and not isinstance(v, bool)
+    if not isinstance(h.get("text"), str) or not h["text"].strip():
+        out.append(f"{sid} (hook): data.headline.text is required (a short line)")
+    elif len(h["text"].split()) > 6:
+        out.append(f"{sid} (hook): data.headline.text has more than 6 words: {h['text']!r}")
+    pos = h.get("pos")
+    if pos is not None and not (isinstance(pos, list) and len(pos) == 2 and all(num(v) and 0 <= v <= 1 for v in pos)):
+        out.append(f"{sid} (hook): data.headline.pos must be [x, y] with both between 0 and 1, not {pos!r}")
+    if h.get("width") is not None and not (num(h["width"]) and 0.2 <= h["width"] <= 1):
+        out.append(f"{sid} (hook): data.headline.width must be a fraction of the frame width from 0.2 to 1, not {h['width']!r}")
+    if h.get("size") is not None and not (num(h["size"]) and 40 <= h["size"] <= 300):
+        out.append(f"{sid} (hook): data.headline.size must be a font size from 40 to 300 px, not {h['size']!r}")
+    if h.get("accent") is not None and h["accent"] not in HEADLINE_ACCENTS:
+        out.append(f"{sid} (hook): data.headline.accent must be one of {', '.join(HEADLINE_ACCENTS)}, not {h['accent']!r}")
+    if layout != "footage":
+        out.append(f"{sid} (hook): data.headline only shows in the footage layout (set \"layout\": \"footage\" in project.json)")
+    return out
+
+
 ANCHOR_RE = re.compile(r"^(start|end|cut)([+-]\d+(?:\.\d+)?)?$")
 MEDIA_EXT = {".png", ".jpg", ".jpeg", ".webp", ".mp4"}
 VERTICAL_ONLY = {"hook", "broll"}
@@ -60,10 +94,16 @@ def validate(p):
             f = d.get("focus")
             if f is not None and not (isinstance(f, list) and len(f) == 2 and all(isinstance(v, (int, float)) and 0 <= v <= 1 for v in f)):
                 problems.append(f"{sid} (broll): data.focus must be [x, y] with both between 0 and 1, not {f!r}")
+        if d.get("headline") is not None and t != "hook":
+            problems.append(f"{sid} ({t}): data.headline only applies to a hook scene")
+        if d.get("clean") is not None and (t != "end_card" or not isinstance(d["clean"], bool)):
+            problems.append(f"{sid} ({t}): data.clean must be true or false, on an end_card scene only, not {d['clean']!r}")
         if t == "hook":
             if d.get("proof") and "turn" not in names:
                 problems.append(f"{sid} (hook) needs a cue named 'turn' (when data.proof slams in)")
-            if not str(d.get("pill", "")).strip():
+            if d.get("headline") is not None:   # the headline replaces the pill, so the pill is optional
+                problems += headline_problems(sid, d["headline"], p.data.get("layout"))
+            elif not str(d.get("pill", "")).strip():
                 problems.append(f"{sid} (hook): data.pill is required")
             elif len(d["pill"].split()) > 6:
                 problems.append(f"{sid} (hook): data.pill has more than 6 words: {d['pill']!r}")
@@ -168,7 +208,7 @@ def build(p, cut):
     cues, problems = [], validate(p)
     for s in scenes:
         names = {c["name"] for c in s.get("cues", [])}
-        need = REQUIRED.get(s["type"], []) + [x["cue"] for x in s.get("data", {}).get("cards", []) + s.get("data", {}).get("tiles", [])]
+        need = required(s) + [x["cue"] for x in s.get("data", {}).get("cards", []) + s.get("data", {}).get("tiles", [])]
         if s["type"] == "recap":
             need += [f"l{i + 1}" for i in range(len(s["data"]["lines"]))]
         problems += [f"{s['id']} ({s['type']}) needs a cue named '{n}'" for n in need if n not in names]
