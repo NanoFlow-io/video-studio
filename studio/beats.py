@@ -107,6 +107,13 @@ def validate(p):
                 problems.append(f"{sid} (hook): data.pill is required")
             elif len(d["pill"].split()) > 6:
                 problems.append(f"{sid} (hook): data.pill has more than 6 words: {d['pill']!r}")
+            if str(d.get("caption") or "").strip():   # the narration subtitle sits where the pill would
+                if p.data.get("layout") != "footage":
+                    problems.append(f"{sid} (hook): data.caption needs the footage layout (other layouts use captions: true)")
+                elif str(d.get("pill") or "").strip():
+                    problems.append(f"{sid} (hook): use data.pill or data.caption, not both (they share the lower caption spot)")
+                elif s.get("captions") is True:
+                    problems.append(f"{sid} (hook): remove \"captions\": true; data.caption is the subtitle and the generic captions would draw dark chips over it")
             for i, w in enumerate(d.get("words", [])):
                 if not isinstance(w, dict) or not str(w.get("text", "")).strip() or w.get("at") in (None, ""):
                     problems.append(f"{sid} (hook): data.words[{i}] needs text and at"); continue

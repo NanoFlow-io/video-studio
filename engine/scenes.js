@@ -530,7 +530,7 @@ TYPES.broll = function(sc, s, d, C){
   idle(r, s.start + 0.3, s.end);
 };
 
-/* data: pill, words [{text, at, tone}], media?, proof?, focus?   cues: turn (proof slams in), handoff (optional) */
+/* data: pill, words [{text, at, tone}], media?, proof?, focus?, caption? (footage layout)   cues: turn (proof slams in), handoff (optional) */
 TYPES.hook = function(sc, s, d, C){
   if(!V) throw new Error("hook (" + s.id + ") is vertical only");
   if(FOOTAGE){
@@ -552,6 +552,7 @@ TYPES.hook = function(sc, s, d, C){
     fitText(fpill, 1000, 62, 40, 1, 1); at(fpill, 540, FOOT.capY);
     if(d.pill){ tl.fromTo(fpill, { autoAlpha: 0, scale: 0.85 }, { autoAlpha: 1, scale: 1, duration: 0.12, ease: "back.out(2)" }, s.start);
       tl.to(fpill, { autoAlpha: 0, duration: 0.15 }, s.end - 0.1); } else gsap.set(fpill, { autoAlpha: 0 });
+    if(d.caption) footCaption(sc, s, d.caption);   /* the line's subtitle, same as broll; beats.py keeps it apart from a pill */
     return; }
   var side = (s.next && SIDE[s.next]) || (d.side === "left" ? "left" : "right");
   var H = Math.min(C.has("handoff") ? C("handoff") : s.end - 0.1, s.end - 0.1), dur = clamp(s.end - H, 0.1, 0.4);

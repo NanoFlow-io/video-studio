@@ -86,6 +86,24 @@ class Headline(unittest.TestCase):
     def test_pill_still_required_without_headline(self):
         self.assertTrue(any("data.pill is required" in x for x in self.problems()))
 
+    def test_hook_caption_alongside_headline(self):
+        self.assertEqual(self.problems(headline={"text": "Know this feeling?"}, caption="Be your own boss, they said."), [])
+        self.assertEqual(self.problems(pill="Hi", caption=""), [])
+        self.assertEqual(len([x for x in self.problems(pill="Hi", caption="Be your own boss.") if "not both" in x]), 1)
+        self.assertEqual(len([x for x in self.problems(layout=None, pill="Hi", caption="Be your own boss.") if "footage layout" in x]), 1)
+        sc = {**hook(headline={"text": "x"}, caption="Be your own boss."), "captions": True}
+        self.assertEqual(len([x for x in beats.validate(SimpleNamespace(dir=Path("."), data={"layout": "footage", "scenes": [sc]})) if "dark chips" in x]), 1)
+
+    def test_engine_draws_the_footage_hook_caption(self):
+        js = (cuts.ROOT / "engine" / "scenes.js").read_text(encoding="utf-8")
+        hook_js = js[js.index("TYPES.hook = function"):]; footage = hook_js[:hook_js.index("return; }")]
+        self.assertIn("if(d.caption) footCaption(sc, s, d.caption);", footage)
+
+    def test_template_hook_has_its_subtitle(self):
+        t = json.loads((cuts.ROOT / "projects" / "nanoflow-humour" / "project.json").read_text(encoding="utf-8"))
+        r01 = t["scenes"][0]
+        self.assertEqual((r01["type"], r01["data"]["caption"]), ("hook", r01["line"]["text"]))
+
 
 class EngineSplice(unittest.TestCase):
     def test_plain_projects_get_scenes_js_unchanged(self):
