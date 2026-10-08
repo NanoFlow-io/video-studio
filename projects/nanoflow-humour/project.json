@@ -330,9 +330,9 @@
    "cues": [
     {
      "name": "logo",
-     "at": "NanoFlow",
+     "at": "start+0.3",
      "sfx": null,
-     "note": "logo pops, then the tagline"
+     "note": "logo and the closing appear as the card opens, so the line reads while it is spoken"
     }
    ]
   }
