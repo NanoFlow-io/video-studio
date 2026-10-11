@@ -1,0 +1,60 @@
+{
+ "template": "owner-explainer-field-notes-v1",
+ "kind": "PLACEHOLDER STORYBOARD: no business inputs were supplied; every [BRACKETED] slot is filled from the template inputs, never invented",
+ "durationSec": 13.5,
+ "chapters": 3,
+ "beats": [
+  {
+   "id": "B1", "chapter": "THE PROBLEM", "index": 1, "start": 0.0, "end": 4.2,
+   "narration": "[Owner, in their own words: the problem customers notice, about 10 words.]",
+   "kicker": "[TARGET CUSTOMER]",
+   "headline": [{ "text": "The common" }, { "text": "[Customer problem]", "emphasis": "ochreBox" }],
+   "annotation": "[Where the customer notices it]",
+   "composition": "subject elevation: the customer's place (generic building) on a ground disc inside faint survey rings; problem markers pulse on it; one leader annotation",
+   "startState": "paper, header with progress rule at 1/3, empty illustration band",
+   "animation": [
+    { "at": 0.00, "what": "header + progress rule extend to 1/3; kicker dash draws, kicker fades in" },
+    { "at": 0.25, "what": "headline line 1 rises in" },
+    { "at": 0.55, "what": "line 2 rises; the ochre box wipes in behind it on the spoken problem word, text turns white" },
+    { "at": 0.90, "what": "survey rings fade in; ground disc and building outline draw on (0.7 s), fills tint in" },
+    { "at": 1.90, "what": "three ochre problem markers pop and pulse once, synced to the problem word" },
+    { "at": 2.60, "what": "leader line draws to a marker; italic annotation fades in" }
+   ],
+   "endState": "headline with ochre box, building with three pulsing markers, annotation; hold 1.2 s"
+  },
+  {
+   "id": "B2", "chapter": "THE CAUSE", "index": 2, "start": 4.2, "end": 9.0,
+   "narration": "[Owner: the verified cause and how it reaches the problem, about 14 words.]",
+   "kicker": "WHAT'S ACTUALLY HAPPENING",
+   "headline": [{ "text": "[Verified cause]" }, { "text": "[how it spreads]", "emphasis": "blueUnderline" }],
+   "annotation": "[Measured or observed detail]",
+   "composition": "cross-section cutaway: ground surface with the building on top, layered soil below; the cause travels along a dashed path from its source up to the building; indicator card, measurement bracket and an ochre cause tag",
+   "startState": "previous headline slides up and out; header rule extends to 2/3",
+   "animation": [
+    { "at": 0.00, "what": "B1 headline exits up; the illustration wipes down into the cutaway (the building stays as the anchor)" },
+    { "at": 0.30, "what": "headline lines rise in; blue underline wipes under line 2 on the spoken word" },
+    { "at": 0.80, "what": "soil layers slide up from the bottom one by one (0.15 s apart)" },
+    { "at": 1.50, "what": "source node appears deep in the ground; the dashed cause path draws upward to the foundation while a marker travels it (1.2 s)" },
+    { "at": 2.90, "what": "indicator card fills its bar to HIGH; measurement bracket draws; ochre [VERIFIED CAUSE] tag slides in on its leader" }
+   ],
+   "endState": "cutaway with the complete cause path, indicator card, bracket and tag; hold 1.3 s"
+  },
+  {
+   "id": "B3", "chapter": "THE FIX", "index": 3, "start": 9.0, "end": 13.5,
+   "narration": "[Owner: what the business does and the realistic result, about 14 words.]",
+   "kicker": "[BUSINESS SOLUTION CATEGORY]",
+   "headline": [{ "text": "[Business" }, { "text": "solution]", "emphasis": "sageUnderlay" }],
+   "quote": "[Realistic customer outcome]",
+   "composition": "the same building, now protected: blue perimeter ring on the ground disc, sage shield drawn around it with a check badge; problem markers pushed out and faded; cadence timeline and a next-step card in the lower band",
+   "startState": "broad diagonal wipe (sage, near-black, ochre; 0.6 s) clears the cutaway; header rule extends to 3/3",
+   "animation": [
+    { "at": 0.00, "what": "diagonal geometric wipe, then the headline rises; sage underlay wipes behind line 2" },
+    { "at": 0.70, "what": "building returns at the B1 position; problem markers return around it" },
+    { "at": 1.20, "what": "blue perimeter ring draws around the base; markers are pushed outward and fade (shows HOW the fix changes the problem)" },
+    { "at": 1.90, "what": "shield outline draws around the building, sage tint fills; check badge pops" },
+    { "at": 2.60, "what": "italic outcome quote fades in; cadence timeline ticks four nodes left to right; next-step card slides up with its ochre offset" }
+   ],
+   "endState": "protected building with ring, shield and check; outcome quote, timeline and card; hold 1.4 s, then hand off to the owner CTA section"
+  }
+ ]
+}

@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Owner Explainer — Field Notes v1 (still preview)</title>
+<link rel="stylesheet" href="../fonts/fonts.css">
+<style>
+  :root { --paper:#E7E0D4; --ink:#1B1B15; }
+  html, body { margin:0; background:#888; }
+  #frame { position:relative; width:1080px; height:1920px; overflow:hidden; background:var(--paper); }
+  .abs { position:absolute; }
+  /* paper: faint grid, uneven shading and grain (all generated, no image files) */
+  #grid { inset:0; background-image:
+      linear-gradient(to right, var(--grid) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid) 1px, transparent 1px);
+    background-size:54px 54px; opacity:.32; }
+  #shade { inset:0; background:
+      radial-gradient(120% 80% at 30% 18%, rgba(255,255,255,.28), rgba(255,255,255,0) 60%),
+      radial-gradient(90% 70% at 85% 95%, rgba(120,100,70,.10), rgba(0,0,0,0) 70%),
+      radial-gradient(70% 50% at 5% 70%, rgba(120,100,70,.07), rgba(0,0,0,0) 70%); }
+  #grain { inset:0; opacity:.55; mix-blend-mode:multiply; }
+  /* header */
+  .hdr { left:var(--mx); right:var(--mx); top:var(--hdrY); display:flex; justify-content:space-between; align-items:baseline;
+    font:600 var(--hdrSize)/1 'Inter'; letter-spacing:.18em; text-transform:uppercase; color:#8A8378; }
+  .hdr b { color:var(--ink); font-weight:700; }
+  .hdr .num { color:var(--ink); font-weight:700; margin-left:.5em; }
+  .rule { left:var(--mx); right:var(--mx); top:var(--ruleY); height:2px; background:#CFC7BA; }
+  .rule i { position:absolute; left:0; top:0; height:3px; margin-top:-.5px; background:var(--ochreRule); }
+  /* kicker + headline */
+  .kicker { left:var(--mx); top:var(--kickY); font:700 var(--kickSize)/1 'Inter'; letter-spacing:.2em; text-transform:uppercase; color:#3A3630;
+    display:flex; align-items:center; gap:18px; }
+  .kicker::before { content:''; width:38px; height:3px; background:var(--ochre); display:block; }
+  .headline { left:var(--mx); top:var(--headY); width:950px; font:800 var(--headSize)/1.0 'Inter Tight'; letter-spacing:-.035em; color:var(--ink); }
+  .headline .ln { display:block; white-space:nowrap; }
+  .headline .ln > span { position:relative; padding:0 0; }
+  .ochreBox { background:var(--ochre); color:#fff; padding:0 12px 6px !important; margin-left:-12px; box-decoration-break:clone; }
+  .blueUnderline { background:linear-gradient(transparent 68%, var(--dustyBlue) 68%, var(--dustyBlue) 94%, transparent 94%); }
+  .sageUnderlay { background:linear-gradient(transparent 52%, var(--sageTint) 52%, var(--sageTint) 96%, transparent 96%); }
+  .italic { font-family:'Instrument Serif'; font-style:italic; font-weight:400; }
+  .note { font:italic 400 40px/1.1 'Instrument Serif'; color:#3A3630; }
+  .quote { left:var(--mx); font:italic 400 46px/1.1 'Instrument Serif'; color:#3A3630; }
+  .tag { font:700 19px/1 'Inter'; letter-spacing:.14em; text-transform:uppercase; color:#fff; background:var(--ochre); padding:9px 12px 8px; }
+  .label { font:700 19px/1 'Inter'; letter-spacing:.16em; text-transform:uppercase; color:#3A3630; }
+  .mini { font:600 17px/1 'Inter'; letter-spacing:.12em; text-transform:uppercase; color:#5A554D; }
+  .card { background:#F6F1E8; border:3px solid var(--ink); box-shadow:10px 10px 0 var(--ochre); padding:22px 26px; display:flex; gap:20px; align-items:center;
+    font:700 34px/1.12 'Inter Tight'; letter-spacing:-.02em; color:var(--ink); }
+  .card .box { width:40px; height:40px; border:3px solid var(--ink); border-radius:6px; flex:none; display:flex; align-items:center; justify-content:center; }
+  .stamp { left:var(--mx); bottom:52px; font:700 16px/1 'Inter'; letter-spacing:.2em; color:var(--ochre); text-transform:uppercase; border:2px solid var(--ochre); padding:8px 12px; background:var(--paperLight); z-index:5; }
+  svg text { font-family:'Inter'; }
+</style>
+</head>
+<body>
+<div id="frame">
+  <div id="grid" class="abs"></div>
+  <div id="shade" class="abs"></div>
+  <svg id="grain" class="abs" width="1080" height="1920"><filter id="g"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" seed="7"/><feColorMatrix values="0 0 0 0 .45  0 0 0 0 .40  0 0 0 0 .33  0 0 0 .09 0"/></filter><rect width="1080" height="1920" filter="url(#g)"/></svg>
+  <div id="content"></div>
+</div>
+<script src="data.js"></script>
+<script>
+/* Static END-STATE preview of one beat (?beat=1|2|3). Everything comes from template.json + storyboard.json
+   (inlined into data.js by render.py), so text, palette and layout are edited there, not here. No animation. */
+const T = window.TEMPLATE, S = window.STORYBOARD, P = T.palette, L = T.layout;
+const beatNo = Math.max(1, Math.min(3, Number(new URLSearchParams(location.search).get('beat') || 1)));
+const beat = S.beats[beatNo - 1];
+const root = document.documentElement.style;
+Object.entries(P).forEach(([k, v]) => { if (!k.startsWith('_') && typeof v === 'string') root.setProperty('--' + k, v); });
+root.setProperty('--mx', L.marginX + 'px');
+[['--hdrY', L.header.y], ['--hdrSize', L.header.size], ['--ruleY', L.header.ruleY], ['--kickY', L.kicker.y], ['--kickSize', L.kicker.size], ['--headY', L.headline.top], ['--headSize', L.headline.size]].forEach(([k, v]) => root.setProperty(k, v + 'px'));
+const C = document.getElementById('content');
+const el = (html) => { const d = document.createElement('div'); d.innerHTML = html.trim(); const n = d.firstChild; C.appendChild(n); return n; };
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const biz = T.inputs.businessName.value || '[BUSINESS]';
+
+// header, progress rule, kicker, headline
+el(`<div class="abs hdr"><span><b>${esc(biz)}</b> FIELD NOTES</span><span>${esc(beat.chapter)}<span class="num">${String(beat.index).padStart(2, '0')}/${String(S.chapters).padStart(2, '0')}</span></span></div>`);
+el(`<div class="abs rule"><i style="width:${(beat.index / S.chapters * 100).toFixed(1)}%"></i></div>`);
+el(`<div class="abs kicker">${esc(beat.kicker)}</div>`);
+el(`<div class="abs headline">${beat.headline.map((l) => `<span class="ln"><span class="${l.emphasis || ''}">${esc(l.text)}</span></span>`).join('')}</div>`);
+el(`<div class="abs stamp">Placeholder storyboard · still ${beatNo}/3 · not for publishing</div>`);
+
+// ── shared illustration parts (flat, thin dark outlines, muted fills) ──
+const ink = P.ink, sw = 4;
+function building(x, y, s = 1, opts = {}) {      // x,y = centre of the ground line
+  const g = (d) => d;
+  return `<g transform="translate(${x},${y}) scale(${s})">
+    <rect x="-150" y="-120" width="90" height="120" fill="#EDE4D6" stroke="${ink}" stroke-width="${sw}"/>
+    <rect x="-128" y="-92" width="40" height="38" fill="${P.dustyBlue}" stroke="${ink}" stroke-width="${sw}"/>
+    <rect x="-60" y="-190" width="190" height="190" fill="#FAF7F1" stroke="${ink}" stroke-width="${sw}"/>
+    <path d="M-82,-186 L35,-282 L152,-186 Z" fill="${opts.roof || ink}" stroke="${ink}" stroke-width="${sw}" stroke-linejoin="round"/>
+    <circle cx="35" cy="-222" r="9" fill="#FAF7F1"/>
+    <rect x="-28" y="-104" width="44" height="104" fill="${P.ochre}" stroke="${ink}" stroke-width="${sw}"/>
+    <rect x="50" y="-150" width="50" height="46" fill="${P.dustyBlue}" stroke="${ink}" stroke-width="${sw}"/>
+    <path d="M70,-60 L112,-60 L112,0" fill="none" stroke="${ink}" stroke-width="${sw}"/>
+    <line x1="-180" y1="0" x2="170" y2="0" stroke="${ink}" stroke-width="${sw}" stroke-linecap="round"/>
+  </g>`;
+}
+const marker = (x, y, r = 16) => `<g><circle cx="${x}" cy="${y}" r="${r * 2.2}" fill="none" stroke="${P.ochre}" stroke-width="3" opacity=".45"/>
+  <circle cx="${x}" cy="${y}" r="${r * 1.4}" fill="${P.ochre}" opacity=".18"/><circle cx="${x}" cy="${y}" r="${r * .62}" fill="${P.ochre}" stroke="${ink}" stroke-width="3"/></g>`;
+const svg = (inner, top = 0, h = 1920) => el(`<svg class="abs" style="left:0;top:${top}px" width="1080" height="${h}" viewBox="0 ${top} 1080 ${h}">${inner}</svg>`);
+
+if (beatNo === 1) {
+  // survey rings + ground disc + building + problem markers + leader annotation
+  let rings = ''; for (let i = 1; i <= 6; i++) rings += `<circle cx="540" cy="1150" r="${i * 95}" fill="none" stroke="#CBBFAE" stroke-width="2" opacity="${.55 - i * .06}"/>`;
+  svg(`${rings}
+    <ellipse cx="540" cy="1300" rx="380" ry="78" fill="${P.groundTint}" stroke="none"/>
+    ${building(540, 1300, 1.7)}
+    ${marker(340, 1132, 20)} ${marker(640, 1048, 20)} ${marker(732, 1236, 20)}
+    <path d="M732,1236 L830,1376 L1008,1376" fill="none" stroke="${ink}" stroke-width="3"/>`);
+  el(`<div class="abs note" style="right:${L.marginX}px;top:1392px;width:620px;text-align:right">${esc(beat.annotation)}</div>`);
+  el(`<div class="abs label" style="left:${L.marginX}px;top:1580px;display:flex;gap:16px;align-items:center"><span style="width:38px;height:3px;background:${P.ochre};display:block"></span>OBSERVED BY CUSTOMERS</div>`);
+  el(`<div class="abs mini" style="left:${L.marginX}px;top:1626px">[WHEN] · [HOW OFTEN] · [WHERE]</div>`);
+}
+
+if (beatNo === 2) {
+  // cutaway: surface line, small building, soil layers, source node, dashed cause path, indicator, bracket, tag
+  const top = 860, layers = [[P.tan, 90], [P.brown, 150], [P.brownDeep, 170], [P.brownDark, 400]];
+  let y = top, soil = '';
+  layers.forEach(([c, h], i) => {
+    const jag = Array.from({ length: 28 }, (_, k) => `${k * 40},${y + (k % 2 ? 6 : -6) * (i ? 1 : 0)}`).join(' L');
+    soil += `<path d="M0,${y} L${jag} L1080,${y} L1080,1920 L0,1920 Z" fill="${c}"/>`; y += h;
+  });
+  let pebbles = ''; for (let i = 0; i < 40; i++) { const px = (i * 271) % 1080, py = top + 40 + ((i * 137) % 760); pebbles += `<circle cx="${px}" cy="${py}" r="${3 + (i % 3)}" fill="#F0E6D6" opacity=".35"/>`; }
+  svg(`${soil}${pebbles}
+    <rect x="0" y="${top - 14}" width="1080" height="14" fill="${P.sage}"/>
+    <line x1="0" y1="${top}" x2="1080" y2="${top}" stroke="${ink}" stroke-width="4"/>
+    ${building(570, top, .9)}
+    <circle cx="300" cy="1500" r="34" fill="${P.ochre}" stroke="${ink}" stroke-width="4"/><circle cx="300" cy="1500" r="58" fill="none" stroke="${P.ochre}" stroke-width="3" opacity=".5"/>
+    <path d="M300,1466 C300,1330 620,1300 570,${top + 8}" fill="none" stroke="${ink}" stroke-width="5" stroke-dasharray="16 12" stroke-linecap="round"/>
+    <path d="M554,${top + 36} L570,${top + 8} L588,${top + 36}" fill="none" stroke="${ink}" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="412" cy="1318" r="11" fill="#FAF7F1" stroke="${ink}" stroke-width="3"/>
+    <path d="M930,${top + 10} L960,${top + 10} L960,1500 L930,1500" fill="none" stroke="#F6F1E8" stroke-width="3"/>
+    <path d="M345,1500 L600,1600 L700,1600" fill="none" stroke="#F6F1E8" stroke-width="3"/>`, 0, 1920);
+  el(`<div class="abs tag" style="left:706px;top:1584px">[Verified cause]</div>`);
+  el(`<div class="abs" style="left:976px;top:${(860 + 1500) / 2 - 60}px;writing-mode:vertical-rl;font:700 19px/1 'Inter';letter-spacing:.16em;color:#F6F1E8">[MEASURE]</div>`);
+  el(`<div class="abs" style="left:${L.marginX}px;top:610px;width:360px;border:3px solid ${ink};background:#F6F1E8;padding:14px 16px 16px">
+        <div style="display:flex;justify-content:space-between" class="mini"><span style="color:${ink};font-weight:700">[INDICATOR]</span><span style="color:${P.blueStroke};font-weight:700">HIGH</span></div>
+        <div style="margin-top:12px;height:10px;background:#D9D2C6"><div style="width:84%;height:100%;background:${P.blueStroke}"></div></div></div>`);
+  el(`<div class="abs note" style="left:${L.marginX}px;top:706px;width:340px">${esc(beat.annotation)}</div>`);
+}
+
+if (beatNo === 3) {
+  // protected building: ground disc, blue perimeter ring, shield + check, retreating markers; lower band: cadence + card
+  const cx = 540, gy = 1170;
+  svg(`<ellipse cx="${cx}" cy="${gy}" rx="380" ry="78" fill="${P.groundTint}"/>
+    <path d="M${cx},610 L${cx + 210},680 L${cx + 210},900 C${cx + 210},1060 ${cx + 90},1150 ${cx},1215 C${cx - 90},1150 ${cx - 210},1060 ${cx - 210},900 L${cx - 210},680 Z" fill="${P.sageTint}" fill-opacity=".45" stroke="${P.sage}" stroke-width="6" stroke-linejoin="round"/>
+    <path d="M${cx},636 L${cx + 186},698 L${cx + 186},900 C${cx + 186},1045 ${cx + 80},1124 ${cx},1185 C${cx - 80},1124 ${cx - 186},1045 ${cx - 186},900 L${cx - 186},698 Z" fill="none" stroke="${P.sage}" stroke-width="2" opacity=".6"/>
+    <ellipse cx="${cx}" cy="${gy}" rx="330" ry="60" fill="none" stroke="${P.dustyBlue}" stroke-width="16" opacity=".85"/>
+    <ellipse cx="${cx}" cy="${gy}" rx="330" ry="60" fill="none" stroke="${P.blueStroke}" stroke-width="4"/>
+    ${building(cx, gy, 1.12)}
+    <circle cx="${cx + 196}" cy="688" r="40" fill="${P.sage}" stroke="#F6F1E8" stroke-width="5"/>
+    <path d="M${cx + 176},688 L${cx + 192},704 L${cx + 218},674" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+    <g opacity=".35">${marker(110, 1260, 11)}${marker(985, 1120, 11)}${marker(930, 1300, 11)}</g>`);
+  el(`<div class="abs quote" style="top:${L.headline.top + 2 * L.headline.size + 18}px;width:950px">“${esc(beat.quote)}”</div>`);
+  const nodes = ['[STEP 1]', '[STEP 2]', '[STEP 3]', '[STEP 4]'];
+  el(`<div class="abs label" style="left:${L.marginX}px;top:1350px;display:flex;gap:16px;align-items:center"><span style="width:38px;height:3px;background:${P.ochre};display:block"></span>[SERVICE CADENCE]</div>`);
+  svg(`<line x1="${L.marginX}" y1="1450" x2="${1080 - L.marginX}" y2="1450" stroke="${ink}" stroke-width="3"/>
+    ${nodes.map((_, i) => { const x = 140 + i * 265; return `<circle cx="${x}" cy="1450" r="20" fill="${P.sage}"/><path d="M${x - 9},1450 L${x - 2},1457 L${x + 10},1443" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>`; }).join('')}`);
+  nodes.forEach((n, i) => el(`<div class="abs mini" style="left:${140 + i * 265 - 70}px;width:140px;text-align:center;top:1398px;color:${ink};font-weight:700">${n}</div>`));
+  el(`<div class="abs card" style="left:${L.marginX}px;top:1520px;width:${1080 - 2 * L.marginX - 70}px"><span class="box"><svg width="26" height="22"><path d="M3,12 L10,19 L23,3" fill="none" stroke="${ink}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>[Next step for the customer]</span></div>`);
+}
+// Auto-fit: a headline line wider than layout.headline.maxWidth shrinks (all lines together, down to 70%).
+function fitHeadline() {
+  const h = document.querySelector('.headline'); if (!h) return;
+  let size = L.headline.size;
+  const widest = () => Math.max(...[...h.querySelectorAll('.ln > span')].map((s) => s.getBoundingClientRect().width));
+  while (widest() > L.headline.maxWidth && size > L.headline.size * 0.7) { size -= 2; h.style.fontSize = size + 'px'; }
+}
+document.fonts.ready.then(() => { fitHeadline(); document.body.dataset.ready = '1'; });
+</script>
+</body>
+</html>
