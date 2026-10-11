@@ -14,6 +14,8 @@ REQUIRED = {
     "integrations_hub": ["hub", "ok"], "phone_approve": ["phone", "tap", "approve", "lock"], "recap": [], "end_card": ["logo", "button", "url", "chord"],
     # entertainment style (Brand Kit reel). hook also needs `turn` when it has a `proof`; `zoom` and `handoff` are optional
     "hook": [], "broll": [],
+    # field-notes explainer (engine/fieldnotes.js, experimental): cues are whatever its actions name, checked below
+    "fieldnotes": [],
 }
 HEADLINE_ACCENTS = ("pink",)
 
@@ -49,6 +51,80 @@ def headline_problems(sid, h, layout):
     return out
 
 
+# field-notes scene data (engine/fieldnotes.js). Kinds and the actions each accepts; "draw", "show" and "hide" work on any
+# object, and timeline parts ("timeline.peak") take show / hide / seg; the playhead also takes playhead.
+FN_KINDS = {"house": {"fill"}, "ac_unit": {"run"}, "timeline": {"seg", "playhead"}, "gauge": {"set"},
+            "thermostat": {"turn"}, "arrow": {"flow"}, "callout": set(), "note": set(), "card": set()}
+FN_LOCAL = {"callout", "note", "card"}
+FN_EMPHASIS = {None, "ochre", "blue", "sage", "italic"}
+FN_TIME_RE = re.compile(r"^([A-Za-z0-9_]+)([+-]\d+(?:\.\d+)?)?$")
+
+
+def fieldnotes_problems(sid, d, cue_names, carried):
+    """Checks for one fieldnotes scene. `carried` maps object id -> kind for objects that continue from earlier
+    fieldnotes scenes; it is updated with this scene's objects that carry on."""
+    out, num = [], lambda v: isinstance(v, (int, float)) and not isinstance(v, bool)
+    pre = f"{sid} (fieldnotes)"
+    hd = d.get("headline") or {}
+    lines = hd.get("lines")
+    if not isinstance(lines, list) or not lines or not all(isinstance(x, dict) and str(x.get("text", "")).strip() for x in lines):
+        out.append(f"{pre}: data.headline.lines must be a list of {{text, em?, at?}} with text")
+    else:
+        if len(lines) > 3:
+            out.append(f"{pre}: data.headline has more than 3 lines")
+        for x in lines:
+            if x.get("em") not in FN_EMPHASIS:
+                out.append(f"{pre}: headline emphasis must be one of ochre, blue, sage, italic, not {x.get('em')!r}")
+
+    def time_ok(v, where):
+        if v is None or (num(v) and v >= 0):
+            return
+        m = FN_TIME_RE.match(str(v).strip()) if isinstance(v, str) else None
+        if not m:
+            out.append(f"{pre}: {where}: time must be seconds after the scene start or a cue name with an optional +/- offset, not {v!r}")
+        elif m.group(1) not in ("start", "end") and m.group(1) not in cue_names:
+            out.append(f"{pre}: {where}: '{m.group(1)}' is not one of this scene's cues ({', '.join(sorted(cue_names)) or 'none'})")
+    time_ok(hd.get("at"), "headline.at")
+    for x in lines if isinstance(lines, list) else []:
+        if isinstance(x, dict):
+            time_ok(x.get("at"), f"headline line {x.get('text')!r}")
+    kinds = {} if d.get("continue") is False else dict(carried)
+    parts = {}
+    for i, o in enumerate(d.get("objects") or []):
+        if not isinstance(o, dict) or not str(o.get("id", "")).strip():
+            out.append(f"{pre}: objects[{i}] needs an id"); continue
+        kind = o.get("kind") or kinds.get(o["id"])
+        if kind not in FN_KINDS:
+            out.append(f"{pre}: object {o['id']}: kind must be one of {', '.join(sorted(FN_KINDS))}, not {o.get('kind')!r}"); continue
+        kinds[o["id"]] = kind
+        if kind == "timeline":
+            parts.setdefault(o["id"], {"playhead"}).update(x.get("id") for x in (o.get("bands") or []) + (o.get("segs") or []) if isinstance(x, dict))
+    for i, a in enumerate(d.get("actions") or []):
+        if not isinstance(a, dict):
+            out.append(f"{pre}: actions[{i}] must be an object"); continue
+        verb, target = a.get("do"), str(a.get("target", ""))
+        oid, _, part = target.partition(".")
+        where = f"action {i + 1} ({verb} {target})"
+        time_ok(a.get("at"), where)
+        if oid not in kinds:
+            out.append(f"{pre}: {where}: no object '{oid}' in this scene or carried from the previous one"); continue
+        kind = kinds[oid]
+        if part:
+            if kind != "timeline":
+                out.append(f"{pre}: {where}: only a timeline has parts")
+            elif verb not in ("show", "hide", "seg", "playhead"):
+                out.append(f"{pre}: {where}: a timeline part takes show, hide, seg or playhead")
+            elif part not in parts.get(oid, {"playhead"}) and oid not in carried:
+                out.append(f"{pre}: {where}: the timeline has no band or segment '{part}'")
+        elif verb not in {"draw", "show", "hide"} | FN_KINDS[kind]:
+            out.append(f"{pre}: {where}: a {kind} takes {', '.join(sorted({'draw', 'show', 'hide'} | FN_KINDS[kind]))}")
+    if d.get("transition") not in (None, "bands"):
+        out.append(f"{pre}: data.transition must be 'bands' or absent, not {d.get('transition')!r}")
+    carried.clear()
+    carried.update({k: v for k, v in kinds.items() if v not in FN_LOCAL})
+    return out
+
+
 ANCHOR_RE = re.compile(r"^(start|end|cut)([+-]\d+(?:\.\d+)?)?$")
 MEDIA_EXT = {".png", ".jpg", ".jpeg", ".webp", ".mp4"}
 VERTICAL_ONLY = {"hook", "broll"}
@@ -57,11 +133,13 @@ MEDIA_DIRS = {"media", "images", "brand"}
 
 def validate(p):
     """Checks on scene data that need no voice timings, so they run before anything is bought."""
-    problems = []
+    problems, fn_carried = [], {}
     for s in p.data["scenes"]:
         t, d, sid = s["type"], s.get("data", {}) or {}, s["id"]
         if t not in REQUIRED:
             problems.append(f"{sid}: unknown scene type '{t}'"); continue
+        if t == "fieldnotes":
+            problems += fieldnotes_problems(sid, d, {c.get("name") for c in s.get("cues", [])}, fn_carried)
         if t in VERTICAL_ONLY and s["line"].get("vertical", True) is False:
             problems.append(f"{sid} ({t}): this type is vertical only, so line.vertical cannot be false")
         names = {c["name"] for c in s.get("cues", [])}
@@ -94,7 +172,7 @@ def validate(p):
             f = d.get("focus")
             if f is not None and not (isinstance(f, list) and len(f) == 2 and all(isinstance(v, (int, float)) and 0 <= v <= 1 for v in f)):
                 problems.append(f"{sid} (broll): data.focus must be [x, y] with both between 0 and 1, not {f!r}")
-        if d.get("headline") is not None and t != "hook":
+        if d.get("headline") is not None and t not in ("hook", "fieldnotes"):   # fieldnotes checks its own headline
             problems.append(f"{sid} ({t}): data.headline only applies to a hook scene")
         if d.get("clean") is not None and (t != "end_card" or not isinstance(d["clean"], bool)):
             problems.append(f"{sid} ({t}): data.clean must be true or false, on an end_card scene only, not {d['clean']!r}")

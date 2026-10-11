@@ -35,15 +35,21 @@ def uses_humour(data):
     return any((s.get("data") or {}).get("headline") or (s.get("data") or {}).get("clean") is True for s in data.get("scenes", []))
 
 
+def uses_fieldnotes(data):
+    """True when a scene is a field-notes explainer scene (type fieldnotes, engine/fieldnotes.js; experimental)."""
+    return any(s.get("type") == "fieldnotes" for s in data.get("scenes", []))
+
+
 def engine_js(data):
-    """The engine inlined into the page: scenes.js, with engine/humour.js spliced in before the build section only for
-    projects that use it, so every other project's page stays byte-identical."""
+    """The engine inlined into the page: scenes.js, with engine/humour.js and engine/fieldnotes.js spliced in before the
+    build section only for projects that use them, so every other project's page stays byte-identical."""
     js = (ROOT / "engine" / "scenes.js").read_text(encoding="utf-8")
-    if not uses_humour(data):
+    extra = [f for f, used in (("humour.js", uses_humour(data)), ("fieldnotes.js", uses_fieldnotes(data))) if used]
+    if not extra:
         return js
     if js.count(HUMOUR_AT) != 1:
-        raise SystemExit("engine/scenes.js: the build section marker is missing, so engine/humour.js cannot be added")
-    return js.replace(HUMOUR_AT, (ROOT / "engine" / "humour.js").read_text(encoding="utf-8") + HUMOUR_AT)
+        raise SystemExit(f"engine/scenes.js: the build section marker is missing, so engine/{extra[0]} cannot be added")
+    return js.replace(HUMOUR_AT, "".join((ROOT / "engine" / f).read_text(encoding="utf-8") for f in extra) + HUMOUR_AT)
 
 
 def build(p, cut):

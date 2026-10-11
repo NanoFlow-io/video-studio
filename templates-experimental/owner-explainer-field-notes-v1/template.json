@@ -1,7 +1,7 @@
 {
  "id": "owner-explainer-field-notes-v1",
  "name": "Owner Explainer — Field Notes v1",
- "status": "experimental: specification + static still preview only; no animation renderer yet",
+ "status": "experimental: style spec + still preview + a working opt-in animation renderer (engine/fieldnotes.js, scene type 'fieldnotes'); prompt-to-scene-data planning is manual",
  "createdBy": "Nano for bobby@nanoflow.io",
  "createdAt": "2026-10-11",
  "scope": "Section 3 of the owner-explainer reel only: the animated cause-and-solution explanation narrated by the owner. Opening footage, owner avatar and closing CTA are separate sections and are NOT part of this template.",
@@ -198,6 +198,8 @@
   "storyboard": "storyboard.json and STORYBOARD.md",
   "preview": "preview/index.html (static still preview: ?beat=1|2|3)",
   "stills": "stills/beat1.png, stills/beat2.png, stills/beat3.png",
-  "fonts": "fonts/"
+  "fonts": "fonts/",
+  "renderer": "engine/fieldnotes.js (scene data reference: FIELDNOTES.md)",
+  "firstTest": "projects/fieldnotes-tn-cool-before-peak (+ -variant, data-only changes)"
  }
 }

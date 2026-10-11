@@ -14,19 +14,11 @@ Studio default, template list or platform route points here.
 | `stills/beat1..3.png` | 1080x1920 keyframes from the preview | produced |
 | `fonts/` | Inter Tight, Inter, Instrument Serif (OFL) | used by the preview |
 
-It is NOT a functioning animation template: there is no motion, narration sync or video output yet.
+Animation (2026-10-11): `engine/fieldnotes.js` renders scenes of type `fieldnotes` from scene data (objects and timed
+actions); see `FIELDNOTES.md` for the data, the object and action types, how to start a new video and what is still
+manual. First test: `projects/fieldnotes-tn-cool-before-peak` (silent, provisional timings). The prompt-to-scene-data
+step is manual for now, so this is a working renderer, not an automatic prompt-to-animation workflow.
 
 Re-render the stills after editing the JSON (free, local Chromium):
 
     /home/adam/video-studio/.venv/bin/python templates-experimental/owner-explainer-field-notes-v1/preview/render.py
-
-## Gap for the animation test
-
-The Studio engine (`engine/scenes.js`) has no scene type for this look (its types are the Nano reel and footage
-layouts). Proposed, pending approval: an opt-in engine module `engine/fieldnotes.js`, spliced in by `studio/cuts.py`
-only for projects whose scenes use `type: "fieldnotes"` (the same gating as `engine/humour.js`, so every other project's
-page stays byte-identical). It would port this preview's SVG parts and drive the motion rules with GSAP from the
-project's word cues, so the owner's narration, the cue timings, the mix, the remote render and provenance all stay the
-existing Studio pipeline. Rendering is free (plex-server). The only possible paid item is the narration if it is
-synthesised rather than the owner's recording: about 1 ElevenLabs credit per character (about 200 credits for a 13.5 s
-test), quoted before any run.

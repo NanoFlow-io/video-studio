@@ -1,0 +1,557 @@
+{
+ "name": "fieldnotes-tn-cool-before-peak-variant",
+ "title": "True North field notes: cool before peak (experimental test) (data-only variant)",
+ "style": "entertainment",
+ "_note": "Experimental field-notes explainer test (owner-explainer-field-notes-v1). Provisional timings from --dry-timings until real narration exists. No rates, universal peak times, savings figures or guarantees.",
+ "palette": {
+  "primary": "#698157",
+  "accent": "#D58745",
+  "ink": "#1B1B15",
+  "paper": "#E7E0D4",
+  "ink2": "#5A554D",
+  "grid": "#D6CEC0",
+  "muted": "#8A8378",
+  "ochre": "#D58745",
+  "ochreRule": "#C3996F",
+  "sage": "#698157",
+  "sageWipe": "#6C8454",
+  "sageTint": "#B1B799",
+  "blue": "#A5BDD5",
+  "blueStroke": "#7E9CC0",
+  "ground": "#E1D5C3",
+  "card": "#F6F1E8"
+ },
+ "fonts": {
+  "title": "Inter Tight",
+  "body": "Inter",
+  "note": "Instrument Serif"
+ },
+ "voice": {
+  "voice_id": "iP95p4xoKVk53GoZ742B",
+  "voice_name": "Chris (ElevenLabs premade)",
+  "model": "eleven_multilingual_v2",
+  "settings": {
+   "stability": 0.45,
+   "similarity_boost": 0.8,
+   "style": 0.25,
+   "use_speaker_boost": true,
+   "speed": 1
+  },
+  "lead_in": 0.4,
+  "tail": 1.6
+ },
+ "audio": {},
+ "music": {},
+ "sfx": {},
+ "scenes": [
+  {
+   "id": "F01",
+   "type": "fieldnotes",
+   "line": {
+    "text": "On a time-of-use plan?",
+    "pause": [
+     0,
+     1.3
+    ]
+   },
+   "cues": [
+    {
+     "name": "tou",
+     "at": "time",
+     "sfx": null
+    },
+    {
+     "name": "plan",
+     "at": "plan",
+     "sfx": null
+    }
+   ],
+   "data": {
+    "header": {
+     "brand": "TRUE NORTH",
+     "label": "FIELD NOTES",
+     "chapter": "THE PROBLEM",
+     "index": 1,
+     "total": 3
+    },
+    "kicker": "ON A TIME-OF-USE PLAN",
+    "headline": {
+     "lines": [
+      {
+       "text": "Cooling during"
+      },
+      {
+       "text": "the priciest hours",
+       "em": "ochre",
+       "at": "tou+0.2"
+      }
+     ]
+    },
+    "objects": [
+     {
+      "id": "house",
+      "kind": "house",
+      "x": 400,
+      "y": 1110,
+      "scale": 1.35
+     },
+     {
+      "id": "ac",
+      "kind": "ac_unit",
+      "x": 800,
+      "y": 1110,
+      "scale": 1
+     },
+     {
+      "id": "timeline",
+      "kind": "timeline",
+      "x": 72,
+      "y": 1400,
+      "w": 936,
+      "left": "EARLIER IN THE DAY",
+      "right": "LATER",
+      "bands": [
+       {
+        "id": "peak",
+        "from": 0.48,
+        "to": 0.78,
+        "label": "PEAK PRICE"
+       }
+      ],
+      "segs": [
+       {
+        "id": "early",
+        "from": 0.3,
+        "to": 0.48,
+        "level": 0.9
+       },
+       {
+        "id": "atpeak",
+        "from": 0.48,
+        "to": 0.8,
+        "level": 0.9
+       }
+      ],
+      "playhead": {
+       "pos": 0.36
+      }
+     },
+     {
+      "id": "gauge",
+      "kind": "gauge",
+      "x": 72,
+      "y": 1540,
+      "w": 600,
+      "label": "COOLING DURING PEAK HOURS",
+      "level": 0.85,
+      "color": "blueStroke"
+     },
+     {
+      "id": "acpeak",
+      "kind": "callout",
+      "x": 862,
+      "y": 962,
+      "ly": 870,
+      "style": "tag",
+      "text": "AC runs at peak"
+     },
+     {
+      "id": "vary",
+      "kind": "note",
+      "x": 1008,
+      "y": 1490,
+      "align": "right",
+      "size": 34,
+      "text": "peak times vary by plan"
+     }
+    ],
+    "actions": [
+     {
+      "at": 0.35,
+      "do": "draw",
+      "target": "house",
+      "dur": 0.7
+     },
+     {
+      "at": 0.6,
+      "do": "draw",
+      "target": "ac",
+      "dur": 0.6
+     },
+     {
+      "at": 0.85,
+      "do": "run",
+      "target": "ac",
+      "speed": 1.6
+     },
+     {
+      "at": 0.85,
+      "do": "draw",
+      "target": "timeline",
+      "dur": 0.6
+     },
+     {
+      "at": "tou",
+      "do": "show",
+      "target": "timeline.peak"
+     },
+     {
+      "at": "tou+0.25",
+      "do": "show",
+      "target": "timeline.early",
+      "dur": 0.4
+     },
+     {
+      "at": "tou+0.55",
+      "do": "show",
+      "target": "timeline.atpeak",
+      "dur": 0.5
+     },
+     {
+      "at": "tou+0.3",
+      "do": "show",
+      "target": "timeline.playhead"
+     },
+     {
+      "at": "tou+0.6",
+      "do": "playhead",
+      "target": "timeline.playhead",
+      "to": 0.62,
+      "dur": 2.4
+     },
+     {
+      "at": "plan",
+      "do": "draw",
+      "target": "gauge"
+     },
+     {
+      "at": "plan+0.25",
+      "do": "show",
+      "target": "acpeak"
+     },
+     {
+      "at": "plan+0.6",
+      "do": "show",
+      "target": "vary"
+     },
+     {
+      "at": "end-0.5",
+      "do": "hide",
+      "target": "timeline.playhead"
+     }
+    ]
+   }
+  },
+  {
+   "id": "F02",
+   "type": "fieldnotes",
+   "line": {
+    "text": "Cool your home before peak rates,",
+    "pause": [
+     0,
+     0.6
+    ]
+   },
+   "cues": [
+    {
+     "name": "cool",
+     "at": "Cool",
+     "sfx": null
+    },
+    {
+     "name": "before",
+     "at": "before",
+     "sfx": null
+    },
+    {
+     "name": "peak",
+     "at": "peak",
+     "sfx": null
+    }
+   ],
+   "data": {
+    "header": {
+     "brand": "TRUE NORTH",
+     "label": "FIELD NOTES",
+     "chapter": "THE SHIFT",
+     "index": 2,
+     "total": 3
+    },
+    "kicker": "BEFORE THE PEAK",
+    "headline": {
+     "lines": [
+      {
+       "text": "Cool the house"
+      },
+      {
+       "text": "earlier",
+       "em": "blue",
+       "at": "before"
+      }
+     ]
+    },
+    "objects": [
+     {
+      "id": "timeline",
+      "segs": [
+       {
+        "id": "moved",
+        "from": 0.62,
+        "to": 0.78,
+        "level": 0.45
+       }
+      ]
+     },
+     {
+      "id": "coolair",
+      "kind": "arrow",
+      "points": [
+       [
+        712,
+        975
+       ],
+       [
+        670,
+        870
+       ],
+       [
+        590,
+        925
+       ]
+      ],
+      "color": "blueStroke",
+      "dash": true,
+      "width": 6
+     },
+     {
+      "id": "precool",
+      "kind": "callout",
+      "x": 245,
+      "y": 1328,
+      "ly": 1236,
+      "style": "label",
+      "text": "Pre-cool here"
+     }
+    ],
+    "actions": [
+     {
+      "at": "cool",
+      "do": "draw",
+      "target": "coolair",
+      "dur": 0.6
+     },
+     {
+      "at": "cool+0.5",
+      "do": "flow",
+      "target": "coolair",
+      "dur": 2.4
+     },
+     {
+      "at": "cool+0.2",
+      "do": "fill",
+      "target": "house",
+      "level": 1,
+      "dur": 1.4
+     },
+     {
+      "at": "before",
+      "do": "show",
+      "target": "timeline.moved",
+      "dur": 0.3
+     },
+     {
+      "at": "before+0.3",
+      "do": "seg",
+      "target": "timeline.moved",
+      "from": 0.1,
+      "to": 0.26,
+      "level": 0.9,
+      "dur": 1.4
+     },
+     {
+      "at": "before+0.3",
+      "do": "seg",
+      "target": "timeline.atpeak",
+      "level": 0.55,
+      "dur": 0.9
+     },
+     {
+      "at": "peak+0.3",
+      "do": "show",
+      "target": "precool"
+     }
+    ]
+   }
+  },
+  {
+   "id": "F03",
+   "type": "fieldnotes",
+   "line": {
+    "text": "then raise the thermostat a little. That can shift some cooling away from expensive hours. Check your plan's peak times.",
+    "pause": [
+     0,
+     0
+    ]
+   },
+   "cues": [
+    {
+     "name": "raise",
+     "at": "raise",
+     "sfx": null
+    },
+    {
+     "name": "shift",
+     "at": "shift",
+     "sfx": null
+    },
+    {
+     "name": "expensive",
+     "at": "expensive",
+     "sfx": null
+    },
+    {
+     "name": "check",
+     "at": "Check",
+     "sfx": null
+    }
+   ],
+   "data": {
+    "transition": "bands",
+    "header": {
+     "brand": "TRUE NORTH",
+     "label": "FIELD NOTES",
+     "chapter": "THE FIX",
+     "index": 3,
+     "total": 3
+    },
+    "kicker": "DURING THE PEAK",
+    "headline": {
+     "lines": [
+      {
+       "text": "Nudge the setting"
+      },
+      {
+       "text": "up a little",
+       "em": "sage",
+       "at": "raise+0.2"
+      }
+     ]
+    },
+    "objects": [
+     {
+      "id": "thermo",
+      "kind": "thermostat",
+      "x": 170,
+      "y": 700,
+      "r": 62,
+      "angle": -30
+     },
+     {
+      "id": "thermlink",
+      "kind": "arrow",
+      "points": [
+       [
+        170,
+        762
+       ],
+       [
+        170,
+        1000
+       ],
+       [
+        262,
+        1000
+       ]
+      ],
+      "color": "ink",
+      "dash": true,
+      "head": false,
+      "width": 3
+     },
+     {
+      "id": "higher",
+      "kind": "callout",
+      "x": 248,
+      "y": 680,
+      "lx": 300,
+      "ly": 640,
+      "style": "tag",
+      "text": "A little higher"
+     },
+     {
+      "id": "checkcard",
+      "kind": "card",
+      "x": 72,
+      "y": 1622,
+      "w": 860,
+      "text": "Check your rate plan."
+     }
+    ],
+    "actions": [
+     {
+      "at": 0.45,
+      "do": "draw",
+      "target": "thermo",
+      "dur": 0.6
+     },
+     {
+      "at": 0.6,
+      "do": "draw",
+      "target": "thermlink",
+      "dur": 0.5
+     },
+     {
+      "at": "raise",
+      "do": "turn",
+      "target": "thermo",
+      "by": 28,
+      "dur": 0.8
+     },
+     {
+      "at": "raise+0.45",
+      "do": "show",
+      "target": "higher"
+     },
+     {
+      "at": "shift",
+      "do": "show",
+      "target": "timeline.playhead"
+     },
+     {
+      "at": "shift",
+      "do": "playhead",
+      "target": "timeline.playhead",
+      "from": 0.48,
+      "to": 0.78,
+      "dur": 2.4
+     },
+     {
+      "at": "shift",
+      "do": "run",
+      "target": "ac",
+      "speed": 0.45
+     },
+     {
+      "at": "shift+0.2",
+      "do": "seg",
+      "target": "timeline.atpeak",
+      "level": 0.2,
+      "dur": 0.9
+     },
+     {
+      "at": "expensive",
+      "do": "set",
+      "target": "gauge",
+      "level": 0.4,
+      "dur": 0.9
+     },
+     {
+      "at": "check-0.8",
+      "do": "show",
+      "target": "checkcard"
+     }
+    ]
+   }
+  }
+ ]
+}

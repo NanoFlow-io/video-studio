@@ -126,7 +126,7 @@ def cmd_transitions(a):
 def cmd_build(a):
     from studio import vo, audio, beats, mix, mediafit, cuts as cutmod
     p, env, dr = Project(a.name), load_env(), dry(a)
-    missing = [n for n in {s["pose"] for s in p.data["scenes"]} if not (p.dir / "poses" / f"{n}.webp").exists()]
+    missing = [n for n in {s["pose"] for s in p.data["scenes"] if s.get("pose")} if not (p.dir / "poses" / f"{n}.webp").exists()]
     if missing: sys.exit(f"Missing poses: {', '.join(sorted(missing))}. Run `python studio.py poses {a.name}` first.")
     problems = beats.validate(p)   # before anything is bought
     if problems: sys.exit("project.json problems:\n  " + "\n  ".join(problems))
