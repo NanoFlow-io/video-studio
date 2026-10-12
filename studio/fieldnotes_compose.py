@@ -327,6 +327,35 @@ def _edge(bx, toward):
     return [round(cx + dx * k, 1), round(cy + dy * k, 1)]
 
 
+def _label_rect(mx, my, side, n):
+    """Approximate box of a link label (uppercase tag, about 15 px per character at 20 px) for a side."""
+    w, h = 15 * n + 28, 40
+    if side == "above": return (mx - w / 2, my - 34 - h, mx + w / 2, my - 34)
+    if side == "left": return (mx - 30 - w, my - h / 2, mx - 30, my + h / 2)
+    return (mx + 30, my - h / 2, mx + 30 + w, my + h / 2)
+
+
+def _overlap(a, b):
+    return max(0, min(a[2], b[2]) - max(a[0], b[0])) * max(0, min(a[3], b[3]) - max(a[1], b[1]))
+
+
+def _label_side(p0, p1, n, boxes, mids, horiz):
+    """The side for a link's label that keeps it on the frame and off other links' markers and labels and off objects."""
+    mx, my = (p0[0] + p1[0]) / 2, (p0[1] + p1[1]) / 2
+    best, score_best = None, None
+    for side in (["above", "left", "right"] if horiz else ["left", "right", "above"]):
+        r = _label_rect(mx, my, side, n)
+        s = 0.0
+        if r[0] < 40 or r[2] > 1040 or r[1] < 560: s += 1e6
+        for (ox, oy, oside, on) in mids:
+            s += 50 * _overlap(r, (ox - 24, oy - 24, ox + 24, oy + 24)) + 50 * _overlap(r, _label_rect(ox, oy, oside, on))
+        for b in boxes.values():
+            s += _overlap(r, (b["x0"] + b["w"] * 0.08, b["y0"] + b["h"] * 0.08, b["x0"] + b["w"] * 0.92, b["y0"] + b["h"] * 0.92))
+        if score_best is None or s < score_best:
+            best, score_best = side, s
+    return best
+
+
 # ---- compile ----
 def _cue_name(word, used):
     base = re.sub(r"[^a-z0-9]", "", norm(word))[:12] or "w"
@@ -393,7 +422,7 @@ def compile_plan(plan, name, title):
     business = (plan.get("facts") or {}).get("business") or ""
     brand = re.sub(r"[^A-Za-z0-9 &'.]", "", re.sub(r"\(.*?\)", "", business)).strip().upper()[:28]
     chs, n = plan["chapters"], len(plan["chapters"])
-    scenes, gauge_drawn, links = [], False, {}
+    scenes, gauge_drawn, links, link_mids = [], False, {}, []
     for ci, ch in enumerate(chs):
         sid, nar, used = f"F{ci + 1:02d}", ch["narration"].strip(), set()
         cues, actions, objects, cue_of = [], [], [], {}
@@ -414,9 +443,14 @@ def compile_plan(plan, name, title):
             if ch.get("emphasis_on"):
                 hl[1]["at"] = at(ch["emphasis_on"], 0.15)
         last_est, seq, prev_on = 0.0, 0.0, None
-        for k, e in enumerate(ch["events"]):
+        evs = ch["events"]
+        word_t = [_est_word_time(nar, x.get("on") or "start") for x in evs]
+        for k, e in enumerate(evs):
             on = e.get("on") or "start"
-            seq = seq + 0.45 if on == prev_on else 0.0
+            # events on the same word unfold 0.2 s apart, but never past the next spoken cue (order stays as planned)
+            nxt = next((word_t[j] for j in range(k + 1, len(evs)) if (evs[j].get("on") or "start") != on), None)
+            room = max(0.0, (nxt - word_t[k] - 0.15)) if nxt is not None else 1.2
+            seq = min(seq + 0.2, room) if on == prev_on else 0.0
             prev_on = on
             when = (lambda off=0.0: at(on, seq + off))
             last_est = max(last_est, _est_word_time(nar, on) + seq + 1.2)
@@ -486,9 +520,11 @@ def compile_plan(plan, name, title):
                 p0, p1 = _edge(a, (bb["cx"], bb["cy"])), _edge(bb, (a["cx"], a["cy"]))
                 links[e["id"]] = True
                 horiz = abs(p1[0] - p0[0]) > abs(p1[1] - p0[1])
+                labels = [x for x in (e.get("label"), *(y.get("label") for c2 in chs for y in c2["events"] if y.get("link") == e["id"])) if x]
+                side = _label_side(p0, p1, max((len(x) for x in labels), default=0), boxes, link_mids, horiz)
+                link_mids.append(((p0[0] + p1[0]) / 2, (p0[1] + p1[1]) / 2, side, max((len(x) for x in labels), default=0)))
                 objects.append({"id": e["id"], "kind": "link", "from": p0, "to": p1, "style": e.get("style") or "solid", "label": e.get("label") or "",
-                                "bend": 0.12 if horiz else 0.18,
-                                "labelSide": "above" if horiz else ("left" if (p0[0] + p1[0]) / 2 > 640 else "right")})
+                                "bend": 0.12 if horiz else 0.18, "labelSide": side})
                 actions.append({"at": when(), "do": "draw", "target": e["id"], "dur": 0.6})
             elif do in ("break", "fix"):
                 actions.append({"at": when(), "do": "mark", "target": e["link"], "state": "broken" if do == "break" else "ok", "label": e.get("label") or ""})

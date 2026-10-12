@@ -452,7 +452,7 @@ FN_KINDS.link = function(o, ctx){ var d = o.def, k = FN.col, ink = k.ink, a = d.
     draw: function(t, a){ tl.set(root, { autoAlpha: 1 }, t); var L = Math.ceil(mp.getTotalLength()) + 2;
       gsap.set(mp, { strokeDasharray: L + " " + L, strokeDashoffset: L }); tl.to(mp, { strokeDashoffset: 0, duration: a.dur || 0.6, ease: "power2.inOut" }, t);
       gsap.set(head, { opacity: 0 }); tl.to(head, { opacity: 1, duration: 0.2 }, t + (a.dur || 0.6) * 0.85);
-      if(d.label){ tl.fromTo(tag, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.3 }, t + 0.4); st.label = d.label; }
+      if(d.label && !st.mark){ tl.fromTo(tag, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.3 }, t + 0.4); st.label = d.label; }
       st.drawn = true; },
     mark: function(t, a){ var ok = a.state === "ok", on = ok ? good : bad, off = ok ? bad : good;
       tl.to(off, { autoAlpha: 0, duration: 0.15 }, t);

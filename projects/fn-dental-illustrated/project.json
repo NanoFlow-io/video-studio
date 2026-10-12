@@ -97,9 +97,9 @@
       "id": "chair",
       "kind": "chair",
       "cx": 384.0,
-      "cy": 910.0,
+      "cy": 755.0,
       "bw": 604,
-      "bh": 600,
+      "bh": 290,
       "state": "empty"
      },
      {
@@ -109,6 +109,15 @@
       "cy": 910.0,
       "bw": 292,
       "bh": 600
+     },
+     {
+      "id": "mail",
+      "kind": "envelope",
+      "cx": 384.0,
+      "cy": 1065.0,
+      "bw": 604,
+      "bh": 290,
+      "state": "sent"
      },
      {
       "id": "cal",
@@ -146,7 +155,7 @@
       "dur": 0.7
      },
      {
-      "at": 0.8,
+      "at": 0.55,
       "do": "draw",
       "target": "parent",
       "dur": 0.7
@@ -158,7 +167,7 @@
       "state": "empty"
      },
      {
-      "at": "missed+0.45",
+      "at": "missed+0.20",
       "do": "state",
       "target": "parent",
       "state": "away"
@@ -235,22 +244,28 @@
       "id": "c1",
       "kind": "link",
       "from": [
-       852.0,
-       1162.0
+       567.9,
+       1186.8
       ],
       "to": [
-       852.0,
-       1253.2
+       729.4,
+       1293.8
       ],
       "style": "dashed",
       "label": "Evening email",
-      "bend": 0.18,
-      "labelSide": "left"
+      "bend": 0.12,
+      "labelSide": "right"
      }
     ],
     "actions": [
      {
       "at": 0.35,
+      "do": "draw",
+      "target": "mail",
+      "dur": 0.7
+     },
+     {
+      "at": 0.55,
       "do": "draw",
       "target": "phone",
       "dur": 0.7
@@ -264,13 +279,19 @@
      },
      {
       "at": "email",
+      "do": "state",
+      "target": "mail",
+      "state": "unread"
+     },
+     {
+      "at": "email+0.20",
       "do": "message",
       "target": "phone",
       "type": "email",
       "text": "Reminder: check-up tomorrow"
      },
      {
-      "at": "email+0.45",
+      "at": "email+0.23",
       "do": "draw",
       "target": "c1",
       "dur": 0.6
@@ -279,6 +300,12 @@
       "at": "seen",
       "do": "bury",
       "target": "phone"
+     },
+     {
+      "at": "seen+0.20",
+      "do": "state",
+      "target": "mail",
+      "state": "missed"
      },
      {
       "at": "late",
@@ -294,7 +321,7 @@
    "id": "F03",
    "type": "fieldnotes",
    "line": {
-    "text": "We now text two days ahead. Reply to reschedule, so we can offer the slot.",
+    "text": "We now text two days ahead. Can't make it? We can offer the slot. Reply to reschedule.",
     "pause": [
      0,
      0
@@ -317,6 +344,11 @@
      "sfx": null
     },
     {
+     "name": "make",
+     "at": "make",
+     "sfx": null
+    },
+    {
      "name": "offer",
      "at": "offer",
      "sfx": null
@@ -324,6 +356,11 @@
     {
      "name": "slot",
      "at": "slot",
+     "sfx": null
+    },
+    {
+     "name": "reschedule",
+     "at": "reschedule",
      "sfx": null
     }
    ],
@@ -340,10 +377,10 @@
     "headline": {
      "lines": [
       {
-       "text": "Text early,"
+       "text": "Text early."
       },
       {
-       "text": "reply to reschedule",
+       "text": "Reply to reschedule",
        "em": "sage",
        "at": "reply+0.15"
       }
@@ -351,12 +388,28 @@
     },
     "objects": [
      {
+      "id": "c2",
+      "kind": "link",
+      "from": [
+       852.0,
+       1162.0
+      ],
+      "to": [
+       852.0,
+       1253.2
+      ],
+      "style": "solid",
+      "label": "Text two days ahead",
+      "bend": 0.18,
+      "labelSide": "above"
+     },
+     {
       "id": "card",
       "kind": "card",
       "x": 72,
       "y": 1640,
       "w": 860,
-      "text": "Text two days ahead to confirm"
+      "text": "Reply to reschedule"
      }
     ],
     "actions": [
@@ -375,24 +428,17 @@
       "medium": "text"
      },
      {
-      "at": "ahead+0.45",
-      "do": "mark",
-      "target": "c1",
-      "state": "ok",
-      "label": "Text two days ahead"
+      "at": "ahead+0.20",
+      "do": "draw",
+      "target": "c2",
+      "dur": 0.6
      },
      {
-      "at": "reply",
+      "at": "make",
       "do": "message",
       "target": "phone",
       "type": "reply",
       "text": "Can't make it. Please reschedule"
-     },
-     {
-      "at": "reply+0.45",
-      "do": "state",
-      "target": "parent",
-      "state": "happy"
      },
      {
       "at": "offer",
@@ -401,15 +447,21 @@
       "state": "rebooked"
      },
      {
-      "at": "offer+0.45",
-      "do": "show",
-      "target": "card"
-     },
-     {
       "at": "slot",
       "do": "state",
       "target": "chair",
       "state": "occupied"
+     },
+     {
+      "at": "reply",
+      "do": "state",
+      "target": "parent",
+      "state": "happy"
+     },
+     {
+      "at": "reschedule",
+      "do": "show",
+      "target": "card"
      }
     ]
    }

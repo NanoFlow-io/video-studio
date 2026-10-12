@@ -18,7 +18,16 @@
    "brief_sha": "a328695a0759afbc",
    "plan_sha": "52713677582eb1cc",
    "preview": "projects/fn-dental-illustrated/fieldnotes/preview-v2.mp4"
+  },
+  {
+   "version": 3,
+   "created": "2026-10-12T01:24:35+00:00",
+   "status": "awaiting-approval",
+   "revision": "Keep the same story and Field Notes style, but make the missed email more visually obvious and finish with Reply to reschedule. Keep it around 15 seconds.",
+   "brief_sha": "bc16c93135b52037",
+   "plan_sha": "325e698c912cbb5d",
+   "preview": "projects/fn-dental-illustrated/fieldnotes/preview-v3.mp4"
   }
  ],
- "current": 2
+ "current": 3
 }

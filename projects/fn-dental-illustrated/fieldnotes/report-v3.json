@@ -1,0 +1,41 @@
+{
+ "version": 3,
+ "created": "2026-10-12T01:24:35+00:00",
+ "revision": "Keep the same story and Field Notes style, but make the missed email more visually obvious and finish with Reply to reschedule. Keep it around 15 seconds.",
+ "brief_sha": "bc16c93135b52037",
+ "plan_sha": "325e698c912cbb5d",
+ "style": {
+  "template": "owner-explainer-field-notes-v1",
+  "style_sha": "a390fe1b65101e30",
+  "renderer_sha": "0aca1ac2e137a567",
+  "planner_sha": "58beaf706261589f"
+ },
+ "studio_commit": "c7def36",
+ "model_calls": [
+  {
+   "model": "claude-opus-5-5",
+   "input_tokens": 2,
+   "cache_read_input_tokens": 8544,
+   "cache_creation_input_tokens": 30566,
+   "output_tokens": 5378,
+   "equivalent_api_cost_usd": 0.3538048,
+   "billing": "Claude Code login (subscription), not a metered API key",
+   "duration_ms": 46446
+  }
+ ],
+ "first_pass_problems": [],
+ "plan_problems": [],
+ "status": "awaiting-approval",
+ "render": {
+  "cut": "vertical",
+  "size": "1080x1920",
+  "fps": 30,
+  "quality": "looks",
+  "timings": "dry, 2.6 words/s (silent)"
+ },
+ "scene_problems": [],
+ "project_sha": "3c20766fe15d29df",
+ "preview": "projects/fn-dental-illustrated/fieldnotes/preview-v3.mp4",
+ "preview_sha": "f3547d632fffd7f0",
+ "duration": 17.2
+}

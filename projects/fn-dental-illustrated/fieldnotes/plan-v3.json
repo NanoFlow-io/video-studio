@@ -1,0 +1,253 @@
+{
+ "facts": {
+  "business": "Harbor Lane Dental",
+  "business_type": "small family dental practice",
+  "audience": "busy parents who book check-ups for their kids",
+  "problem": "appointments get missed and the chair sits empty",
+  "cause": "the only reminder is an email sent the evening before, which many parents don't see until it is too late to rearrange (from the practice's own front-desk notes)",
+  "solution": "a text reminder two days ahead that patients can reply to, to confirm or reschedule",
+  "outcome": "when someone can't make it, they can tell the practice early, so the slot can be offered to another patient",
+  "narration_supplied": false
+ },
+ "questions": [],
+ "missing_primitives": [],
+ "narration_draft": true,
+ "cast": [
+  {
+   "id": "chair",
+   "kind": "chair",
+   "slot": "r1c1",
+   "span": "2x1",
+   "state": "empty"
+  },
+  {
+   "id": "phone",
+   "kind": "phone",
+   "slot": "r1c3",
+   "span": "1x2"
+  },
+  {
+   "id": "mail",
+   "kind": "envelope",
+   "slot": "r2c1",
+   "span": "2x1",
+   "state": "sent"
+  },
+  {
+   "id": "cal",
+   "kind": "calendar",
+   "slot": "r3c1",
+   "span": "2x1",
+   "state": "booked"
+  },
+  {
+   "id": "parent",
+   "kind": "person",
+   "slot": "r3c3",
+   "span": "1x1",
+   "state": "present"
+  }
+ ],
+ "chapters": [
+  {
+   "chapter": "THE PROBLEM",
+   "kicker": "HARBOR LANE DENTAL",
+   "headline": [
+    "Booked check-ups,",
+    "empty chairs"
+   ],
+   "emphasis": "ochre",
+   "emphasis_on": "empty",
+   "narration": "Check-ups get missed. Chairs sit empty.",
+   "events": [
+    {
+     "on": "start",
+     "do": "draw",
+     "obj": "cal"
+    },
+    {
+     "on": "start",
+     "do": "draw",
+     "obj": "parent"
+    },
+    {
+     "on": "missed",
+     "do": "state",
+     "obj": "cal",
+     "state": "empty"
+    },
+    {
+     "on": "missed",
+     "do": "state",
+     "obj": "parent",
+     "state": "away"
+    },
+    {
+     "on": "Chairs",
+     "do": "draw",
+     "obj": "chair"
+    },
+    {
+     "on": "empty",
+     "do": "callout",
+     "obj": "chair",
+     "text": "Nobody in the chair"
+    }
+   ]
+  },
+  {
+   "chapter": "THE CAUSE",
+   "kicker": "THE EVENING BEFORE",
+   "headline": [
+    "One evening email,",
+    "seen late"
+   ],
+   "emphasis": "blue",
+   "emphasis_on": "late",
+   "narration": "Our only reminder: an evening email, seen late.",
+   "events": [
+    {
+     "on": "start",
+     "do": "draw",
+     "obj": "mail"
+    },
+    {
+     "on": "start",
+     "do": "draw",
+     "obj": "phone"
+    },
+    {
+     "on": "reminder",
+     "do": "remind",
+     "obj": "cal",
+     "days_before": 1,
+     "medium": "email"
+    },
+    {
+     "on": "email",
+     "do": "state",
+     "obj": "mail",
+     "state": "unread"
+    },
+    {
+     "on": "email",
+     "do": "message",
+     "obj": "phone",
+     "type": "email",
+     "text": "Reminder: check-up tomorrow"
+    },
+    {
+     "on": "email",
+     "do": "connect",
+     "id": "c1",
+     "from": "mail",
+     "to": "parent",
+     "style": "dashed",
+     "label": "Evening email"
+    },
+    {
+     "on": "seen",
+     "do": "bury",
+     "obj": "phone"
+    },
+    {
+     "on": "seen",
+     "do": "state",
+     "obj": "mail",
+     "state": "missed"
+    },
+    {
+     "on": "late",
+     "do": "break",
+     "link": "c1",
+     "label": "Seen too late"
+    }
+   ]
+  },
+  {
+   "chapter": "THE FIX",
+   "kicker": "TWO DAYS AHEAD",
+   "headline": [
+    "Text early.",
+    "Reply to reschedule"
+   ],
+   "emphasis": "sage",
+   "emphasis_on": "Reply",
+   "narration": "We now text two days ahead. Can't make it? We can offer the slot. Reply to reschedule.",
+   "events": [
+    {
+     "on": "text",
+     "do": "message",
+     "obj": "phone",
+     "type": "text",
+     "text": "Harbor Lane: check-up in two days"
+    },
+    {
+     "on": "ahead",
+     "do": "remind",
+     "obj": "cal",
+     "days_before": 2,
+     "medium": "text"
+    },
+    {
+     "on": "ahead",
+     "do": "connect",
+     "id": "c2",
+     "from": "phone",
+     "to": "parent",
+     "style": "solid",
+     "label": "Text two days ahead"
+    },
+    {
+     "on": "make",
+     "do": "message",
+     "obj": "phone",
+     "type": "reply",
+     "text": "Can't make it. Please reschedule"
+    },
+    {
+     "on": "offer",
+     "do": "state",
+     "obj": "cal",
+     "state": "rebooked"
+    },
+    {
+     "on": "slot",
+     "do": "state",
+     "obj": "chair",
+     "state": "occupied"
+    },
+    {
+     "on": "Reply",
+     "do": "state",
+     "obj": "parent",
+     "state": "happy"
+    },
+    {
+     "on": "reschedule",
+     "do": "checklist",
+     "text": "Reply to reschedule"
+    }
+   ]
+  }
+ ],
+ "checks": [
+  "Revision applied: the brief now asks for a more obvious missed email and an ending on 'Reply to reschedule'. The story, style and length are the same.",
+  "Missed email is now more obvious. A large envelope (2x1) goes from sent to unread to missed (faded). Its dashed link to the parent breaks with the label 'Seen too late'. At the same moment the phone's email gets buried under other notifications.",
+  "The video now ends on 'Reply to reschedule'. It is the last line of the narration and the second headline line, and the final event is the checklist card 'Reply to reschedule'.",
+  "Every fact comes from the brief. I added no prices, rates, statistics, guarantees or quotes.",
+  "No digits appear in on-screen text or narration. days_before 1 and 2 are compiler settings and are never shown.",
+  "No forbidden words and no em or en dashes.",
+  "All six essential facts are present, so there are no questions.",
+  "Duration: the narration is 31 words (6 + 8 + 17), about 15 seconds.",
+  "There are 5 objects with no overlaps: chair r1 c1-2, envelope r2 c1-2, calendar r3 c1-2, phone r1-2 c3, parent r3c3. The chair, envelope, calendar and phone are large. The parent is 1x1.",
+  "The only callout is on the chair, which is in row 1.",
+  "Connections are short. The envelope at r2 sits diagonally next to the parent at r3c3, and the phone sits directly above the parent.",
+  "The old email link c1 stays broken and the new text link c2 is separate, so the email is never shown as fixed. The faded envelope stays on screen as a contrast.",
+  "Every object is drawn before it is changed or connected. c1 and c2 are created before they are used.",
+  "Every 'on' word appears exactly in its chapter's narration: missed, Chairs, empty, reminder, email, seen, late, text, ahead, make, offer, slot, Reply, reschedule. The emphasis_on words (empty, late, Reply) are all in their narration.",
+  "Text lengths are within limits. Kickers are up to 18 characters, headline lines up to 19, the callout 19, link labels up to 19, messages up to 33 and the checklist 19.",
+  "Outcome: 'We can offer the slot' keeps the brief's hedge. The calendar check and the filled chair show the freed slot going to another patient. 'Confirm' is still part of the solution in the brief. The ending focuses on rescheduling, as the owner asked."
+ ],
+ "brief": "FICTIONAL TEST BRIEF (not a real business; for testing the field-notes workflow only).\n\nHarbor Lane Dental is a small family dental practice.\nAudience: busy parents who book check-ups for their kids.\nProblem: appointments get missed and the chair sits empty.\nVerified cause (from the practice's own front-desk notes): the only reminder is an email sent the evening before, which many parents don't see until it is too late to rearrange.\nSolution: a text reminder two days ahead that patients can reply to, to confirm or reschedule.\nRealistic outcome: when someone can't make it, they can tell the practice early, so the slot can be offered to another patient.\nStyle note: same story and Field Notes style. Make the missed email more visually obvious, and finish with Reply to reschedule.\nNo narration supplied. About 15 seconds."
+}
