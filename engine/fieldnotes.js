@@ -1,6 +1,7 @@
 /* ===================== FIELD NOTES EXPLAINER (engine/fieldnotes.js, experimental 2026-10-11) =====================
    studio/cuts.py splices this file in before the build section only for projects with a scene of type "fieldnotes",
    so every other page stays byte-identical. Look: templates-experimental/owner-explainer-field-notes-v1/STYLE.md.
+   Renderer version: 4 (bump with any visible change; studio/fieldnotes_compose.py VERSIONS reads it).
    A fieldnotes scene is data, not code (FIELDNOTES.md): data.header, kicker, headline, objects and actions.
    Times: a number is seconds after the scene starts; a string is one of the scene's cue names (beats.py anchors cues to
    the narration words) with an optional +/- offset, or "start" / "end" (the scene's own start and end).

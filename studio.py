@@ -199,11 +199,12 @@ def main():
         s.add_argument("--cues", default="", help="verify: cue ids to sync-check, e.g. S02.missed,S14.l1")
     # field-notes explainer (experimental): an ordinary-language brief -> plan -> validated scenes -> silent preview
     fn = sp.add_parser("fieldnotes", help="field-notes explainer from an ordinary-language brief (experimental)")
-    fn.add_argument("action", choices=["new", "revise", "replan", "rebuild", "status"])
+    fn.add_argument("action", choices=["new", "revise", "replan", "rebuild", "status", "check", "migrate"])
     fn.add_argument("name", help="project name (a new folder under projects/)")
     fn.add_argument("text", nargs="?", default="", help="new: path to the brief (.txt/.md, plain words); revise: the change, in plain words")
     fn.add_argument("--title", default=None)
     fn.add_argument("--no-render", action="store_true", help="plan and validate only")
+    fn.add_argument("--version", type=int, default=None, help="rebuild / migrate: the saved version (default: current)")
     a = ap.parse_args()
     globals()["cmd_" + a.cmd.replace("-", "_")](a)
 
@@ -213,8 +214,17 @@ def cmd_fieldnotes(a):
     r = fp.Run(a.name)
     if a.action == "status":
         print(json.dumps(r.state(), indent=1, ensure_ascii=False)); return
+    if a.action == "check":   # saved plans against the current schema and validator (writes fieldnotes/compat.json only)
+        c = fp.check(a.name)
+        for v, e in c["versions"].items():
+            print(f"v{v}: {e['status']}" + "".join(f"\n   - {p}" for p in e["problems"]))
+        return
     if a.action == "rebuild":
-        fp.rebuild(a.name, render=not a.no_render); return
+        fp.rebuild(a.name, version=a.version, render=not a.no_render); return
+    if a.action == "migrate":
+        rec = fp.migrate(a.name, version=a.version, render=not a.no_render, title=a.title)
+        print("  changes for review:" + "".join(f"\n   - {x}" for x in rec.get("changes") or []))
+        return
     if a.action == "new":
         if r.fn.exists() and r.state()["versions"]:
             sys.exit(f"{a.name} already has a field-notes plan; use revise or replan")

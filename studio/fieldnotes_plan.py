@@ -50,7 +50,7 @@ def style_version():
     """Hash of the saved style (template palette and fonts) and the renderer, recorded with every plan."""
     t = json.loads((STYLE_DIR / "template.json").read_text(encoding="utf-8"))
     style = json.dumps({k: t.get(k) for k in ("id", "palette", "fonts", "layout", "motion")}, sort_keys=True)
-    return {"template": t.get("id"), "style_sha": sha(style), "renderer_sha": sha((ROOT / "engine" / "fieldnotes.js").read_bytes()),
+    return {"template": t.get("id"), "style_sha": sha(style), "renderer_sha": sha((Path(__file__).resolve().parent.parent / "engine" / "fieldnotes.js").read_bytes()),
             "planner_sha": sha(Path(__file__).read_bytes() + PROMPT.read_bytes() + Path(__file__).with_name("fieldnotes_compose.py").read_bytes())}
 
 
@@ -93,7 +93,22 @@ def parse_reply(text):
     raise SystemExit("planner: the model did not return a JSON object")
 
 
-def build_prompt(brief, revision=None, previous=None, errors=None):
+MIGRATION = """## Migration
+
+This approved brief was planned earlier under older rules; that plan no longer passes them. Plan the SAME brief again
+under the current rules and catalogue. The brief is approved and must not change: do not return a "brief". Keep the
+earlier story, chapter order, headlines, narration and pictures wherever the current rules allow, and change only what
+these problems require (fix them honestly; never weaken what the brief says to get round a rule):
+
+{PROBLEMS}
+
+Earlier plan (for continuity; it may use an older format):
+```json
+{PREVIOUS}
+```"""
+
+
+def build_prompt(brief, revision=None, previous=None, errors=None, migration=None):
     total = 38
     t = target_seconds(brief)
     if t:
@@ -104,6 +119,9 @@ def build_prompt(brief, revision=None, previous=None, errors=None):
                "full revised brief as \"brief\" in your JSON, then plan from the revised brief. Keep everything else the same "
                f"unless the change needs it.\n\nChange: {revision}\n\nPrevious plan (for continuity):\n```json\n"
                f"{json.dumps(previous, ensure_ascii=False)}\n```")
+    if migration:
+        rev = MIGRATION.replace("{PROBLEMS}", "\n".join(f"- {p}" for p in migration["problems"])).replace(
+            "{PREVIOUS}", json.dumps(migration["previous"], ensure_ascii=False))
     if errors:
         rev += ("\n\n## Fix these problems in your previous reply\n\n" + "\n".join(f"- {e}" for e in errors) +
                 "\n\nPrevious reply:\n```json\n" + json.dumps(previous, ensure_ascii=False) + "\n```")
@@ -111,7 +129,8 @@ def build_prompt(brief, revision=None, previous=None, errors=None):
 
 
 # ---------- validation and compilation live in studio/fieldnotes_compose.py (the primitive catalogue) ----------
-from .fieldnotes_compose import validate_plan, compile_plan, estimated_seconds, target_seconds, catalog_text, PRIMS  # noqa: E402
+from .fieldnotes_compose import (validate_plan, compile_plan, estimated_seconds, target_seconds, catalog_text, PRIMS,  # noqa: E402
+                                 versions, compatibility, storyboard, plan_changes, plan_schema)
 
 
 # ---------- the workflow ----------
@@ -130,11 +149,14 @@ class Run:
         (self.fn / "run.json").write_text(json.dumps(st, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
 
 
-def _plan_with_repair(brief, revision=None, previous=None, supplied=None):
-    """One planning call, then at most one repair call if validation finds problems. Returns (plan, problems, usage list)."""
+def _plan_with_repair(brief, revision=None, previous=None, supplied=None, migration=None):
+    """One planning call, then at most one repair call if validation finds problems. Returns (plan, problems, usage list).
+    A migration keeps the brief exactly as approved (any brief the model returns is ignored)."""
     usage = []
-    text, u = ask_model(build_prompt(brief, revision, previous)); usage.append(u)
+    text, u = ask_model(build_prompt(brief, revision, previous, migration=migration)); usage.append(u)
     plan = parse_reply(text)
+    if migration:
+        plan["brief"] = brief
     if revision and plan.get("brief"):
         brief = plan["brief"]
     if supplied:
@@ -148,6 +170,8 @@ def _plan_with_repair(brief, revision=None, previous=None, supplied=None):
         if supplied:
             p2["supplied_narration"] = supplied
         p2.setdefault("brief", plan.get("brief"))
+        if migration:
+            p2["brief"] = brief
         probs, plan = validate_plan(p2, brief), p2
     return plan, probs, usage, brief, first
 
@@ -158,23 +182,31 @@ def supplied_narration(brief):
     return m.group(1).strip() if m else None
 
 
-def run_version(name, brief, title=None, revision=None, render=True):
+def run_version(name, brief, title=None, revision=None, render=True, migrate_from=None):
     r = Run(name)
     r.fn.mkdir(parents=True, exist_ok=True)
     st = r.state()
     v = len(st["versions"]) + 1
-    previous = None
+    previous, migration = None, None
     if st["versions"]:
-        previous = json.loads((r.fn / f"plan-v{v - 1}.json").read_text(encoding="utf-8"))
+        previous = json.loads((r.fn / f"plan-v{(migrate_from or st.get('current') or v - 1)}.json").read_text(encoding="utf-8"))
+    if migrate_from:
+        migration = {"problems": migrate_from_problems(r, migrate_from), "previous": previous}
+        if plan_schema(previous) != 2:
+            previous = None   # an old-format plan is shown only as continuity inside the migration section
     supplied = supplied_narration(brief)
-    print(f"fieldnotes {name} v{v}: planning ({'revision' if revision else 'new brief'}; model {MODEL} via Claude Code login)")
-    plan, probs, usage, final_brief, first = _plan_with_repair(brief, revision, previous, supplied)
+    what = f"migration of v{migrate_from}" if migrate_from else "revision" if revision else "new brief"
+    print(f"fieldnotes {name} v{v}: planning ({what}; model {MODEL} via Claude Code login)")
+    plan, probs, usage, final_brief, first = _plan_with_repair(brief, revision, previous, supplied, migration)
     (r.fn / f"brief-v{v}.txt").write_text(final_brief.strip() + "\n", encoding="utf-8")
     (r.fn / f"plan-v{v}.json").write_text(json.dumps(plan, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
     rec = {"version": v, "created": datetime.now(timezone.utc).isoformat(timespec="seconds"), "revision": revision,
            "brief_sha": sha(final_brief), "plan_sha": sha(json.dumps(plan, sort_keys=True)), "style": style_version(),
-           "studio_commit": git_head(), "model_calls": usage, "first_pass_problems": first, "plan_problems": probs, "status": None,
+           "versions": versions(), "studio_commit": git_head(), "model_calls": usage, "first_pass_problems": first, "plan_problems": probs, "status": None,
            "render": {"cut": "vertical", "size": "1080x1920", "fps": 30, "quality": "looks", "timings": f"dry, {DRY_WPS} words/s (silent)"}}
+    if migrate_from:
+        rec["migrated_from"] = migrate_from
+        rec["brief_unchanged"] = sha(final_brief) == sha((r.fn / f"brief-v{migrate_from}.txt").read_text(encoding="utf-8"))
     if probs:
         rec["status"] = "needs-answers" if plan.get("questions") else "unsupported-diagram" if plan.get("gap") else "invalid-plan"
         _finish(r, st, rec)
@@ -183,8 +215,55 @@ def run_version(name, brief, title=None, revision=None, render=True):
             print(f"   - {p}")
         return rec
     rec.update(_compile_and_render(r, plan, title or name, v, render))
+    (r.fn / f"storyboard-v{v}.md").write_text(storyboard(plan, v, rec.get("duration")) + "\n", encoding="utf-8")
+    src = migrate_from or (st.get("current") if st["versions"] else None)
+    if src:   # what changed since the version this one was planned from, for the person reviewing it
+        rec["changes_from"] = src
+        rec["changes"] = plan_changes(json.loads((r.fn / f"plan-v{src}.json").read_text(encoding="utf-8")), plan,
+                                      _report(r, src).get("duration"), rec.get("duration"))
     _finish(r, st, rec)
     return rec
+
+
+def _report(r, v):
+    f = r.fn / f"report-v{v}.json"
+    return json.loads(f.read_text(encoding="utf-8")) if f.exists() else {}
+
+
+def check(name, write=True):
+    """Compatibility of every saved version with the current schema and validator. Writes fieldnotes/compat.json (a new
+    file; plans, briefs, reports and previews are never touched) and returns it."""
+    r = Run(name); st = r.state()
+    out = {"project": name, "checked": datetime.now(timezone.utc).isoformat(timespec="seconds"), "current": versions(), "versions": {}}
+    for e in st["versions"]:
+        v = e["version"]
+        plan = json.loads((r.fn / f"plan-v{v}.json").read_text(encoding="utf-8"))
+        brief = (r.fn / f"brief-v{v}.txt").read_text(encoding="utf-8")
+        c = compatibility(plan, brief, _report(r, v))
+        c["preview"] = e.get("preview")
+        out["versions"][str(v)] = c
+    if write and r.fn.exists():
+        (r.fn / "compat.json").write_text(json.dumps(out, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
+    return out
+
+
+def migrate_from_problems(r, v):
+    plan = json.loads((r.fn / f"plan-v{v}.json").read_text(encoding="utf-8"))
+    return compatibility(plan, (r.fn / f"brief-v{v}.txt").read_text(encoding="utf-8"), _report(r, v))["problems"]
+
+
+def migrate(name, version=None, render=True, title=None):
+    """Plan an old version's approved brief again under the current rules, as a NEW version. The old brief, plan, report
+    and preview stay as they are; the new report lists what changed for a person to review."""
+    r = Run(name); st = r.state()
+    v = int(version or st.get("current") or 0)
+    if not (r.fn / f"plan-v{v}.json").exists():
+        raise SystemExit(f"{name} has no v{v}")
+    c = check(name)["versions"][str(v)]
+    if c["status"] != "needs-migration":
+        raise SystemExit(f"{name} v{v} is {c['status']}: nothing to migrate" + ("" if c["status"] != "compatible" else " (use rebuild to re-render it)"))
+    brief = (r.fn / f"brief-v{v}.txt").read_text(encoding="utf-8")
+    return run_version(name, brief, title=title, render=render, migrate_from=v)
 
 
 def _compile_and_render(r, plan, title, v, render):
@@ -232,6 +311,10 @@ def rebuild(name, version=None, render=True):
     r = Run(name); st = r.state()
     v = version or st.get("current")
     plan = json.loads((r.fn / f"plan-v{v}.json").read_text(encoding="utf-8"))
+    c = compatibility(plan, (r.fn / f"brief-v{v}.txt").read_text(encoding="utf-8"), _report(r, v))
+    if c["status"] != "compatible":   # no bypass: a plan the current rules refuse is re-planned, not re-rendered
+        raise SystemExit(f"{name} v{v} {c['status']}: " + "; ".join(c["problems"])
+                         + f"\n  run `studio.py fieldnotes migrate {name} --version {v}` to plan the same brief again")
     out = _compile_and_render(r, plan, json.loads((r.dir / "project.json").read_text(encoding="utf-8")).get("title", name), f"{v}-rebuild", render)
     print(f"  rebuild of v{v}: {out['status']}")
     return out

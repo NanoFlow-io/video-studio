@@ -1,0 +1,90 @@
+{
+ "project": "fn-dental-illustrated",
+ "checked": "2026-10-12T01:56:59+00:00",
+ "current": {
+  "schema": 2,
+  "planner": 4,
+  "validator": 3,
+  "renderer": 4
+ },
+ "versions": {
+  "1": {
+   "current": {
+    "schema": 2,
+    "planner": 4,
+    "validator": 3,
+    "renderer": 4
+   },
+   "recorded": {
+    "recorded": false,
+    "schema": 2,
+    "note": "made before versions were recorded (2026-10-12); hashes: {\"planner_sha\": \"b036f5eaad39f1d3\", \"renderer_sha\": \"f2f6fb7f3b729cf1\", \"style_sha\": \"a390fe1b65101e30\", \"template\": \"owner-explainer-field-notes-v1\"}"
+   },
+   "status": "needs-migration",
+   "problems": [
+    "outcome check: chapter 3 shows chair as 'occupied', but the brief only says the outcome is possible (\"when someone can't make it, they can tell the practice early, so the slot can be\"); show it as possible (for a calendar, 'available') rather than done",
+    "outcome check: chapter 3 shows cal as 'rebooked', but the brief only says the outcome is possible (\"when someone can't make it, they can tell the practice early, so the slot can be\"); show it as possible (for a calendar, 'available') rather than done",
+    "outcome check: the brief's outcome is only possible, so the last chapter's narration must keep that (can, could or may)",
+    "connection c1 (phone to parent): no clear room for its label 'Told in time'; place the two objects further apart (leave a free cell between or beside them) or shorten the label"
+   ],
+   "preview": "projects/fn-dental-illustrated/fieldnotes/preview-v1.mp4"
+  },
+  "2": {
+   "current": {
+    "schema": 2,
+    "planner": 4,
+    "validator": 3,
+    "renderer": 4
+   },
+   "recorded": {
+    "recorded": false,
+    "schema": 2,
+    "note": "made before versions were recorded (2026-10-12); hashes: {\"planner_sha\": \"a0b53469d625094f\", \"renderer_sha\": \"f2f6fb7f3b729cf1\", \"style_sha\": \"a390fe1b65101e30\", \"template\": \"owner-explainer-field-notes-v1\"}"
+   },
+   "status": "needs-migration",
+   "problems": [
+    "outcome check: chapter 3 shows cal as 'rebooked', but the brief only says the outcome is possible (\"when someone can't make it, they can tell the practice early, so the slot can be\"); show it as possible (for a calendar, 'available') rather than done",
+    "outcome check: chapter 3 shows chair as 'occupied', but the brief only says the outcome is possible (\"when someone can't make it, they can tell the practice early, so the slot can be\"); show it as possible (for a calendar, 'available') rather than done",
+    "connection c1 (phone to parent): no clear room for its label 'Text two days ahead'; place the two objects further apart (leave a free cell between or beside them) or shorten the label"
+   ],
+   "preview": "projects/fn-dental-illustrated/fieldnotes/preview-v2.mp4"
+  },
+  "3": {
+   "current": {
+    "schema": 2,
+    "planner": 4,
+    "validator": 3,
+    "renderer": 4
+   },
+   "recorded": {
+    "recorded": false,
+    "schema": 2,
+    "note": "made before versions were recorded (2026-10-12); hashes: {\"planner_sha\": \"58beaf706261589f\", \"renderer_sha\": \"0aca1ac2e137a567\", \"style_sha\": \"a390fe1b65101e30\", \"template\": \"owner-explainer-field-notes-v1\"}"
+   },
+   "status": "needs-migration",
+   "problems": [
+    "outcome check: chapter 3 shows cal as 'rebooked', but the brief only says the outcome is possible (\"when someone can't make it, they can tell the practice early, so the slot can be\"); show it as possible (for a calendar, 'available') rather than done",
+    "outcome check: chapter 3 shows chair as 'occupied', but the brief only says the outcome is possible (\"when someone can't make it, they can tell the practice early, so the slot can be\"); show it as possible (for a calendar, 'available') rather than done",
+    "connection c1 (mail to parent): no clear room for its label 'Seen too late'; place the two objects further apart (leave a free cell between or beside them) or shorten the label",
+    "connection c2 (phone to parent): no clear room for its label 'Text two days ahead'; place the two objects further apart (leave a free cell between or beside them) or shorten the label"
+   ],
+   "preview": "projects/fn-dental-illustrated/fieldnotes/preview-v3.mp4"
+  },
+  "4": {
+   "current": {
+    "schema": 2,
+    "planner": 4,
+    "validator": 3,
+    "renderer": 4
+   },
+   "recorded": {
+    "recorded": false,
+    "schema": 2,
+    "note": "made before versions were recorded (2026-10-12); hashes: {\"planner_sha\": \"6d42b9ccfcb05456\", \"renderer_sha\": \"9630c3bc4780faaa\", \"style_sha\": \"a390fe1b65101e30\", \"template\": \"owner-explainer-field-notes-v1\"}"
+   },
+   "status": "compatible",
+   "problems": [],
+   "preview": "projects/fn-dental-illustrated/fieldnotes/preview-v4.mp4"
+  }
+ }
+}

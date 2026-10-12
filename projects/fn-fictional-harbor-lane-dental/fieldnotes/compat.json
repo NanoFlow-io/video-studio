@@ -1,0 +1,66 @@
+{
+ "project": "fn-fictional-harbor-lane-dental",
+ "checked": "2026-10-12T01:55:03+00:00",
+ "current": {
+  "schema": 2,
+  "planner": 4,
+  "validator": 3,
+  "renderer": 4
+ },
+ "versions": {
+  "1": {
+   "current": {
+    "schema": 2,
+    "planner": 4,
+    "validator": 3,
+    "renderer": 4
+   },
+   "recorded": {
+    "recorded": false,
+    "schema": 1,
+    "note": "made before versions were recorded (2026-10-12); hashes: {\"planner_sha\": \"d64ede1096f8b792\", \"renderer_sha\": \"97c3378c917af9b1\", \"style_sha\": \"a390fe1b65101e30\", \"template\": \"owner-explainer-field-notes-v1\"}"
+   },
+   "status": "needs-migration",
+   "problems": [
+    "plan schema 1 (stage diagram) cannot be compiled by the current planner (schema 2)"
+   ],
+   "preview": "projects/fn-fictional-harbor-lane-dental/fieldnotes/preview-v1.mp4"
+  },
+  "2": {
+   "current": {
+    "schema": 2,
+    "planner": 4,
+    "validator": 3,
+    "renderer": 4
+   },
+   "recorded": {
+    "recorded": false,
+    "schema": 1,
+    "note": "made before versions were recorded (2026-10-12); hashes: {\"planner_sha\": \"a1c907d848e6a850\", \"renderer_sha\": \"500ac93a68e00a38\", \"style_sha\": \"a390fe1b65101e30\", \"template\": \"owner-explainer-field-notes-v1\"}"
+   },
+   "status": "needs-migration",
+   "problems": [
+    "plan schema 1 (stage diagram) cannot be compiled by the current planner (schema 2)"
+   ],
+   "preview": "projects/fn-fictional-harbor-lane-dental/fieldnotes/preview-v2.mp4"
+  },
+  "3": {
+   "current": {
+    "schema": 2,
+    "planner": 4,
+    "validator": 3,
+    "renderer": 4
+   },
+   "recorded": {
+    "recorded": false,
+    "schema": 1,
+    "note": "made before versions were recorded (2026-10-12); hashes: {\"planner_sha\": \"dde0bc49306a4ec1\", \"renderer_sha\": \"500ac93a68e00a38\", \"style_sha\": \"a390fe1b65101e30\", \"template\": \"owner-explainer-field-notes-v1\"}"
+   },
+   "status": "needs-migration",
+   "problems": [
+    "plan schema 1 (stage diagram) cannot be compiled by the current planner (schema 2)"
+   ],
+   "preview": "projects/fn-fictional-harbor-lane-dental/fieldnotes/preview-v3.mp4"
+  }
+ }
+}
