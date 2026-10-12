@@ -54,7 +54,24 @@
    "voice_contract": "techbots-truenorth content-engine/reel-builder/approved-assets/truenorth/voice-contract.json (Dmitriy True North, eleven_turbo_v2_5, stability 0.4, similarity 0.85, style 0.35) at speed 1.12",
    "logo": "tenants/truenorth/identity/logo.png sha256 bee13bdf7336... (= website Logo_TrueNorth_Blue-1.png)",
    "contact_number": "949 669 7337 (matches hvactruenorth.com main number)",
-   "spoken_number": "nine four nine, six six nine, seven three three seven"
+   "spoken_number": "nine four nine, six six nine, seven three three seven",
+   "saved_closes": [
+    {
+     "id": "truenorth-close-v1",
+     "path": "/home/adam/video-studio/owner-featured/closes/truenorth-close-v1/",
+     "clip": "close-v1.mp4",
+     "sha256": "e99ac65eabf7c996aaf49ef8f8fe771c5da4784026ce29d4fabb87ad4040bd7e",
+     "argil_look": "Truck 1",
+     "status": "draft until Bob approves the first reel"
+    }
+   ],
+   "argil_look": "Truck 1 (7073cbb5-44c1-4a7a-9f91-f4eefa64c368), approved by Bob 2026-10-12"
   }
- }
+ },
+ "assembly_notes": [
+  "Argil returns portrait looks pillarboxed in 2560x1440: crop the 808x1438 picture and scale to 1080x1920",
+  "Encode new parts to the explainer's exact stream format and concat with stream copy so the accepted explainer is not re-encoded",
+  "Turbo voice at speed 1.12 reads short single lines at about 5 words/s: check pace per line and slow with a pitch-preserving stretch if needed",
+  "Level each new part to the explainer's integrated loudness; measure the final close clip, not its source audio"
+ ]
 }
