@@ -1,0 +1,251 @@
+{
+ "facts": {
+  "business": "Harbor Lane Dental",
+  "business_type": "small family dental practice",
+  "audience": "busy parents who book check-ups for their kids",
+  "problem": "appointments get missed and the chair sits empty",
+  "cause": "the only reminder is an email sent the evening before, which many parents don't see until it is too late to rearrange (from the practice's own front-desk notes)",
+  "solution": "a text reminder two days ahead that patients can reply to, to confirm or reschedule",
+  "outcome": "when someone can't make it, they can tell the practice early, so the slot can be offered to another patient",
+  "narration_supplied": false
+ },
+ "questions": [],
+ "missing_primitives": [],
+ "narration_draft": true,
+ "cast": [
+  {
+   "id": "chair",
+   "kind": "chair",
+   "slot": "r1c1",
+   "span": "2x1",
+   "state": "empty"
+  },
+  {
+   "id": "phone",
+   "kind": "phone",
+   "slot": "r1c3",
+   "span": "1x2"
+  },
+  {
+   "id": "mail",
+   "kind": "envelope",
+   "slot": "r2c1",
+   "span": "2x1",
+   "state": "unread"
+  },
+  {
+   "id": "cal",
+   "kind": "calendar",
+   "slot": "r3c1",
+   "span": "2x1",
+   "state": "booked"
+  },
+  {
+   "id": "parent",
+   "kind": "person",
+   "slot": "r3c3",
+   "span": "1x1",
+   "state": "present"
+  }
+ ],
+ "chapters": [
+  {
+   "chapter": "THE PROBLEM",
+   "kicker": "HARBOR LANE DENTAL",
+   "headline": [
+    "Booked check-ups,",
+    "empty chairs"
+   ],
+   "emphasis": "ochre",
+   "emphasis_on": "empty",
+   "narration": "Check-ups missed, chairs empty.",
+   "events": [
+    {
+     "on": "start",
+     "do": "draw",
+     "obj": "cal"
+    },
+    {
+     "on": "start",
+     "do": "draw",
+     "obj": "parent"
+    },
+    {
+     "on": "start",
+     "do": "draw",
+     "obj": "chair"
+    },
+    {
+     "on": "missed",
+     "do": "state",
+     "obj": "cal",
+     "state": "empty"
+    },
+    {
+     "on": "missed",
+     "do": "state",
+     "obj": "parent",
+     "state": "away"
+    },
+    {
+     "on": "empty",
+     "do": "callout",
+     "obj": "chair",
+     "text": "Nobody in the chair"
+    }
+   ]
+  },
+  {
+   "chapter": "THE CAUSE",
+   "kicker": "THE EVENING BEFORE",
+   "headline": [
+    "One evening email,",
+    "seen late"
+   ],
+   "emphasis": "blue",
+   "emphasis_on": "late",
+   "narration": "An evening email, seen too late.",
+   "events": [
+    {
+     "on": "start",
+     "do": "draw",
+     "obj": "phone"
+    },
+    {
+     "on": "evening",
+     "do": "remind",
+     "obj": "cal",
+     "days_before": 1,
+     "medium": "email"
+    },
+    {
+     "on": "email",
+     "do": "message",
+     "obj": "phone",
+     "type": "email",
+     "text": "Reminder: check-up tomorrow"
+    },
+    {
+     "on": "email",
+     "do": "draw",
+     "obj": "mail"
+    },
+    {
+     "on": "email",
+     "do": "zoom",
+     "obj": "phone",
+     "msg": "email",
+     "to": "mail"
+    },
+    {
+     "on": "email",
+     "do": "connect",
+     "id": "c1",
+     "from": "mail",
+     "to": "parent",
+     "style": "dashed",
+     "label": ""
+    },
+    {
+     "on": "seen",
+     "do": "bury",
+     "obj": "phone"
+    },
+    {
+     "on": "seen",
+     "do": "state",
+     "obj": "mail",
+     "state": "missed"
+    },
+    {
+     "on": "late",
+     "do": "break",
+     "link": "c1",
+     "label": ""
+    }
+   ]
+  },
+  {
+   "chapter": "THE FIX",
+   "kicker": "TWO DAYS AHEAD",
+   "headline": [
+    "Text early.",
+    "Reply to reschedule"
+   ],
+   "emphasis": "sage",
+   "emphasis_on": "reschedule",
+   "narration": "We text two days ahead. Can't come? Reply, so we can offer the slot. Reply to reschedule.",
+   "events": [
+    {
+     "on": "text",
+     "do": "message",
+     "obj": "phone",
+     "type": "text",
+     "text": "Harbor Lane: check-up in two days"
+    },
+    {
+     "on": "text",
+     "do": "remind",
+     "obj": "cal",
+     "days_before": 2,
+     "medium": "text"
+    },
+    {
+     "on": "ahead",
+     "do": "connect",
+     "id": "c2",
+     "from": "phone",
+     "to": "parent",
+     "style": "solid",
+     "label": ""
+    },
+    {
+     "on": "come",
+     "do": "message",
+     "obj": "phone",
+     "type": "reply",
+     "text": "Can't make it. Please reschedule"
+    },
+    {
+     "on": "come",
+     "do": "pulse",
+     "link": "c2"
+    },
+    {
+     "on": "offer",
+     "do": "state",
+     "obj": "cal",
+     "state": "available"
+    },
+    {
+     "on": "slot",
+     "do": "callout",
+     "obj": "chair",
+     "text": "Slot free to offer"
+    },
+    {
+     "on": "reschedule",
+     "do": "checklist",
+     "text": "Reply to reschedule"
+    }
+   ]
+  }
+ ],
+ "checks": [
+  "Duration fix: the narration is now 27 words (4 + 6 + 17), down from 34, so it should run about 15 seconds.",
+  "Each chapter has only one event on its last word: the chair callout on 'empty', the link break on 'late' and the checklist on 'reschedule'. Everything else happens earlier, so nothing runs on after the narration ends.",
+  "One email, drawn once. At 'email' the email shows up on the phone, the envelope is drawn, and the phone zooms from that email to the envelope, so it is the same message shown larger.",
+  "The missed email is easy to see. The envelope starts unread. At 'seen' the phone's email is buried and the envelope fades to missed, and at 'late' its dashed link to the parent breaks.",
+  "The outcome is shown as possible. The calendar goes to available (a plus), and the chair stays empty with the callout 'Slot free to offer'. There is no rebooked or occupied state, and the narration keeps 'we can offer the slot'.",
+  "The video ends on 'Reply to reschedule'. It is the last narration line, the second headline line and the final checklist card.",
+  "Every fact comes from the brief. There are no prices, statistics, guarantees, quotes or times of day. The 'Reminder' in the phone message is copied from the brief.",
+  "No digits appear in on-screen text or narration. days_before 1 and 2 are compiler settings and are never shown. There are no forbidden words and no em or en dashes.",
+  "All six essential facts are present, so there are no questions.",
+  "There are 5 objects with no overlaps: chair r1 c1-2, envelope r2 c1-2, calendar r3 c1-2, phone r1-2 c3 and parent r3c3. The chair, envelope, calendar and phone are large.",
+  "There is no free grid cell, so connection and break labels are left empty. Both callouts are on the chair in row 1.",
+  "Every object is drawn before it is changed, zoomed or connected. c1 and c2 are created before they are broken or pulsed.",
+  "Every 'on' word appears in its chapter's narration: missed, empty, evening, email, seen, late, text, ahead, come, offer, slot, reschedule. 'Reply' appears twice, so it is not used as a trigger. The emphasis_on words empty, late and reschedule appear in their chapters.",
+  "Text lengths are within limits: chapter labels up to 11 characters, kickers up to 18, headline lines up to 19, callouts up to 19, messages up to 33 and the checklist 19."
+ ],
+ "brief": "FICTIONAL TEST BRIEF (not a real business; for testing the field-notes workflow only).\n\nHarbor Lane Dental is a small family dental practice.\nAudience: busy parents who book check-ups for their kids.\nProblem: appointments get missed and the chair sits empty.\nVerified cause (from the practice's own front-desk notes): the only reminder is an email sent the evening before, which many parents don't see until it is too late to rearrange.\nSolution: a text reminder two days ahead that patients can reply to, to confirm or reschedule.\nRealistic outcome: when someone can't make it, they can tell the practice early, so the slot can be offered to another patient.\nStyle note: same story and Field Notes style. Make the missed email more visually obvious, showing the envelope as an enlarged view of the same phone email notification by zooming in from the phone, not as a second email. End with the appointment slot available to offer, not an occupied chair or a confirmed replacement booking, keep 'we can offer the slot' in the narration, and finish with Reply to reschedule.\nNo narration supplied. About 15 seconds."
+}

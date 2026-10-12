@@ -1,0 +1,53 @@
+{
+ "version": 4,
+ "created": "2026-10-12T01:41:56+00:00",
+ "revision": "Keep the Field Notes style and the current story. Make the envelope clearly an enlarged view of the same phone notification, not a second email, using a zoom from the phone. End with the appointment slot available to offer, not an occupied chair or a confirmed replacement booking, and keep 'we can offer the slot' in the narration. Keep it around 15 seconds.",
+ "brief_sha": "245730aa26905693",
+ "plan_sha": "7658e21560f046ca",
+ "style": {
+  "template": "owner-explainer-field-notes-v1",
+  "style_sha": "a390fe1b65101e30",
+  "renderer_sha": "9630c3bc4780faaa",
+  "planner_sha": "6d42b9ccfcb05456"
+ },
+ "studio_commit": "4889af8",
+ "model_calls": [
+  {
+   "model": "claude-opus-5-5",
+   "input_tokens": 2,
+   "cache_read_input_tokens": 8544,
+   "cache_creation_input_tokens": 36138,
+   "output_tokens": 5107,
+   "equivalent_api_cost_usd": 0.3929608,
+   "billing": "Claude Code login (subscription), not a metered API key",
+   "duration_ms": 43020
+  },
+  {
+   "model": "claude-opus-5-5",
+   "input_tokens": 2,
+   "cache_read_input_tokens": 8544,
+   "cache_creation_input_tokens": 36325,
+   "output_tokens": 3976,
+   "equivalent_api_cost_usd": 0.3718368,
+   "billing": "Claude Code login (subscription), not a metered API key",
+   "duration_ms": 32552
+  }
+ ],
+ "first_pass_problems": [
+  "the brief asks for about 15 s but this plan runs about 18.1 s; use about 28 words in total or fewer events after the last word of a chapter"
+ ],
+ "plan_problems": [],
+ "status": "awaiting-approval",
+ "render": {
+  "cut": "vertical",
+  "size": "1080x1920",
+  "fps": 30,
+  "quality": "looks",
+  "timings": "dry, 2.6 words/s (silent)"
+ },
+ "scene_problems": [],
+ "project_sha": "bca471c3478ce855",
+ "preview": "projects/fn-dental-illustrated/fieldnotes/preview-v4.mp4",
+ "preview_sha": "c23c9825d2119f54",
+ "duration": 15.532
+}

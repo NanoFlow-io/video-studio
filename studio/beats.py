@@ -56,7 +56,7 @@ def headline_problems(sid, h, layout):
 FN_KINDS = {"house": {"fill"}, "ac_unit": {"run"}, "timeline": {"seg", "playhead"}, "gauge": {"set"},
             "thermostat": {"turn"}, "arrow": {"flow"}, "callout": set(), "note": set(), "card": set(), "flow": {"pulse"},
             # illustration primitives (2026-10-12)
-            "person": {"state"}, "chair": {"state"}, "calendar": {"state", "remind"}, "phone": {"message", "bury"},
+            "person": {"state"}, "chair": {"state"}, "calendar": {"state", "remind"}, "phone": {"message", "bury", "zoom"},
             "envelope": {"state"}, "building": set(), "link": {"mark", "pulse"}}
 # kinds with named parts ("timeline.peak", "flow.l2") and the actions a part takes
 FN_PART_VERBS = {"timeline": {"show", "hide", "seg", "playhead"}, "flow": {"show", "hide", "highlight", "mark"}}

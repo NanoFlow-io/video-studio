@@ -327,13 +327,15 @@ FN_KINDS.calendar = function(o, ctx){ var k = FN.col, ink = k.ink, B = fnBox(o, 
   for(var r = 0; r < 3; r++) for(var c = 0; c < cols; c++){ var p = cell(r, c);
     sv("rect", { x: p.x, y: p.y, width: cw, height: cw, rx: 6, fill: k.paper, stroke: k.inkSoft, "stroke-width": 2, "data-fade": 1 }, g); }
   var A = cell(ap.r, ap.c), mk2 = function(fill, stroke, dash){ return sv("rect", { x: A.x, y: A.y, width: cw, height: cw, rx: 6, fill: fill, stroke: stroke, "stroke-width": 4, "stroke-dasharray": dash || "none", "data-skip": 1 }, g); };
-  var states = { booked: mk2(k.blue, ink), empty: mk2(k.paper, k.ochre, "8 7"), rebooked: mk2(k.sageTint, k.sage) };
+  var states = { booked: mk2(k.blue, ink), empty: mk2(k.paper, k.ochre, "8 7"), rebooked: mk2(k.sageTint, k.sage), available: mk2(k.paper, k.sage, "8 7") };
+  /* available: an open slot that can be offered (a plus), not a confirmed booking */
+  var plus = sv("path", { d: "M" + (A.x + cw / 2) + "," + (A.y + 13) + " v24 M" + (A.x + 13) + "," + (A.y + cw / 2) + " h24", stroke: k.sage, "stroke-width": 5, "stroke-linecap": "round", "data-skip": 1 }, g);
   var check = sv("path", { d: "M" + (A.x + 13) + "," + (A.y + 26) + " L" + (A.x + 22) + "," + (A.y + 35) + " L" + (A.x + 38) + "," + (A.y + 16), fill: "none", stroke: k.sage, "stroke-width": 5, "stroke-linecap": "round", "stroke-linejoin": "round", "data-skip": 1 }, g);
   var cross = sv("path", { d: "M" + (A.x + 16) + "," + (A.y + 16) + " L" + (A.x + 34) + "," + (A.y + 34) + " M" + (A.x + 34) + "," + (A.y + 16) + " L" + (A.x + 16) + "," + (A.y + 34), stroke: k.ochre, "stroke-width": 5, "stroke-linecap": "round", "data-skip": 1 }, g);
   var rem = sv("g", { "data-skip": 1 }, g);
   var st = o.st.state || o.def.state || "booked"; o.st.state = st;
   var show = function(name){ Object.keys(states).forEach(function(n){ gsap.set(states[n], { autoAlpha: n === name ? 1 : 0 }); });
-    gsap.set(check, { autoAlpha: name === "rebooked" ? 1 : 0 }); gsap.set(cross, { autoAlpha: name === "empty" ? 1 : 0 }); };
+    gsap.set(check, { autoAlpha: name === "rebooked" ? 1 : 0 }); gsap.set(cross, { autoAlpha: name === "empty" ? 1 : 0 }); gsap.set(plus, { autoAlpha: name === "available" ? 1 : 0 }); };
   show(st);
   var drawRem = function(days, medium){ while(rem.firstChild) rem.removeChild(rem.firstChild);
     var R = cell(ap.r, ap.c - days), cx1 = R.x + cw / 2, cx2 = A.x + cw / 2, top = y0 + ap.r * (cw + gap) - 6;
@@ -346,10 +348,11 @@ FN_KINDS.calendar = function(o, ctx){ var k = FN.col, ink = k.ink, B = fnBox(o, 
   if(o.st.remind) drawRem(o.st.remind.days, o.st.remind.medium); else gsap.set(rem, { autoAlpha: 0 });
   return { root: B.root,
     state: function(t, a){ var to = a.state, from = o.st.state;
-      tl.to([states[from], check, cross], { autoAlpha: 0, duration: 0.2 }, t);
+      tl.to([states[from], check, cross, plus], { autoAlpha: 0, duration: 0.2 }, t);
       tl.fromTo(states[to], { autoAlpha: 0, scale: 0.7, transformOrigin: "50% 50%" }, { autoAlpha: 1, scale: 1, duration: 0.35, ease: "back.out(1.6)" }, t + 0.15);
       if(to === "rebooked") tl.fromTo(check, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.25 }, t + 0.4);
       if(to === "empty") tl.fromTo(cross, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.25 }, t + 0.4);
+      if(to === "available") tl.fromTo(plus, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.25 }, t + 0.4);
       o.st.state = to; },
     remind: function(t, a){ var days = Math.max(1, Math.min(3, a.days_before || 1)), arc = drawRem(days, a.medium || "text");
       tl.set(rem, { autoAlpha: 1 }, t); gsap.set(rem.firstChild, { opacity: 0 }); tl.to(rem.firstChild, { opacity: 1, duration: 0.3 }, t);
@@ -382,22 +385,43 @@ FN_KINDS.phone = function(o, ctx){ var k = FN.col, ink = k.ink, B = fnBox(o, ctx
   var fillers = function(y){ var f = sv("g", { transform: "translate(0," + y + ")" }, inner); for(var i = 0; i < 3; i++){ sv("rect", { x: -68, y: i * 46, width: 136, height: 38, rx: 8, fill: k.track }, f); sv("rect", { x: -56, y: i * 46 + 14, width: 60, height: 6, rx: 3, fill: k.paper }, f); } return f; };
   var FH = 3 * 46 + 4, rows = [], y = TOP;
   if(st.buried){ fillers(TOP); y += FH; }
-  st.msgs.forEach(function(m){ var r = build(m); r.pos.setAttribute("transform", "translate(0," + y + ")"); if(m.faded) gsap.set(r, { opacity: 0.38 }); rows.push({ el: r, y: y }); y += rowH(m); });
+  st.msgs.forEach(function(m){ var r = build(m); r.pos.setAttribute("transform", "translate(0," + y + ")"); if(m.faded) gsap.set(r, { opacity: 0.38 }); rows.push({ el: r, y: y, m: m }); y += rowH(m); });
   inner.setAttribute("transform", "translate(0," + (-st.scroll) + ")");
+  /* zoom: an ochre ring on one message row and two dashed lines to the object that shows it enlarged (same message).
+     Coordinates are global; the ring and lines follow the row when it is buried or the screen scrolls. */
+  var Z = null, dd = o.def, S = B.s;
+  var zGeom = function(){ var rw = rows[st.zoom.row], top = rw.y - st.scroll, h = rowH(rw.m) - 8, T = st.zoom.rect;
+    var r = { x0: dd.cx + S * -72, x1: dd.cx + S * 72, y0: dd.cy + S * (top - 4), y1: dd.cy + S * (top + h + 4) };
+    var left = T.x1 <= r.x0, sx = left ? r.x0 : r.x1, tx = left ? T.x1 : T.x0;
+    return { r: r, l1: [sx, r.y0, tx, T.y0], l2: [sx, r.y1, tx, T.y1] }; };
+  var zBuild = function(){ var gm = zGeom(), zg = sv("g", { "data-skip": 1 }, B.root);
+    var ring = sv("rect", { x: gm.r.x0, y: gm.r.y0, width: gm.r.x1 - gm.r.x0, height: gm.r.y1 - gm.r.y0, rx: 12, fill: "none", stroke: k.ochre, "stroke-width": 5 }, zg);
+    var mkl = function(L){ return sv("line", { x1: L[0], y1: L[1], x2: L[2], y2: L[3], stroke: k.ochre, "stroke-width": 3, "stroke-dasharray": "9 8" }, zg); };
+    Z = { g: zg, ring: ring, l1: mkl(gm.l1), l2: mkl(gm.l2), gm: gm }; return Z; };
+  var zFollow = function(t){ if(!Z) return; var a = Z.gm, b = zGeom(), dur = 0.45;
+    fnAttrTween(Z.ring, "y", String, a.r.y0, b.r.y0, t, dur); fnAttrTween(Z.l1, "y1", String, a.l1[1], b.l1[1], t, dur); fnAttrTween(Z.l2, "y1", String, a.l2[1], b.l2[1], t, dur);
+    Z.gm = b; };
+  if(st.zoom) zBuild();
   var scrollTo = function(bottom, t){ var want = Math.max(0, bottom - BOTTOM);
-    if(want !== st.scroll){ fnAttrTween(inner, "transform", function(v){ return "translate(0," + (-v).toFixed(1) + ")"; }, st.scroll, want, t, 0.45, "power2.inOut"); st.scroll = want; } };
+    if(want !== st.scroll){ fnAttrTween(inner, "transform", function(v){ return "translate(0," + (-v).toFixed(1) + ")"; }, st.scroll, want, t, 0.45, "power2.inOut"); st.scroll = want; zFollow(t); } };
   return { root: B.root,
     message: function(t, a){ var m = { type: a.type || "text", text: a.text || "" }, r = build(m);
       r.pos.setAttribute("transform", "translate(0," + y + ")"); gsap.set(r, { autoAlpha: 0 });
       scrollTo(y + rowH(m), t);
       tl.fromTo(r, { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: 0.35, ease: "power2.out" }, t + 0.15);
-      st.msgs.push(m); rows.push({ el: r, y: y }); y += rowH(m); },
+      st.msgs.push(m); rows.push({ el: r, y: y, m: m }); y += rowH(m); },
+    zoom: function(t, a){ var i = -1; rows.forEach(function(rw, j){ if(rw.m.type === (a.msg || "email")) i = j; });
+      if(i < 0) throw new Error("phone " + o.id + ": no " + a.msg + " message to zoom into");
+      st.zoom = { row: i, rect: a.rect }; zBuild(); gsap.set(Z.g, { autoAlpha: 0 });
+      tl.set(Z.g, { autoAlpha: 1 }, t);
+      tl.fromTo(Z.ring, { opacity: 0, scale: 1.25, transformOrigin: "50% 50%" }, { opacity: 1, scale: 1, duration: 0.35, ease: "power2.out" }, t);
+      tl.fromTo([Z.l1, Z.l2], { opacity: 0 }, { opacity: 1, duration: 0.35 }, t + 0.25); },
     bury: function(t){ var f = fillers(TOP); gsap.set(f, { autoAlpha: 0 });
       tl.fromTo(f, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.4 }, t);
       rows.forEach(function(rw){ var y1 = rw.y + FH;
         fnAttrTween(rw.el.pos, "transform", function(v){ return "translate(0," + v.toFixed(1) + ")"; }, rw.y, y1, t, 0.45, "power2.inOut");
         tl.to(rw.el, { opacity: 0.38, duration: 0.4 }, t + 0.2); rw.y = y1; });
-      y += FH; st.buried = true; st.msgs.forEach(function(m){ m.faded = true; }); } }; };
+      y += FH; st.buried = true; st.msgs.forEach(function(m){ m.faded = true; }); zFollow(t); } }; };
 
 FN_KINDS.envelope = function(o, ctx){ var k = FN.col, ink = k.ink, B = fnBox(o, ctx, 220, 160), g = B.g;
   var body = sv("g", {}, g);
@@ -441,8 +465,9 @@ FN_KINDS.link = function(o, ctx){ var d = o.def, k = FN.col, ink = k.ink, a = d.
   sv("path", { d: "M" + (mid.x - 9) + "," + mid.y + " L" + (mid.x - 2) + "," + (mid.y + 7) + " L" + (mid.x + 10) + "," + (mid.y - 7), fill: "none", stroke: "#fff", "stroke-width": 4, "stroke-linecap": "round", "stroke-linejoin": "round" }, good);
   var st = o.st, tag = mk(ctx.html, "div", "fn-tag", esc(st.label || d.label || ""), "background:" + (st.mark === "ok" ? k.sage : k.ochre));
   /* label beside the midpoint, or centred above it for a mostly horizontal link */
-  var above = d.labelSide === "above", lx = above ? mid.x : mid.x + (d.labelSide === "left" ? -30 : 30), ly = above ? mid.y - 34 : mid.y;
-  var place = function(el){ gsap.set(el, { x: lx, y: ly, xPercent: above ? -50 : d.labelSide === "left" ? -100 : 0, yPercent: above ? -100 : -50 }); };
+  var above = d.labelSide === "above", below = d.labelSide === "below", vert = above || below;
+  var lx = vert ? mid.x : mid.x + (d.labelSide === "left" ? -30 : 30), ly = above ? mid.y - 34 : below ? mid.y + 34 : mid.y;
+  var place = function(el){ gsap.set(el, { x: lx, y: ly, xPercent: vert ? -50 : d.labelSide === "left" ? -100 : 0, yPercent: above ? -100 : below ? 0 : -50 }); };
   place(tag);
   gsap.set(bad, { autoAlpha: st.mark === "broken" ? 1 : 0 }); gsap.set(good, { autoAlpha: st.mark === "ok" ? 1 : 0 });
   gsap.set(tag, { autoAlpha: (st.drawn && (st.label || d.label)) ? 1 : 0 });

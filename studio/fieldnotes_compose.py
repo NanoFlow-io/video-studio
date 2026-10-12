@@ -31,12 +31,15 @@ PRIMS = {
     "person": {"desc": "a person (customer, patient, parent, staff or owner); present, away (a dashed outline: missing), happy",
                "spans": ["1x1", "1x2"], "states": ["present", "away", "happy"], "verbs": {"state": {"state": E("present", "away", "happy")}}},
     "chair": {"desc": "an appointment chair (dentist, salon, clinic, barber): empty (dashed outline where the person should be) or occupied",
-              "spans": ["1x1", "2x1", "2x2"], "states": ["empty", "occupied"], "verbs": {"state": {"state": E("empty", "occupied")}}},
-    "calendar": {"desc": "a calendar with one appointment day: booked, empty (missed, an X) or rebooked (a check); 'remind' marks a reminder sent N days before with an arrow to the appointment",
-                 "spans": ["1x1", "2x1", "2x2"], "states": ["booked", "empty", "rebooked"],
-                 "verbs": {"state": {"state": E("booked", "empty", "rebooked")}, "remind": {"days_before": {"int": [1, 3]}, "medium": E("email", "text")}}},
-    "phone": {"desc": "a phone screen showing up to 3 messages in order: an email notification, a text from the business, or the customer's reply; 'bury' stacks other notifications above the messages so they sink out of sight",
-              "spans": ["1x2"], "verbs": {"message": {"type": E("email", "text", "reply"), "text": {"str": "message"}}, "bury": {}}},
+              "spans": ["1x1", "2x1", "2x2"], "states": ["empty", "occupied"], "verbs": {"state": {"state": E("empty", "occupied")}},
+              "outcome_states": ["occupied"]},
+    "calendar": {"desc": "a calendar with one appointment day: booked, empty (missed, an X), available (an open slot that can be offered, a plus) or rebooked (a confirmed new booking, a check); 'remind' marks a reminder sent N days before with an arrow to the appointment",
+                 "spans": ["1x1", "2x1", "2x2"], "states": ["booked", "empty", "available", "rebooked"],
+                 "verbs": {"state": {"state": E("booked", "empty", "available", "rebooked")}, "remind": {"days_before": {"int": [1, 3]}, "medium": E("email", "text")}},
+                 "outcome_states": ["rebooked"]},
+    "phone": {"desc": "a phone screen showing up to 3 messages in order: an email notification, a text from the business, or the customer's reply; 'bury' stacks other notifications above the messages so they sink out of sight; 'zoom' rings one message and draws zoom lines to another cast object that shows THAT SAME message enlarged (for example an envelope)",
+              "spans": ["1x2"], "verbs": {"message": {"type": E("email", "text", "reply"), "text": {"str": "message"}}, "bury": {},
+                                          "zoom": {"msg": E("email", "text", "reply"), "to": {"obj": True}}}},
     "envelope": {"desc": "an email or letter: sent, unread (a dot), missed (faded) or opened",
                  "spans": ["1x1", "2x1"], "states": ["sent", "unread", "missed", "opened"], "verbs": {"state": {"state": E("sent", "unread", "missed", "opened")}}},
     "building": {"desc": "the business's premises (shop, clinic, office) with a short sign", "spans": ["1x1", "2x1", "2x2"], "params": {"sign": {"str": "sign"}}},
@@ -242,6 +245,14 @@ def validate_plan(plan, brief):
                 _check_params(verbs[do], e, we, out, fit, ids, links, steps_ids)
                 if do == "callout" and not callout_place(plan, oid):
                     out.append(f"{we}: no free room next to {oid} for a callout label; free a neighbouring cell or drop it")
+                if do == "zoom":
+                    if e.get("to") == oid or e.get("to") not in drawn:
+                        out.append(f"{we}: zoom needs another cast object, drawn first, to show the enlarged message")
+                    if not any(x.get("obj") == oid and x.get("do") == "message" and x.get("type") == e.get("msg")
+                               for c2 in chapters[:ci + 1] for x in (c2.get("events") or [])[: (ei if c2 is ch else None)]):
+                        out.append(f"{we}: no {e.get('msg')} message on {oid} yet to zoom into")
+                    if sum(1 for c2 in chapters for x in (c2.get("events") or []) if x.get("obj") == oid and x.get("do") == "zoom") > 1:
+                        out.append(f"{we}: one zoom per phone")
                 if do == "message":
                     n = sum(1 for c in chapters[:ci + 1] for x in (c.get("events") or []) if x.get("obj") == oid and x.get("do") == "message")
                     if n > 3: out.append(f"{we}: a phone shows at most 3 messages")
@@ -263,6 +274,8 @@ def validate_plan(plan, brief):
                         out.append(f"{we}: from and to must differ")
                     links.add(e.get("id"))
                 if do == "gauge": gauge = True
+    out += outcome_problems(plan, brief, ids)
+    out += link_label_problems(plan)
     for t in texts:   # claims: numbers and absolute words only when the brief has them
         for d in re.findall(r"\d[\d,.:%]*", str(t)):
             if d.rstrip(".,") not in brief:
@@ -283,6 +296,30 @@ def validate_plan(plan, brief):
             want = max(10, round(total * target / est))
             out.append(f"the brief asks for about {target} s but this plan runs about {est} s; use about {want} words in total"
                        + (" or fewer events after the last word of a chapter" if est > target else ""))
+    return out
+
+
+HEDGE_RE = re.compile(r"\b(can|could|may|might|able to)\b", re.I)
+
+
+def outcome_problems(plan, brief, ids):
+    """The picture and narration must not state the outcome more strongly than the brief. When the brief's outcome is
+    only possible ("the slot can be offered"), states that show it done (a calendar 'rebooked', a chair 'occupied'
+    after being empty) are refused, and the last chapter's narration must keep a hedge (can, could, may)."""
+    outcome = str((plan.get("facts") or {}).get("outcome") or "")
+    m = re.search(r"outcome[^:\n]*:\s*(.+)", brief, re.I)
+    source = (m.group(1) if m else "") + " " + outcome
+    if not HEDGE_RE.search(source):
+        return []
+    out, chapters = [], plan.get("chapters") or []
+    for ci, ch in enumerate(chapters):
+        for e in ch.get("events") or []:
+            kind = ids.get(e.get("obj"))
+            if e.get("do") == "state" and kind and e.get("state") in PRIMS[kind].get("outcome_states", []) and ci > 0:
+                out.append(f"outcome check: chapter {ci + 1} shows {e['obj']} as {e['state']!r}, but the brief only says the outcome is possible "
+                           f"({source.strip()[:80]!r}); show it as possible (for a calendar, 'available') rather than done")
+    if chapters and not HEDGE_RE.search(str(chapters[-1].get("narration") or "")):
+        out.append("outcome check: the brief's outcome is only possible, so the last chapter's narration must keep that (can, could or may)")
     return out
 
 
@@ -331,6 +368,7 @@ def _label_rect(mx, my, side, n):
     """Approximate box of a link label (uppercase tag, about 15 px per character at 20 px) for a side."""
     w, h = 15 * n + 28, 40
     if side == "above": return (mx - w / 2, my - 34 - h, mx + w / 2, my - 34)
+    if side == "below": return (mx - w / 2, my + 34, mx + w / 2, my + 34 + h)
     if side == "left": return (mx - 30 - w, my - h / 2, mx - 30, my + h / 2)
     return (mx + 30, my - h / 2, mx + 30 + w, my + h / 2)
 
@@ -339,21 +377,45 @@ def _overlap(a, b):
     return max(0, min(a[2], b[2]) - max(a[0], b[0])) * max(0, min(a[3], b[3]) - max(a[1], b[1]))
 
 
-def _label_side(p0, p1, n, boxes, mids, horiz):
-    """The side for a link's label that keeps it on the frame and off other links' markers and labels and off objects."""
+def _label_side(p0, p1, n, boxes, mids, horiz, with_score=False):
+    """The side for a link's label that keeps it on the frame and off other links' markers and labels and off objects
+    (with_score: also the overlap score of that side; 0 means a clean spot)."""
     mx, my = (p0[0] + p1[0]) / 2, (p0[1] + p1[1]) / 2
     best, score_best = None, None
-    for side in (["above", "left", "right"] if horiz else ["left", "right", "above"]):
+    for side in (["above", "below", "left", "right"] if horiz else ["left", "right", "above", "below"]):
         r = _label_rect(mx, my, side, n)
         s = 0.0
         if r[0] < 40 or r[2] > 1040 or r[1] < 560: s += 1e6
-        for (ox, oy, oside, on) in mids:
-            s += 50 * _overlap(r, (ox - 24, oy - 24, ox + 24, oy + 24)) + 50 * _overlap(r, _label_rect(ox, oy, oside, on))
-        for b in boxes.values():
-            s += _overlap(r, (b["x0"] + b["w"] * 0.08, b["y0"] + b["h"] * 0.08, b["x0"] + b["w"] * 0.92, b["y0"] + b["h"] * 0.92))
+        for (ox, oy, oside, on) in mids:   # other links' markers, and the labels already placed
+            s += 50 * _overlap(r, (ox - 24, oy - 24, ox + 24, oy + 24)) + (50 * _overlap(r, _label_rect(ox, oy, oside, on)) if oside else 0)
+        for b in boxes.values():   # labels stay off the drawings too (whole boxes: a phone's edge is inside its box)
+            s += 3 * _overlap(r, (b["x0"], b["y0"], b["x0"] + b["w"], b["y0"] + b["h"]))
         if score_best is None or s < score_best:
             best, score_best = side, s
-    return best
+    return (best, score_best) if with_score else best
+
+
+def link_label_problems(plan):
+    """Connections whose label has no clean spot (it would cover a drawing, another link or leave the frame)."""
+    cast = {o["id"]: o for o in plan.get("cast") or [] if o.get("id") and parse_slot(o.get("slot")) and parse_span(o.get("span"))}
+    boxes = {oid: box(o["slot"], o["span"]) for oid, o in cast.items()}
+    conns = [x for c in plan.get("chapters") or [] for x in c.get("events") or [] if x.get("do") == "connect" and x.get("from") in boxes and x.get("to") in boxes]
+    geo = {x["id"]: (_edge(boxes[x["from"]], (boxes[x["to"]]["cx"], boxes[x["to"]]["cy"])), _edge(boxes[x["to"]], (boxes[x["from"]]["cx"], boxes[x["from"]]["cy"]))) for x in conns}
+    out, placed = [], []
+    for x in conns:
+        labels = [l for l in (x.get("label"), *(y.get("label") for c in plan["chapters"] for y in c.get("events") or [] if y.get("link") == x["id"])) if l]
+        if not labels:
+            continue
+        p0, p1 = geo[x["id"]]
+        horiz = abs(p1[0] - p0[0]) > abs(p1[1] - p0[1])
+        n = max(len(l) for l in labels)
+        others = [((q0[0] + q1[0]) / 2, (q0[1] + q1[1]) / 2, None, 0) for lid, (q0, q1) in geo.items() if lid != x["id"]]
+        side, score = _label_side(p0, p1, n, boxes, placed + others, horiz, with_score=True)
+        placed.append(((p0[0] + p1[0]) / 2, (p0[1] + p1[1]) / 2, side, n))
+        if score > 0:
+            out.append(f"connection {x['id']} ({x['from']} to {x['to']}): no clear room for its label {labels[-1]!r}; "
+                       "place the two objects further apart (leave a free cell between or beside them) or shorten the label")
+    return out
 
 
 # ---- compile ----
@@ -423,6 +485,13 @@ def compile_plan(plan, name, title):
     brand = re.sub(r"[^A-Za-z0-9 &'.]", "", re.sub(r"\(.*?\)", "", business)).strip().upper()[:28]
     chs, n = plan["chapters"], len(plan["chapters"])
     scenes, gauge_drawn, links, link_mids = [], False, {}, []
+    # every link's ends up front, so each label avoids all links' markers, including later ones
+    link_geo = {}
+    for c2 in chs:
+        for x in c2["events"]:
+            if x.get("do") == "connect" and x.get("from") in boxes and x.get("to") in boxes:
+                a2, b2 = boxes[x["from"]], boxes[x["to"]]
+                link_geo[x["id"]] = (_edge(a2, (b2["cx"], b2["cy"])), _edge(b2, (a2["cx"], a2["cy"])))
     for ci, ch in enumerate(chs):
         sid, nar, used = f"F{ci + 1:02d}", ch["narration"].strip(), set()
         cues, actions, objects, cue_of = [], [], [], {}
@@ -472,6 +541,10 @@ def compile_plan(plan, name, title):
                 actions.append({"at": when(), "do": "message", "target": oid, "type": e["type"], "text": e["text"]})
             elif oid and do == "bury":
                 actions.append({"at": when(), "do": "bury", "target": oid})
+            elif oid and do == "zoom":
+                tb = boxes[e["to"]]
+                rect = {"x0": round(tb["x0"] + tb["w"] * 0.12), "x1": round(tb["x0"] + tb["w"] * 0.88), "y0": round(tb["y0"] + tb["h"] * 0.18), "y1": round(tb["y0"] + tb["h"] * 0.82)}
+                actions.append({"at": when(), "do": "zoom", "target": oid, "msg": e["msg"], "rect": rect})
             elif oid and do == "cool":
                 arrow_id = f"{oid}_air"
                 src = next((x for x in cast.values() if x["kind"] == "ac_unit"), None)
@@ -521,7 +594,8 @@ def compile_plan(plan, name, title):
                 links[e["id"]] = True
                 horiz = abs(p1[0] - p0[0]) > abs(p1[1] - p0[1])
                 labels = [x for x in (e.get("label"), *(y.get("label") for c2 in chs for y in c2["events"] if y.get("link") == e["id"])) if x]
-                side = _label_side(p0, p1, max((len(x) for x in labels), default=0), boxes, link_mids, horiz)
+                others = [((q0[0] + q1[0]) / 2, (q0[1] + q1[1]) / 2, None, 0) for lid, (q0, q1) in link_geo.items() if lid != e["id"]]
+                side = _label_side(p0, p1, max((len(x) for x in labels), default=0), boxes, link_mids + others, horiz)
                 link_mids.append(((p0[0] + p1[0]) / 2, (p0[1] + p1[1]) / 2, side, max((len(x) for x in labels), default=0)))
                 objects.append({"id": e["id"], "kind": "link", "from": p0, "to": p1, "style": e.get("style") or "solid", "label": e.get("label") or "",
                                 "bend": 0.12 if horiz else 0.18, "labelSide": side})

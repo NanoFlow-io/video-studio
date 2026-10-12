@@ -22,6 +22,12 @@ A deterministic compiler draws your plan; you only choose from the catalogue bel
 - SHOW, DON'T LABEL. Pick concrete objects that depict the story's actual things and moments (the person, the device,
   the message, the empty appointment, the place). Use the abstract `steps` diagram only if nothing concrete can show it.
   Each object should earn its place: the viewer should understand the cause and the fix from the pictures alone.
+- One thing, drawn once. Never draw the same item (one email, one message) as two separate objects. To show a phone
+  message larger, draw the enlarged object and use the phone's `zoom` from that message to it, so the viewer sees it is
+  the same message.
+- Show the outcome exactly as strongly as the brief states it. If the brief says something can or could happen, show it
+  as possible (a calendar day `available`, a chair left empty) and keep "can" in the narration; never show it as done
+  (`rebooked`, `occupied`) unless the brief says it happened.
 - If an object the story genuinely needs is not in the catalogue, add it to "missing_primitives" with "essential": true
   if the story cannot be told honestly without it (the run then stops and reports it), or false if a supported object
   can stand in reasonably (say which in "why"). Never substitute an unrelated picture.
@@ -31,7 +37,9 @@ A deterministic compiler draws your plan; you only choose from the catalogue bel
 - Layout: the illustration area is a 3 x 3 grid of cells r1c1 (top left) to r3c3 (bottom right). Each cast object has a
   "slot" (its top-left cell) and a "span" (columns x rows, from its allowed spans). Objects may not overlap. Leave a free
   neighbouring cell (or use row 1) for any object you put a callout on. Put things that interact near each other so
-  connections are short. A gauge, notes and the closing checklist card sit below the grid automatically.
+  connections are short, but a LABELLED connection needs a free cell between or beside its two objects for the label
+  (labels never sit on a drawing); otherwise leave the label empty. A gauge, notes and the closing checklist card sit
+  below the grid automatically.
 - Events: each chapter lists events in time order. "on" is "start" or ONE word copied exactly from that chapter's
   narration (the moment the narrator says it). Draw an object before changing or connecting it. Objects stay on screen
   from chapter to chapter unless hidden. 2 to 4 chapters: the problem first, then the cause or the change, then the fix

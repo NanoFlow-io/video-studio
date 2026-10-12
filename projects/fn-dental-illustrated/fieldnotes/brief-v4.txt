@@ -1,0 +1,10 @@
+FICTIONAL TEST BRIEF (not a real business; for testing the field-notes workflow only).
+
+Harbor Lane Dental is a small family dental practice.
+Audience: busy parents who book check-ups for their kids.
+Problem: appointments get missed and the chair sits empty.
+Verified cause (from the practice's own front-desk notes): the only reminder is an email sent the evening before, which many parents don't see until it is too late to rearrange.
+Solution: a text reminder two days ahead that patients can reply to, to confirm or reschedule.
+Realistic outcome: when someone can't make it, they can tell the practice early, so the slot can be offered to another patient.
+Style note: same story and Field Notes style. Make the missed email more visually obvious, showing the envelope as an enlarged view of the same phone email notification by zooming in from the phone, not as a second email. End with the appointment slot available to offer, not an occupied chair or a confirmed replacement booking, keep 'we can offer the slot' in the narration, and finish with Reply to reschedule.
+No narration supplied. About 15 seconds.

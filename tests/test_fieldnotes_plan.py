@@ -32,14 +32,13 @@ DENTAL = {
          "events": [{"on": "start", "do": "draw", "obj": "phone"}, {"on": "reminder", "do": "message", "obj": "phone", "type": "email", "text": "Reminder: check-up"},
                     {"on": "easy", "do": "bury", "obj": "phone"}, {"on": "miss", "do": "remind", "obj": "cal", "days_before": 1, "medium": "email"}]},
         {"chapter": "THE FIX", "kicker": "A TEXT THEY CAN ANSWER", "headline": ["Text ahead,", "reply to move it"], "emphasis": "sage",
-         "narration": "Now a text comes two days ahead, they reply to reschedule, and the slot goes to another patient.",
+         "narration": "Now a text comes two days ahead, they reply to reschedule, and we can offer the slot.",
          "events": [{"on": "text", "do": "message", "obj": "phone", "type": "text", "text": "Can you make it?"},
                     {"on": "text", "do": "remind", "obj": "cal", "days_before": 2, "medium": "text"},
                     {"on": "reply", "do": "draw", "obj": "parent"},
                     {"on": "reply", "do": "message", "obj": "phone", "type": "reply", "text": "Please reschedule"},
-                    {"on": "slot", "do": "state", "obj": "cal", "state": "rebooked"},
-                    {"on": "patient", "do": "state", "obj": "chair", "state": "occupied"},
-                    {"on": "patient", "do": "checklist", "text": "Reply to reschedule"}]}],
+                    {"on": "offer", "do": "state", "obj": "cal", "state": "available"},
+                    {"on": "slot", "do": "checklist", "text": "Reply to reschedule"}]}],
 }
 BRIEF_HOME = ("True North, an HVAC company. Audience: homeowners on time-of-use plans. Problem: AC runs at peak price. Cause: the peak "
               "window costs more. Solution: cool before peak, raise the thermostat a little. Outcome: shift some cooling.")
@@ -114,6 +113,141 @@ class ValidatePlan(unittest.TestCase):
         t = fc.catalog_text()
         for k in fc.PRIMS:
             self.assertIn(f"`{k}`", t)
+
+
+class OutcomeStrength(unittest.TestCase):
+    """The illustrated outcome must not overstate the brief (2026-10-12 review: 'can offer the slot')."""
+    def test_hedged_brief_refuses_done_states_and_certain_narration(self):
+        bad = copy.deepcopy(DENTAL)
+        fix = bad["chapters"][2]
+        fix["events"] = [x for x in fix["events"] if x.get("obj") != "cal" or x.get("do") != "state"]
+        fix["events"] += [{"on": "slot", "do": "state", "obj": "cal", "state": "rebooked"}, {"on": "slot", "do": "state", "obj": "chair", "state": "occupied"}]
+        fix["narration"] = "Now a text comes two days ahead, they reply to reschedule, and we fill the slot."
+        p = "\n".join(fc.validate_plan(bad, BRIEF_DENTAL))
+        self.assertIn("shows cal as 'rebooked'", p)
+        self.assertIn("shows chair as 'occupied'", p)
+        self.assertIn("must keep that (can, could or may)", p)
+
+    def test_available_and_hedged_narration_pass(self):
+        self.assertEqual([x for x in fc.validate_plan(DENTAL, BRIEF_DENTAL) if x.startswith("outcome")], [])
+
+    def test_unhedged_brief_may_show_the_result(self):
+        brief = BRIEF_DENTAL.replace("the slot can be offered to another patient", "the slot goes to another patient")
+        plan = copy.deepcopy(DENTAL); plan["facts"]["outcome"] = "slot goes to another patient"
+        plan["chapters"][2]["events"].append({"on": "slot", "do": "state", "obj": "cal", "state": "rebooked"})
+        self.assertEqual([x for x in fc.validate_plan(plan, brief) if x.startswith("outcome")], [])
+
+    def test_a_booked_start_is_not_an_outcome(self):   # the starting state in chapter 1 is the situation, not a claim
+        self.assertEqual(fc.outcome_problems({"facts": {"outcome": "can be offered"}, "chapters": [
+            {"narration": "It can be offered.", "events": [{"do": "state", "obj": "cal", "state": "rebooked"}]}]}, "Outcome: can", {"cal": "calendar"}), [])
+
+
+class SameWordOrdering(unittest.TestCase):
+    """Events that share a spoken word unfold briefly but never pass the next cue (2026-10-12: a link was drawn after
+    it broke, which reset its label)."""
+    def plan(self):
+        p = copy.deepcopy(DENTAL)
+        p["chapters"][1]["narration"] = "Our only reminder: an evening email, seen late."
+        p["chapters"][1]["events"] = [{"on": "start", "do": "draw", "obj": "phone"}, {"on": "start", "do": "draw", "obj": "chair"},
+            {"on": "email", "do": "message", "obj": "phone", "type": "email", "text": "Reminder: check-up"},
+            {"on": "email", "do": "state", "obj": "patient", "state": "away"},
+            {"on": "email", "do": "remind", "obj": "cal", "days_before": 1, "medium": "email"},
+            {"on": "email", "do": "connect", "id": "c1", "from": "phone", "to": "chair", "style": "dashed", "label": "Evening email"},
+            {"on": "late", "do": "break", "link": "c1", "label": "Seen too late"}]
+        p["chapters"][0]["events"].insert(0, {"on": "start", "do": "draw", "obj": "patient"})
+        return p
+
+    def times(self, scene):
+        nar, cues = scene["line"]["text"], {c["name"]: c["at"] for c in scene["cues"]}
+        out = []
+        for a in scene["data"]["actions"]:
+            at = a["at"]
+            if isinstance(at, (int, float)): out.append((at, a)); continue
+            name, off = (at.split("+") + ["0"])[:2] if "+" in at else (at, "0")
+            out.append((fc._est_word_time(nar, cues[name]) + float(off), a))
+        return out
+
+    def test_draw_comes_before_break_and_order_is_kept(self):
+        pj = fc.compile_plan(self.plan(), "x", "x")
+        ts = self.times(pj["scenes"][1])
+        draw = next(t for t, a in ts if a["do"] == "draw" and a["target"] == "c1")
+        brk = next(t for t, a in ts if a["do"] == "mark" and a["target"] == "c1")
+        late = fc._est_word_time(pj["scenes"][1]["line"]["text"], "late")
+        self.assertLess(draw, brk)
+        self.assertLess(draw, late)
+
+    def test_stagger_is_capped_below_the_next_word(self):
+        pj = fc.compile_plan(self.plan(), "x", "x")
+        late = fc._est_word_time(pj["scenes"][1]["line"]["text"], "late")
+        on_email = [t for t, a in self.times(pj["scenes"][1]) if a["do"] in ("message", "state", "remind") or (a["do"] == "draw" and a["target"] == "c1")]
+        self.assertTrue(all(t < late for t in on_email), on_email)
+
+
+class LinkLabels(unittest.TestCase):
+    """Link labels stay on the frame, off other links' markers and labels, and off the drawings (2026-10-12: a label
+    covered another link, then sat on the phone's edge)."""
+    def rects(self, pj):
+        out = []
+        for s in pj["scenes"]:
+            for o in s["data"]["objects"]:
+                if o.get("kind") == "link":
+                    mx, my = (o["from"][0] + o["to"][0]) / 2, (o["from"][1] + o["to"][1]) / 2
+                    out.append((o["id"], (mx, my), fc._label_rect(mx, my, o["labelSide"], len(o["label"] or "x"))))
+        return out
+
+    def layout(self, cast):
+        p = copy.deepcopy(DENTAL)
+        p["cast"] = cast
+        ev = p["chapters"][0]["events"] = [{"on": "start", "do": "draw", "obj": o["id"]} for o in cast]
+        ev += [{"on": "start", "do": "connect", "id": "c1", "from": "mail", "to": "parent", "style": "dashed", "label": "Seen too late"},
+               {"on": "start", "do": "connect", "id": "c2", "from": "phone", "to": "parent", "style": "solid", "label": "Text two days ahead"}]
+        for c in p["chapters"][1:]:
+            c["events"] = [{"on": "start", "do": "note", "text": "x"}]
+        return p
+
+    def test_cramped_layout_is_refused_for_a_repair(self):
+        # the v3 layout: phone directly above the parent, a 90 px gap, no clean spot for the text link's label
+        p = self.layout([{"id": "chair", "kind": "chair", "slot": "r1c1", "span": "2x1"}, {"id": "phone", "kind": "phone", "slot": "r1c3", "span": "1x2"},
+                         {"id": "mail", "kind": "envelope", "slot": "r2c1", "span": "2x1"}, {"id": "cal", "kind": "calendar", "slot": "r3c1", "span": "2x1"},
+                         {"id": "parent", "kind": "person", "slot": "r3c3", "span": "1x1"}])
+        self.assertIn("connection c2 (phone to parent): no clear room", "\n".join(fc.link_label_problems(p)))
+
+    def test_roomy_layout_places_both_labels_cleanly(self):
+        p = self.layout([{"id": "phone", "kind": "phone", "slot": "r1c3", "span": "1x2"}, {"id": "mail", "kind": "envelope", "slot": "r1c1", "span": "1x1"},
+                         {"id": "parent", "kind": "person", "slot": "r3c1", "span": "1x1"}])
+        self.assertEqual(fc.link_label_problems(p), [])
+        r = self.rects(fc.compile_plan(p, "x", "x"))
+        (_, m1, a), (_, m2, b) = r
+        self.assertEqual(fc._overlap(a, b), 0)
+        for rect, other in ((a, m2), (b, m1)):
+            self.assertEqual(fc._overlap(rect, (other[0] - 24, other[1] - 24, other[0] + 24, other[1] + 24)), 0)
+            self.assertTrue(rect[0] >= 40 and rect[2] <= 1040)
+        for oid in ("phone", "mail", "parent"):
+            o = next(x for x in p["cast"] if x["id"] == oid); bx = fc.box(o["slot"], o["span"])
+            for rect in (a, b):
+                self.assertEqual(fc._overlap(rect, (bx["x0"], bx["y0"], bx["x0"] + bx["w"], bx["y0"] + bx["h"])), 0, oid)
+
+class Zoom(unittest.TestCase):
+    def plan(self, **kw):
+        p = copy.deepcopy(DENTAL)
+        p["cast"].append({"id": "mail", "kind": "envelope", "slot": "r3c3", "span": "1x1"})
+        p["cast"] = [o for o in p["cast"] if o["id"] != "parent"]
+        p["chapters"][2]["events"] = [x for x in p["chapters"][2]["events"] if x.get("obj") != "parent"]
+        p["chapters"][1]["events"] += [{"on": "miss", "do": "draw", "obj": "mail"}, {"on": "miss", "do": "zoom", "obj": "phone", "msg": "email", "to": "mail", **kw}]
+        return p
+
+    def test_zoom_compiles_with_the_target_rect(self):
+        self.assertEqual(fc.validate_plan(self.plan(), BRIEF_DENTAL), [])
+        pj = fc.compile_plan(self.plan(), "x", "x")
+        z = next(a for s in pj["scenes"] for a in s["data"]["actions"] if a["do"] == "zoom")
+        b = fc.box("r2c3", "1x1")
+        self.assertTrue(b["x0"] <= z["rect"]["x0"] < z["rect"]["x1"] <= b["x0"] + b["w"])
+
+    def test_zoom_needs_the_message_and_another_object(self):
+        p = "\n".join(fc.validate_plan(self.plan(msg="reply"), BRIEF_DENTAL))
+        self.assertIn("no reply message on phone yet", p)
+        p = "\n".join(fc.validate_plan(self.plan(to="phone"), BRIEF_DENTAL))
+        self.assertIn("zoom needs another cast object", p)
 
 
 class Compile(unittest.TestCase):

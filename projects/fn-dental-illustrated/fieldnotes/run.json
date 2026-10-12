@@ -27,7 +27,16 @@
    "brief_sha": "bc16c93135b52037",
    "plan_sha": "325e698c912cbb5d",
    "preview": "projects/fn-dental-illustrated/fieldnotes/preview-v3.mp4"
+  },
+  {
+   "version": 4,
+   "created": "2026-10-12T01:41:56+00:00",
+   "status": "awaiting-approval",
+   "revision": "Keep the Field Notes style and the current story. Make the envelope clearly an enlarged view of the same phone notification, not a second email, using a zoom from the phone. End with the appointment slot available to offer, not an occupied chair or a confirmed replacement booking, and keep 'we can offer the slot' in the narration. Keep it around 15 seconds.",
+   "brief_sha": "245730aa26905693",
+   "plan_sha": "7658e21560f046ca",
+   "preview": "projects/fn-dental-illustrated/fieldnotes/preview-v4.mp4"
   }
  ],
- "current": 3
+ "current": 4
 }

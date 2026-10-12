@@ -50,6 +50,18 @@ itself. The model never writes scene data or code, and nothing in a brief is exe
 `brief-v<N>.txt`, `plan-v<N>.json`, `report-v<N>.json` (style, renderer and planner hashes, Studio commit, model usage,
 first-pass and final validation, render settings) and `preview-v<N>.mp4`.
 
+### Honesty and layout checks (2026-10-12)
+
+- One thing drawn once: a phone message shown larger uses the phone's `zoom` (a ring on that message and dashed lines
+  to the enlarged object, following the message when it is buried or scrolls), never a second, unconnected copy.
+- Outcome strength: when the brief's outcome is only possible ("can be offered"), states that show it done (calendar
+  `rebooked`, chair `occupied` after chapter 1) are refused and the last chapter's narration must keep can, could or
+  may. Use calendar `available` (an open slot) instead.
+- Labelled connections need clear room: a label that would cover a drawing, another link or leave the frame sends the
+  plan back for a repair (move the objects apart or drop the label).
+- Events on the same spoken word unfold 0.2 s apart and never pass the next cue, so a link is always drawn before it
+  breaks.
+
 ### The primitive catalogue
 
 person (present, away as a dashed outline, happy); chair (an appointment chair, empty or occupied); calendar (an

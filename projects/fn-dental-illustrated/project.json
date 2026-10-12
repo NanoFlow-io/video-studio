@@ -48,7 +48,7 @@
    "id": "F01",
    "type": "fieldnotes",
    "line": {
-    "text": "Check-ups get missed. Chairs sit empty.",
+    "text": "Check-ups missed, chairs empty.",
     "pause": [
      0,
      1.32
@@ -63,11 +63,6 @@
     {
      "name": "missed",
      "at": "missed",
-     "sfx": null
-    },
-    {
-     "name": "chairs",
-     "at": "Chairs",
      "sfx": null
     }
    ],
@@ -117,7 +112,7 @@
       "cy": 1065.0,
       "bw": 604,
       "bh": 290,
-      "state": "sent"
+      "state": "unread"
      },
      {
       "id": "cal",
@@ -161,6 +156,12 @@
       "dur": 0.7
      },
      {
+      "at": 0.75,
+      "do": "draw",
+      "target": "chair",
+      "dur": 0.7
+     },
+     {
       "at": "missed",
       "do": "state",
       "target": "cal",
@@ -171,12 +172,6 @@
       "do": "state",
       "target": "parent",
       "state": "away"
-     },
-     {
-      "at": "chairs",
-      "do": "draw",
-      "target": "chair",
-      "dur": 0.7
      },
      {
       "at": "empty+0.20",
@@ -190,7 +185,7 @@
    "id": "F02",
    "type": "fieldnotes",
    "line": {
-    "text": "Our only reminder: an evening email, seen late.",
+    "text": "An evening email, seen too late.",
     "pause": [
      0,
      1.32
@@ -203,8 +198,8 @@
      "sfx": null
     },
     {
-     "name": "reminder",
-     "at": "reminder",
+     "name": "evening",
+     "at": "evening",
      "sfx": null
     },
     {
@@ -252,7 +247,7 @@
        1293.8
       ],
       "style": "dashed",
-      "label": "Evening email",
+      "label": "",
       "bend": 0.12,
       "labelSide": "right"
      }
@@ -261,17 +256,11 @@
      {
       "at": 0.35,
       "do": "draw",
-      "target": "mail",
-      "dur": 0.7
-     },
-     {
-      "at": 0.55,
-      "do": "draw",
       "target": "phone",
       "dur": 0.7
      },
      {
-      "at": "reminder",
+      "at": "evening",
       "do": "remind",
       "target": "cal",
       "days_before": 1,
@@ -279,16 +268,28 @@
      },
      {
       "at": "email",
-      "do": "state",
-      "target": "mail",
-      "state": "unread"
-     },
-     {
-      "at": "email+0.20",
       "do": "message",
       "target": "phone",
       "type": "email",
       "text": "Reminder: check-up tomorrow"
+     },
+     {
+      "at": "email+0.20",
+      "do": "draw",
+      "target": "mail",
+      "dur": 0.7
+     },
+     {
+      "at": "email+0.23",
+      "do": "zoom",
+      "target": "phone",
+      "msg": "email",
+      "rect": {
+       "x0": 154,
+       "x1": 614,
+       "y0": 972,
+       "y1": 1158
+      }
      },
      {
       "at": "email+0.23",
@@ -312,7 +313,7 @@
       "do": "mark",
       "target": "c1",
       "state": "broken",
-      "label": "Seen too late"
+      "label": ""
      }
     ]
    }
@@ -321,7 +322,7 @@
    "id": "F03",
    "type": "fieldnotes",
    "line": {
-    "text": "We now text two days ahead. Can't make it? We can offer the slot. Reply to reschedule.",
+    "text": "We text two days ahead. Can't come? Reply, so we can offer the slot. Reply to reschedule.",
     "pause": [
      0,
      0
@@ -329,8 +330,8 @@
    },
    "cues": [
     {
-     "name": "reply",
-     "at": "Reply",
+     "name": "reschedule",
+     "at": "reschedule",
      "sfx": null
     },
     {
@@ -344,8 +345,8 @@
      "sfx": null
     },
     {
-     "name": "make",
-     "at": "make",
+     "name": "come",
+     "at": "come",
      "sfx": null
     },
     {
@@ -356,11 +357,6 @@
     {
      "name": "slot",
      "at": "slot",
-     "sfx": null
-    },
-    {
-     "name": "reschedule",
-     "at": "reschedule",
      "sfx": null
     }
    ],
@@ -382,7 +378,7 @@
       {
        "text": "Reply to reschedule",
        "em": "sage",
-       "at": "reply+0.15"
+       "at": "reschedule+0.15"
       }
      ]
     },
@@ -399,9 +395,18 @@
        1253.2
       ],
       "style": "solid",
-      "label": "Text two days ahead",
+      "label": "",
       "bend": 0.18,
-      "labelSide": "above"
+      "labelSide": "left"
+     },
+     {
+      "id": "co36",
+      "kind": "callout",
+      "x": 384.0,
+      "y": 616,
+      "ly": 584,
+      "style": "tag",
+      "text": "Slot free to offer"
      },
      {
       "id": "card",
@@ -421,42 +426,41 @@
       "text": "Harbor Lane: check-up in two days"
      },
      {
-      "at": "ahead",
+      "at": "text+0.20",
       "do": "remind",
       "target": "cal",
       "days_before": 2,
       "medium": "text"
      },
      {
-      "at": "ahead+0.20",
+      "at": "ahead",
       "do": "draw",
       "target": "c2",
       "dur": 0.6
      },
      {
-      "at": "make",
+      "at": "come",
       "do": "message",
       "target": "phone",
       "type": "reply",
       "text": "Can't make it. Please reschedule"
      },
      {
+      "at": "come+0.20",
+      "do": "pulse",
+      "target": "c2",
+      "dur": 1.2
+     },
+     {
       "at": "offer",
       "do": "state",
       "target": "cal",
-      "state": "rebooked"
+      "state": "available"
      },
      {
-      "at": "slot",
-      "do": "state",
-      "target": "chair",
-      "state": "occupied"
-     },
-     {
-      "at": "reply",
-      "do": "state",
-      "target": "parent",
-      "state": "happy"
+      "at": "slot+0.20",
+      "do": "show",
+      "target": "co36"
      },
      {
       "at": "reschedule",
