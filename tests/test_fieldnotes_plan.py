@@ -330,6 +330,16 @@ class SuppliedNarration(unittest.TestCase):
         self.assertEqual(fp.supplied_narration(b), "On a time-of-use plan, cooling can cost more.")
 
 
+class CastParams(unittest.TestCase):
+    def test_top_level_timeline_labels_reach_the_page(self):
+        plan = copy.deepcopy(HOME)
+        day = next(o for o in plan["cast"] if o["id"] == "day"); day.pop("params")
+        day.update({"window_label": "PEAK WINDOW", "left": "Earlier (example day)", "right": "Later"})
+        self.assertEqual(fc.validate_plan(plan, BRIEF_HOME), [])
+        obj = next(o for o in fc.compile_plan(plan, "x", "x")["scenes"][0]["data"]["objects"] if o["id"] == "day")
+        self.assertEqual((obj["left"], obj["bands"][0]["label"]), ("Earlier (example day)", "PEAK WINDOW"))
+
+
 class SomeNotAll(unittest.TestCase):
     def test_shift_earlier_leaves_part_of_the_activity_in_the_window(self):
         pj = fc.compile_plan(HOME, "x", "x")

@@ -19,6 +19,7 @@ DRY_WPS = 2.6
 #   schema     1 stage diagrams (a280b4f); 2 cast of illustrated objects on a 3x3 grid (c7def36)
 #   planner    prompt + compiler. 1 a280b4f; 2 c7def36; 3 same-word stagger, label placement (4889af8); 4 zoom (9baa194);
 #              5 claims ledger in the reply, one closing line, timeline drawn as an illustrative example
+#              6 params given directly on a cast entry are compiled (they were dropped)
 #   validator  1 stage plans; 2 composition plans (c7def36, 4889af8); 3 outcome strength, label room, zoom rules (9baa194);
 #              4 factual grounding (brief words, quantifiers, claims ledger) and closing-card capacity (2026-10-12)
 #   renderer   engine/fieldnotes.js "Renderer version: N". 1 f4e3192; 2 c7def36; 3 4889af8; 4 zoom, available (9baa194);
@@ -26,7 +27,7 @@ DRY_WPS = 2.6
 # A saved plan is compatible when its schema is current and it passes the current validator. A renderer or compiler
 # change alone never needs a new plan (`fieldnotes rebuild` reuses it); a stricter validator can make an old plan need
 # migration, which plans the same approved brief again (`fieldnotes migrate`) and never rewrites the old version.
-PLAN_SCHEMA, PLANNER_VERSION, VALIDATOR_VERSION = 2, 5, 4
+PLAN_SCHEMA, PLANNER_VERSION, VALIDATOR_VERSION = 2, 6, 4
 
 
 def renderer_version():
@@ -586,7 +587,10 @@ def _est_word_time(nar, word):
 
 def _object_def(o):
     """Renderer object data for one cast entry, sized to its grid box."""
-    kind, bx, p = o["kind"], box(o["slot"], o["span"]), o.get("params") or {}
+    kind, bx = o["kind"], box(o["slot"], o["span"])
+    # params may sit in "params" or directly on the cast entry (the validator accepts both; 2026-10-12: the compiler
+    # read only "params", so a timeline's "example day" label and window label were silently dropped)
+    p = {**{k: o[k] for k in PRIMS.get(kind, {}).get("params", {}) if k in o}, **(o.get("params") or {})}
     base = {"id": o["id"], "kind": kind}
     if kind in ("person", "chair", "calendar", "phone", "envelope", "building"):
         d = {**base, "cx": bx["cx"], "cy": bx["cy"], "bw": bx["w"], "bh": bx["h"]}
