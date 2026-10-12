@@ -21,13 +21,14 @@ DRY_WPS = 2.6
 #              5 claims ledger in the reply, one closing line, timeline drawn as an illustrative example
 #              6 params given directly on a cast entry are compiled (they were dropped)
 #   validator  1 stage plans; 2 composition plans (c7def36, 4889af8); 3 outcome strength, label room, zoom rules (9baa194);
-#              4 factual grounding (brief words, quantifiers, claims ledger) and closing-card capacity (2026-10-12)
+#              4 factual grounding (brief words, quantifiers, claims ledger) and closing-card capacity (2026-10-12);
+#              5 the narration hedge rule applies to drafted narration only (owner-supplied wording is the owner's own)
 #   renderer   engine/fieldnotes.js "Renderer version: N". 1 f4e3192; 2 c7def36; 3 4889af8; 4 zoom, available (9baa194);
 #              5 phone messages always shown whole (smaller type when long; 4 cut them off)
 # A saved plan is compatible when its schema is current and it passes the current validator. A renderer or compiler
 # change alone never needs a new plan (`fieldnotes rebuild` reuses it); a stricter validator can make an old plan need
 # migration, which plans the same approved brief again (`fieldnotes migrate`) and never rewrites the old version.
-PLAN_SCHEMA, PLANNER_VERSION, VALIDATOR_VERSION = 2, 6, 4
+PLAN_SCHEMA, PLANNER_VERSION, VALIDATOR_VERSION = 2, 6, 5
 
 
 def renderer_version():
@@ -466,7 +467,9 @@ def outcome_problems(plan, brief, ids):
             if e.get("do") == "state" and kind and e.get("state") in PRIMS[kind].get("outcome_states", []) and ci > 0:
                 out.append(f"outcome check: chapter {ci + 1} shows {e['obj']} as {e['state']!r}, but the brief only says the outcome is possible "
                            f"({source.strip()[:80]!r}); show it as possible (for a calendar, 'available') rather than done")
-    if chapters and not HEDGE_RE.search(str(chapters[-1].get("narration") or "")):
+    # Narration the owner supplied word for word is their own approved wording (2026-10-12: "Get some of that cooling
+    # done earlier, when it costs less." is advice, not an invented result); the hedge rule guards drafted narration.
+    if chapters and not plan.get("supplied_narration") and not HEDGE_RE.search(str(chapters[-1].get("narration") or "")):
         out.append("outcome check: the brief's outcome is only possible, so the last chapter's narration must keep that (can, could or may)")
     return out
 

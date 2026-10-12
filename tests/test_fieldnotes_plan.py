@@ -153,6 +153,15 @@ class OutcomeStrength(unittest.TestCase):
         plan["chapters"][2]["events"].append({"on": "slot", "do": "state", "obj": "cal", "state": "rebooked"})
         self.assertEqual([x for x in fc.validate_plan(plan, brief) if x.startswith("outcome")], [])
 
+    def test_owner_supplied_narration_needs_no_hedge_but_pictures_still_do(self):
+        plan = copy.deepcopy(DENTAL)
+        plan["chapters"][2]["narration"] = "Now a text comes two days ahead, they reply to reschedule, and we offer the slot."
+        plan["supplied_narration"] = " ".join(c["narration"] for c in plan["chapters"])
+        p = "\n".join(fc.validate_plan(plan, BRIEF_DENTAL))
+        self.assertNotIn("must keep that (can, could or may)", p)
+        plan["chapters"][2]["events"].append({"on": "slot", "do": "state", "obj": "cal", "state": "rebooked"})
+        self.assertIn("shows cal as 'rebooked'", "\n".join(fc.validate_plan(plan, BRIEF_DENTAL)))
+
     def test_a_booked_start_is_not_an_outcome(self):   # the starting state in chapter 1 is the situation, not a claim
         self.assertEqual(fc.outcome_problems({"facts": {"outcome": "can be offered"}, "chapters": [
             {"narration": "It can be offered.", "events": [{"do": "state", "obj": "cal", "state": "rebooked"}]}]}, "Outcome: can", {"cal": "calendar"}), [])
