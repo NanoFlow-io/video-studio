@@ -242,6 +242,21 @@ class Narrate(TempStudio):
         self.assertEqual((pj["voice"]["lead_in"], pj["voice"]["tail"]), (0.25, 1.5))
         self.assertEqual(out["chars"], sum(len(s["line"]["text"]) for s in pj["scenes"]))
 
+    def test_a_last_word_accent_keeps_a_readable_hold_and_paid_copies_only_change_pacing(self):
+        plan = copy.deepcopy(DENTAL); plan["chapters"][0]["emphasis_on"] = "empty"   # the last word of chapter 1
+        (self.fn / "plan-v2.json").write_text(json.dumps(plan), encoding="utf-8")
+        vf = self.tmp / "voice.json"; vf.write_text(json.dumps({"voice": {"voice_id": "abc", "model_id": "m", "settings": {}}}))
+        live = self.tmp / "live"
+        with mock.patch.object(ag, "REVIEW_ROOT", live):
+            ag.narrated_copy(self.name, 2, vf, "brisk", "fn-test-v2-voiced")
+            pj = json.loads((live / "projects" / "fn-test-v2-voiced" / "project.json").read_text())
+            self.assertEqual(pj["scenes"][0]["line"]["pause"][1], ag.ACCENT_HOLD)
+            vo = live / "projects" / "fn-test-v2-voiced" / "generated" / "vo"; vo.mkdir(parents=True); (vo / "F01-x.mp3").write_bytes(b"paid")
+            ag.narrated_copy(self.name, 2, vf, "brisk", "fn-test-v2-voiced")                 # same words and voice: allowed
+            vf.write_text(json.dumps({"voice": {"voice_id": "other", "model_id": "m", "settings": {}}}))
+            with self.assertRaises(SystemExit):
+                ag.narrated_copy(self.name, 2, vf, "brisk", "fn-test-v2-voiced")             # another voice: refused
+
 
 class DraftOnly(unittest.TestCase):
     def test_the_workflow_only_builds_silent_previews_and_renders_locally(self):

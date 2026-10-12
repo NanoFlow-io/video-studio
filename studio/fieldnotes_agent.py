@@ -19,7 +19,7 @@ module has no approve, narrate, render-remote or publish action. Model-call acti
 same day, so the cost is shown to the person before anything runs. Review delivery copies the draft into the Studio's
 projects folder as a separate review project (<project>-v<N>) with a marker file; it never overwrites a project it did
 not create and never deletes anything."""
-import argparse, hashlib, json, os, shutil, subprocess, sys, urllib.error, urllib.request
+import argparse, hashlib, json, re, os, shutil, subprocess, sys, urllib.error, urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -158,6 +158,7 @@ def deliver(project, version=None, rebuild=False):
             "verified": ok, "proof": proof, "copy": str(dst)}
 
 
+ACCENT_HOLD = 0.7   # seconds a last-word headline accent stays before the next chapter
 PACES = {   # narration delivery for an owner-voiced copy: voice speed and the gaps around the words
     "natural": {"speed": None, "lead_in": 0.4, "hold": None, "tail": 1.8},
     "brisk": {"speed": 1.12, "lead_in": 0.25, "hold": 0.25, "tail": 1.5},   # Bob 2026-10-12: brisk, energetic, not instructional
@@ -178,8 +179,8 @@ def narrated_copy(project, version, voice_file, pace="natural", name=None):
     marker = dst / "fieldnotes" / "narrated-from.json"
     if dst.exists() and not marker.exists():
         raise SystemExit(json.dumps({"ok": False, "error": f"projects/{name} exists and was not made by narrate; not touched"}))
-    if marker.exists() and (dst / "generated" / "vo").exists() and any((dst / "generated" / "vo").iterdir()):
-        raise SystemExit(json.dumps({"ok": False, "error": f"{name} already has paid narration; make a new copy instead"}))
+    paid = marker.exists() and (dst / "generated" / "vo").exists() and any((dst / "generated" / "vo").iterdir())
+    before = json.loads((dst / "project.json").read_text(encoding="utf-8")) if paid else None
     title = json.loads((r.dir / "project.json").read_text(encoding="utf-8")).get("title", project)
     pj = compile_plan(plan, name, f"{title} (narrated draft v{version}, owner voice, {pace})")
     settings = dict(vc.get("settings") or {})
@@ -188,9 +189,22 @@ def narrated_copy(project, version, voice_file, pace="natural", name=None):
     pj["voice"] = {"voice_id": vc["voice_id"], "voice_name": contract.get("voice_name") or vc.get("voice_name") or vc["voice_id"],
                    "model": vc.get("model_id") or vc.get("model"), "settings": settings, "lead_in": pc["lead_in"], "tail": pc["tail"]}
     if pc["hold"] is not None:
-        for sc in pj["scenes"]:
+        for i, sc in enumerate(pj["scenes"]):
             a, h = sc["line"].get("pause", [0, 0])
-            sc["line"]["pause"] = [a, min(h, pc["hold"])]
+            hold = min(h, pc["hold"])
+            # a headline accent on the chapter's LAST word needs time to read before the next chapter (2026-10-12:
+            # "hit your bill hard" showed for about 0.2 s at the brisk pace)
+            last = re.sub(r"[^a-z0-9']", "", sc["line"]["text"].split()[-1].lower())
+            accents = [str(l.get("at") or "").split("+")[0].lower() for l in sc["data"]["headline"]["lines"]]
+            cue_word = {c["name"]: re.sub(r"[^a-z0-9']", "", str(c.get("at", "")).lower()) for c in sc.get("cues", [])}
+            if i < len(pj["scenes"]) - 1 and any(cue_word.get(x, x) == last for x in accents if x):
+                hold = max(hold, ACCENT_HOLD)
+            sc["line"]["pause"] = [a, hold]
+    if before is not None:   # paid narration exists: only pacing may change (same words, voice and settings)
+        same = [(x["id"], x["line"]["text"]) for x in before["scenes"]] == [(x["id"], x["line"]["text"]) for x in pj["scenes"]] \
+            and {k: before["voice"].get(k) for k in ("voice_id", "model", "settings")} == {k: pj["voice"].get(k) for k in ("voice_id", "model", "settings")}
+        if not same:
+            raise SystemExit(json.dumps({"ok": False, "error": f"{name} already has paid narration for other words or another voice; make a new copy"}))
     (dst / "fieldnotes").mkdir(parents=True, exist_ok=True)
     (dst / "project.json").write_text(json.dumps(pj, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
     if not (dst / "fonts").exists():
