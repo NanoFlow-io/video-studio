@@ -9,13 +9,22 @@ from unittest import mock
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from studio import beats, fieldnotes_compose as fc, fieldnotes_plan as fp  # noqa: E402
 
-BRIEF_DENTAL = ("FICTIONAL TEST: Harbor Lane Dental, a family dental practice. Audience: parents. Problem: missed check-ups leave "
-                "an empty chair. Cause: the only reminder is an evening email that is easy to miss. Solution: a text two days ahead "
-                "they can reply to. Outcome: the slot can be offered to another patient.")
+BRIEF_DENTAL = ("FICTIONAL TEST: Harbor Lane Dental, a family dental practice. Audience: parents. Problem: a check-up visit is "
+                "booked, then missed, and the chair sits empty. Cause: the only reminder is one evening email that is easy to miss. "
+                "Solution: a text comes two days ahead that they can answer, so they reply to reschedule or move it. "
+                "Outcome: the slot can be offered to another patient.")
 DENTAL = {
     "facts": {"business": "Harbor Lane Dental (fictional)", "business_type": "dental", "audience": "parents", "problem": "empty chair",
               "cause": "evening email missed", "solution": "text two days ahead", "outcome": "slot offered to another patient"},
     "questions": [], "missing_primitives": [{"name": "tooth", "why": "decoration only", "essential": False}],
+    "claims": [{"text": "A booked visit an empty chair", "support": "a check-up visit is booked, then missed, and the chair sits empty"},
+               {"text": "A check-up is booked, then missed, and the chair sits empty.", "support": "a check-up visit is booked, then missed, and the chair sits empty"},
+               {"text": "Missed visit", "support": "a check-up visit is booked, then missed"},
+               {"text": "An evening email easy to miss", "support": "one evening email that is easy to miss"},
+               {"text": "Our only reminder was an evening email, easy to miss.", "support": "the only reminder is one evening email that is easy to miss"},
+               {"text": "Text ahead, reply to move it", "support": "a text comes two days ahead that they can answer, so they reply to reschedule or move it"},
+               {"text": "Now a text comes two days ahead, they reply to reschedule, and we can offer the slot.", "support": "a text comes two days ahead that they can answer, so they reply to reschedule or move it"},
+               {"text": "Reply to reschedule", "support": "they reply to reschedule"}],
     "cast": [{"id": "cal", "kind": "calendar", "slot": "r1c1", "span": "1x1", "state": "booked"},
              {"id": "chair", "kind": "chair", "slot": "r2c1", "span": "2x1", "state": "occupied"},
              {"id": "phone", "kind": "phone", "slot": "r1c3", "span": "1x2"},
@@ -40,12 +49,19 @@ DENTAL = {
                     {"on": "offer", "do": "state", "obj": "cal", "state": "available"},
                     {"on": "slot", "do": "checklist", "text": "Reply to reschedule"}]}],
 }
-BRIEF_HOME = ("True North, an HVAC company. Audience: homeowners on time-of-use plans. Problem: AC runs at peak price. Cause: the peak "
-              "window costs more. Solution: cool before peak, raise the thermostat a little. Outcome: shift some cooling.")
+BRIEF_HOME = ("True North, an HVAC company. Audience: homeowners on time-of-use plans. Problem: on a time-of-use plan, your AC often "
+              "runs at peak price. Cause: the peak window costs more. Solution: cool your home before peak rates, then raise the "
+              "thermostat a little higher. Outcome: shift some cooling during peak.")
 HOME = {
     "facts": {"business": "True North", "business_type": "HVAC", "audience": "homeowners", "problem": "AC at peak", "cause": "peak costs more",
               "solution": "pre-cool", "outcome": "shift cooling"},
     "questions": [], "missing_primitives": [],
+    "claims": [{"text": "When the AC runs at peak price", "support": "your AC often runs at peak price"},
+               {"text": "On a time-of-use plan, your AC often runs at peak price.", "support": "on a time-of-use plan, your AC often runs at peak price"},
+               {"text": "COOLING DURING PEAK", "support": "shift some cooling during peak"},
+               {"text": "Cool early, raise it a little", "support": "cool your home before peak rates, then raise the thermostat a little higher"},
+               {"text": "Cool your home before peak rates, then raise the thermostat a little.", "support": "cool your home before peak rates, then raise the thermostat a little higher"},
+               {"text": "A little higher", "support": "raise the thermostat a little higher"}],
     "cast": [{"id": "thermo", "kind": "thermostat", "slot": "r1c1", "span": "1x1"},
              {"id": "home", "kind": "house", "slot": "r2c1", "span": "2x1"}, {"id": "ac", "kind": "ac_unit", "slot": "r2c3", "span": "1x1"},
              {"id": "day", "kind": "timeline", "slot": "r3c1", "span": "3x1", "params": {"window_label": "PEAK PRICE", "left": "EARLIER IN THE DAY", "right": "LATER"}}],
@@ -283,6 +299,80 @@ class Compile(unittest.TestCase):
     def test_no_model_call(self):
         with mock.patch.object(fp, "ask_model", side_effect=AssertionError("model called")):
             fc.compile_plan(DENTAL, "y", "y"); fc.validate_plan(DENTAL, BRIEF_DENTAL)
+
+
+class ClosingCard(unittest.TestCase):
+    """2026-10-12: two checklist events replaced each other on the one closing card, so only the second was readable."""
+    def test_one_closing_line_in_the_last_chapter(self):
+        bad = copy.deepcopy(HOME)
+        bad["chapters"][1]["events"] += [{"on": "raise", "do": "checklist", "text": "Cool your home before peak"},
+                                         {"on": "little", "do": "checklist", "text": "Raise the thermostat a little"}]
+        p = "\n".join(fc.validate_plan(bad, BRIEF_HOME))
+        self.assertIn("the closing card holds one line, but the plan gives 2 checklist events", p)
+        early = copy.deepcopy(HOME)
+        early["chapters"][0]["events"].append({"on": "plan", "do": "checklist", "text": "Cool your home before peak"})
+        self.assertIn("chapter 1: the closing checklist belongs in the last chapter", "\n".join(fc.validate_plan(early, BRIEF_HOME)))
+
+    def test_one_note_per_chapter(self):
+        bad = copy.deepcopy(HOME)
+        bad["chapters"][0]["events"] += [{"on": "plan", "do": "note", "text": "Peak price"}, {"on": "runs", "do": "note", "text": "AC runs"}]
+        self.assertIn("chapter 1: one note per chapter", "\n".join(fc.validate_plan(bad, BRIEF_HOME)))
+
+
+class SomeNotAll(unittest.TestCase):
+    def test_shift_earlier_leaves_part_of_the_activity_in_the_window(self):
+        pj = fc.compile_plan(HOME, "x", "x")
+        acts = [a for sc in pj["scenes"] for a in sc["data"]["actions"] if a.get("target") == "day.atpeak" and a.get("do") == "seg"]
+        self.assertTrue(acts and all(a["level"] > 0 for a in acts))   # some cooling stays at peak; never all of it moves
+
+
+class FactualGrounding(unittest.TestCase):
+    """2026-10-12 review: 'AC works hardest when rates peak' and 'Most cooling lands in peak' passed the number and
+    guarantee-word checks but were not stated by the owner. Statements must be built from the brief's facts."""
+    def plan_with(self, headline, narration, support):
+        p = copy.deepcopy(HOME)
+        p["chapters"][0]["headline"] = headline
+        p["chapters"][0]["narration"] = narration
+        p["chapters"][0]["events"] = [e for e in p["chapters"][0]["events"] if e.get("on") in ("start", "plan")]
+        p["claims"] = [c for c in p["claims"] if c["text"] not in ("When the AC runs at peak price", "On a time-of-use plan, your AC often runs at peak price.")]
+        p["claims"] += [{"text": " ".join(headline), "support": support}, {"text": narration, "support": support}]
+        return p
+
+    def test_invented_behaviour_and_comparisons_are_refused(self):
+        p = "\n".join(fc.validate_plan(self.plan_with(["AC works hardest", "when rates peak"], "Most cooling lands in peak on a time-of-use plan.",
+                                                       "your AC often runs at peak price"), BRIEF_HOME))
+        self.assertIn("states an amount or comparison (hardest)", p)
+        self.assertIn("states an amount or comparison (most)", p)
+        self.assertIn("uses lands", p)
+        self.assertIn("works", p)
+
+    def test_a_quantifier_must_be_in_its_own_support(self):
+        brief = BRIEF_HOME + " Note: most homes differ."
+        plan = self.plan_with(["Most cooling", "at peak price"], "On a time-of-use plan, most cooling runs at peak price.", "your AC often runs at peak price")
+        p = "\n".join(fc.validate_plan(plan, brief))
+        self.assertIn("says most but its support 'your AC often runs at peak price' does not", p)
+
+    def test_every_statement_needs_a_word_for_word_support(self):
+        plan = copy.deepcopy(HOME)
+        plan["claims"] = [c for c in plan["claims"] if c["text"] != "A little higher"]
+        plan["claims"].append({"text": "A little higher", "support": "raise it slightly higher"})   # not in the brief
+        p = "\n".join(fc.validate_plan(plan, BRIEF_HOME))
+        self.assertIn("the support for 'A little higher' must be copied word for word", p)
+        plan["claims"] = []
+        self.assertIn("needs a \"claims\" entry", "\n".join(fc.validate_plan(plan, BRIEF_HOME)))
+
+    def test_constraint_lines_are_not_support(self):
+        brief = BRIEF_HOME + "\nConstraints: no guaranteed outcomes, no savings figures."
+        plan = copy.deepcopy(HOME)
+        plan["chapters"][1]["events"].append({"on": "raise", "do": "note", "text": "Guaranteed savings"})
+        plan["claims"].append({"text": "Guaranteed savings", "support": "no guaranteed outcomes, no savings figures"})
+        p = "\n".join(fc.validate_plan(plan, brief))
+        self.assertIn("'Guaranteed' in 'Guaranteed savings' is not in the brief", p)
+        self.assertIn("must be copied word for word from the brief's facts", p)
+
+    def test_supplied_narration_is_its_own_support_and_messages_are_dialogue(self):
+        self.assertEqual(fc.validate_plan(HOME, BRIEF_HOME), [])
+        self.assertEqual(fc.validate_plan(DENTAL, BRIEF_DENTAL), [])   # 'Can you make it?' on the phone is dialogue
 
 
 if __name__ == "__main__":

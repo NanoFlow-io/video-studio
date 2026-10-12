@@ -17,14 +17,16 @@ DRY_WPS = 2.6
 
 # Versions recorded with every plan (report-v<N>.json "versions"). Bump the matching number with any change:
 #   schema     1 stage diagrams (a280b4f); 2 cast of illustrated objects on a 3x3 grid (c7def36)
-#   planner    prompt + compiler. 1 a280b4f; 2 c7def36; 3 same-word stagger, label placement (4889af8); 4 zoom (9baa194)
-#   validator  1 stage plans; 2 composition plans (c7def36, 4889af8); 3 outcome strength, label room, zoom rules (9baa194)
+#   planner    prompt + compiler. 1 a280b4f; 2 c7def36; 3 same-word stagger, label placement (4889af8); 4 zoom (9baa194);
+#              5 claims ledger in the reply, one closing line, timeline drawn as an illustrative example
+#   validator  1 stage plans; 2 composition plans (c7def36, 4889af8); 3 outcome strength, label room, zoom rules (9baa194);
+#              4 factual grounding (brief words, quantifiers, claims ledger) and closing-card capacity (2026-10-12)
 #   renderer   engine/fieldnotes.js "Renderer version: N". 1 f4e3192; 2 c7def36; 3 4889af8; 4 zoom, available (9baa194);
 #              5 phone messages always shown whole (smaller type when long; 4 cut them off)
 # A saved plan is compatible when its schema is current and it passes the current validator. A renderer or compiler
 # change alone never needs a new plan (`fieldnotes rebuild` reuses it); a stricter validator can make an old plan need
 # migration, which plans the same approved brief again (`fieldnotes migrate`) and never rewrites the old version.
-PLAN_SCHEMA, PLANNER_VERSION, VALIDATOR_VERSION = 2, 4, 3
+PLAN_SCHEMA, PLANNER_VERSION, VALIDATOR_VERSION = 2, 5, 4
 
 
 def renderer_version():
@@ -75,7 +77,7 @@ PRIMS = {
     "house": {"desc": "a home with blue cooling that can fill it", "spans": ["2x1"], "verbs": {"cool": {"level": E("full", "partial")}}},
     "ac_unit": {"desc": "an outdoor air-conditioning unit whose fan runs high, low or off", "spans": ["1x1"], "verbs": {"speed": {"speed": E("high", "low", "off")}}},
     "thermostat": {"desc": "a wall thermostat dial that can be turned up or down", "spans": ["1x1"], "verbs": {"turn": {"direction": E("up", "down")}}},
-    "timeline": {"desc": "a day from earlier to later with a price or time window, activity bars that can shift earlier or shrink, and a moving marker",
+    "timeline": {"desc": "an ILLUSTRATIVE example day from earlier to later (not anyone's measured usage) with a price or time window, activity bars, and a moving marker; 'shift_earlier' moves SOME of the activity before the window while part stays in it, 'reduce' shrinks what is in the window (never all of it)",
                  "spans": ["3x1"], "params": {"window_label": {"str": "window_label"}, "left": {"str": "left"}, "right": {"str": "right"}},
                  "verbs": {"window": {}, "activity": {}, "shift_earlier": {}, "reduce": {"level": E("low", "medium")}, "playhead": {"through": E("window", "before")}}},
     "steps": {"desc": "an abstract chain of 3 to 5 numbered steps (break and fix mark the link after a step); use ONLY when no concrete objects can show the mechanism",
@@ -188,11 +190,11 @@ def validate_plan(plan, brief):
     for f in FACTS:
         if not str(facts.get(f) or "").strip():
             out.append(f"facts.{f} is empty: the brief must state it")
-    texts = []
+    texts, tagged = [], []   # tagged: (text, kind, where) for the grounding checks
 
     def fit(text, key, where):
         if text is None: return
-        texts.append(str(text))
+        texts.append(str(text)); tagged.append((str(text), key, where))
         if len(str(text)) > LIMITS[key]:
             out.append(f"{where}: {text!r} is {len(str(text))} characters; the limit is {LIMITS[key]}")
         if re.search(r"[–—]", str(text)):
@@ -246,11 +248,13 @@ def validate_plan(plan, brief):
             out.append(f"{w}: headline must be 1 or 2 lines")
         for line in hl if isinstance(hl, list) else []:
             fit(line, "headline", f"{w} headline")
+        if isinstance(hl, list) and hl:
+            tagged.append((" ".join(str(x) for x in hl), "headline_full", f"{w} headline"))
         if ch.get("emphasis") not in (None, "ochre", "blue", "sage", "italic"):
             out.append(f"{w}: emphasis must be ochre, blue, sage or italic")
         nar = str(ch.get("narration") or "").strip()
         if not nar: out.append(f"{w}: narration is empty")
-        spoken.append(nar); texts.append(nar)
+        spoken.append(nar); texts.append(nar); tagged.append((nar, "narration", f"{w} narration"))
         if ch.get("emphasis_on") and not _cue_ok(ch["emphasis_on"], nar):
             out.append(f"{w}: emphasis_on {ch['emphasis_on']!r} is not a word of its narration")
         evs = ch.get("events") or []
@@ -305,13 +309,16 @@ def validate_plan(plan, brief):
                 if do == "gauge": gauge = True
     out += outcome_problems(plan, brief, ids)
     out += link_label_problems(plan)
-    for t in texts:   # claims: numbers and absolute words only when the brief has them
+    out += closing_card_problems(plan)
+    src = fact_text(brief)   # constraint lines ("no guaranteed outcomes") never count as support
+    for t in texts:   # claims: numbers and absolute words only when the brief's facts have them
         for d in re.findall(r"\d[\d,.:%]*", str(t)):
-            if d.rstrip(".,") not in brief:
+            if d.rstrip(".,") not in src:
                 out.append(f"claim check: {d!r} in {t!r} is not in the brief")
         for wd in words(t):
-            if norm(wd) in BANNED and norm(wd) not in {norm(x) for x in words(b)}:
+            if norm(wd) in BANNED and norm(wd) not in {norm(x) for x in words(src)}:
                 out.append(f"claim check: {wd!r} in {t!r} is not in the brief")
+    out += grounding_problems(plan, brief, tagged)
     if facts.get("narration_supplied") and plan.get("supplied_narration"):
         if [norm(x) for x in words(" ".join(spoken))] != [norm(x) for x in words(plan["supplied_narration"])]:
             out.append("the chapters' narration must be the supplied narration, word for word and in order")
@@ -328,6 +335,114 @@ def validate_plan(plan, brief):
             want = max(10, round(total * target / est))
             out.append(f"the brief asks for about {target} s but this plan runs about {est} s; use about {want} words in total"
                        + (" or fewer events after the last word of a chapter" if est > target else ""))
+    return out
+
+
+# ---- factual grounding and closing-card capacity (validator 4, 2026-10-12) ----
+# No numbers or guarantee words is not the same as accurate. A plan's statements must be built from the brief's FACT
+# lines: every on-screen or drafted word comes from the brief (framing words aside), an amount or comparison (most,
+# hardest, all...) appears in the brief sentence quoted for it, and each headline, callout, note, closing line, label,
+# gauge label and drafted narration sentence cites the brief sentence that supports it, word for word ("claims").
+# These checks stop invented or stretched statements; they cannot prove the brief itself is true (a person confirms it).
+NOT_FACTS_RE = re.compile(r"^\s*(constraints?|length|style(\s+notes?)?|notes?\s+for\s+the\s+planner|format)\s*:", re.I)
+FRAMING = set("""a an the and or but if so to of in on at for with by from as into onto up down off out over under via per
+it its it's this that these those there here then now when while where what why how who which than too also just even
+you your you're yours we we're our us they their them he she his her i i'm me my is are was were be been being am
+do does did done have has had having get gets got can could may might will would should must shall let lets let's
+not no yes before after during earlier later early late first next last soon again still once ago until
+step steps way example illustrative eg problem cause fix change shift outcome result why tip tips note
+earlier later today day""".split())
+QUANT = {"most", "more", "less", "least", "fewer", "fewest", "all", "every", "everyone", "everything", "none", "only",
+         "always", "never", "majority", "half", "double", "twice", "triple", "entire", "whole", "max", "maximum",
+         "minimum", "much", "many", "lots", "plenty", "nothing", "nobody", "everywhere"}
+EST_OK = {"interest", "request", "honest", "modest", "suggest", "rest", "test", "west", "guest", "forest", "harvest",
+          "contest", "invest", "protest", "digest", "nest", "chest", "quest", "arrest", "manifest", "pest", "vest"}
+LEDGER_KINDS = ("headline_full", "callout", "note", "checklist", "label", "gauge_label", "narration")
+LEXICAL_SKIP = ("chapter", "headline_full", "message")   # phone messages are dialogue in the picture; numbers and guarantee words still apply
+
+
+def fact_text(brief):
+    """The brief without its constraint, length and style lines: the only text that can support a statement."""
+    return "\n".join(l for l in str(brief).splitlines() if not NOT_FACTS_RE.match(l))
+
+
+def _stems(text):
+    return [w for w in (norm(x).replace("'s", "") for x in words(text)) if w]
+
+
+def _key(text):
+    return " " + " ".join(_stems(text)) + " "
+
+
+def _quant(w):
+    return w in QUANT or (re.fullmatch(r"[a-z]{3,}est", w) is not None and w not in EST_OK)
+
+
+def _supported(w, pool):
+    if w in pool:
+        return True
+    if len(w) < 4:
+        return False
+    return any(len(b) >= 4 and w[:min(5, len(w), len(b))] == b[:min(5, len(w), len(b))] for b in pool)
+
+
+def _sentences(text):
+    return [x.strip() for x in re.split(r"(?<=[.!?])\s+", str(text).strip()) if x.strip()]
+
+
+def grounding_problems(plan, brief, tagged):
+    src = fact_text(brief)
+    pool = set(_stems(src))
+    out = []
+    for text, kind, where in tagged:
+        if kind in LEXICAL_SKIP:
+            continue
+        ws = _stems(text)
+        q = sorted({w for w in ws if _quant(w) and w not in pool})
+        if q:
+            out.append(f"claim check: {where} {text!r} states an amount or comparison ({', '.join(q)}) that the brief does not; say only what the brief says")
+        unk = sorted({w for w in ws if w not in FRAMING and not _quant(w) and not w.isdigit() and not _supported(w, pool)})
+        if unk:
+            out.append(f"claim check: {where} {text!r} uses {', '.join(unk)}, which the brief does not state; use the brief's own facts and words")
+    ledger = {}
+    for c in plan.get("claims") or []:
+        if isinstance(c, dict) and c.get("text"):
+            ledger[_key(c["text"])] = c
+    supplied = bool((plan.get("facts") or {}).get("narration_supplied") and plan.get("supplied_narration"))
+    srck = _key(src)
+    for text, kind, where in tagged:
+        if kind not in LEDGER_KINDS or (kind == "narration" and supplied) or not str(text).strip():
+            continue
+        for unit in (_sentences(text) if kind == "narration" else [text]):
+            c = ledger.get(_key(unit))
+            if not c:
+                out.append(f"claim check: {where} {unit!r} needs a \"claims\" entry quoting, word for word, the brief sentence that supports it")
+                continue
+            sup = str(c.get("support") or "")
+            if len(_stems(sup)) < 2 or _key(sup) not in srck:
+                out.append(f"claim check: the support for {unit!r} must be copied word for word from the brief's facts (not its constraints)")
+                continue
+            sp = set(_stems(sup))
+            q = sorted({w for w in _stems(unit) if _quant(w) and w not in sp})
+            if q:
+                out.append(f"claim check: {unit!r} says {', '.join(q)} but its support {sup!r} does not")
+    return out
+
+
+def closing_card_problems(plan):
+    """The closing card holds one line, in the last chapter; notes share one spot, so one per chapter."""
+    out, chs = [], plan.get("chapters") or []
+    lines = [(ci, e) for ci, ch in enumerate(chs) for e in ch.get("events") or [] if e.get("do") == "checklist"]
+    if len(lines) > 1:
+        out.append(f"the closing card holds one line, but the plan gives {len(lines)} checklist events "
+                   f"({'; '.join(repr(e.get('text')) for _, e in lines)}); keep one")
+    for ci, e in lines:
+        if ci != len(chs) - 1:
+            out.append(f"chapter {ci + 1}: the closing checklist belongs in the last chapter")
+    for ci, ch in enumerate(chs):
+        n = sum(1 for e in ch.get("events") or [] if e.get("do") == "note")
+        if n > 1:
+            out.append(f"chapter {ci + 1}: one note per chapter (notes share one spot), not {n}")
     return out
 
 

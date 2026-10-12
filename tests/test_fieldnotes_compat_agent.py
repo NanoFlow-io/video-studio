@@ -75,12 +75,14 @@ class SavedPlans(unittest.TestCase):
             self.skipTest(f"{name} not in this checkout")
         return {int(k): v for k, v in fp.check(name, write=False)["versions"].items()}
 
-    def test_dental_v1_to_v3_need_migration_for_the_overstated_outcome_and_v4_is_compatible(self):
+    def test_dental_v1_to_v3_need_migration_for_the_overstated_outcome_and_v4_for_grounding(self):
         c = self.check("fn-dental-illustrated")
         for v in (1, 2, 3):
             self.assertEqual(c[v]["status"], "needs-migration", v)
             self.assertTrue(any(p.startswith("outcome check") for p in c[v]["problems"]), v)
-        self.assertEqual(c[4]["status"], "compatible")
+        # validator 4 (2026-10-12): v4 has no claims ledger, so it is marked for migration rather than waved through
+        self.assertEqual(c[4]["status"], "needs-migration")
+        self.assertTrue(any("claims" in p for p in c[4]["problems"]))
 
     def test_true_north_plans_need_migration(self):
         self.assertEqual(self.check("fn-tn-illustrated")[1]["status"], "needs-migration")

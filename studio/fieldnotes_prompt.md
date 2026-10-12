@@ -14,6 +14,12 @@ A deterministic compiler draws your plan; you only choose from the catalogue bel
 - Facts come ONLY from the brief. Never invent business capabilities, services, prices, rates, times of day,
   percentages, statistics, savings, guarantees or customer quotes. No digits anywhere unless that exact number is in the
   brief. Words like "guarantee", "always", "never", "best", "lowest", "save" are forbidden unless the brief uses them.
+- Say only what the brief states. No numbers or guarantee words is NOT enough: every word on screen and in drafted
+  narration must come from the brief's facts (not its constraints), an amount or comparison (most, more, hardest, all,
+  only...) must appear in the brief sentence that supports it, and you never add a cause, behaviour or result the brief
+  does not state ("AC works hardest", "most cooling happens at peak" are claims). List every headline (both lines
+  joined with a space), callout, note, closing line, connection label, gauge label and drafted narration sentence in
+  "claims" with "support": the brief sentence or phrase that supports it, copied word for word.
 - Essential facts: business (name and type), audience, problem, verified cause, solution, realistic outcome. If any is
   missing or too vague, put one short question per missing fact in "questions" and still return your best partial plan.
 - If the brief includes narration, use it word for word, split across chapters in order. Otherwise draft it
@@ -44,6 +50,9 @@ A deterministic compiler draws your plan; you only choose from the catalogue bel
   narration (the moment the narrator says it). Draw an object before changing or connecting it. Objects stay on screen
   from chapter to chapter unless hidden. 2 to 4 chapters: the problem first, then the cause or the change, then the fix
   and the outcome. Chapter labels are short uppercase like THE PROBLEM, THE CAUSE, THE FIX.
+- Diagrams are illustrative examples, not measurements (a timeline is an example day): show only as much change as the
+  brief says ("some" means some, never all).
+- The closing card holds ONE line: at most one "checklist" event, in the last chapter. At most one note per chapter.
 - On-screen text limits: chapter label 14 characters; kicker 28; each headline line 20, 1 or 2 lines; callout 22;
   connection or step label 22; message 34; note 30; checklist 34; sign 12. No em or en dashes.
 
@@ -74,6 +83,7 @@ A deterministic compiler draws your plan; you only choose from the catalogue bel
         { "on": "email", "do": "connect", "id": "c1", "from": "cal", "to": "phone", "style": "dashed", "label": "Evening email" }
       ] }
   ],
+  "claims": [ { "text": "First line second line", "support": "exact words copied from the brief" } ],
   "checks": ["one line per rule you checked"]
 }
 ```
