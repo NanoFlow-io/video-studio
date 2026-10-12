@@ -119,15 +119,16 @@ def prove_link(name, preview):
     return all(v.get("ok") for v in proof.values()), proof
 
 
-def deliver(project, version=None):
-    """Copy one previewed version into the Studio as its own review project and prove the link."""
+def deliver(project, version=None, rebuild=False):
+    """Copy one previewed version (or its latest renderer-only rebuild) into the Studio as its own review project and
+    prove the link. A rebuild is delivered as <project>-v<N>-r<renderer version>."""
     r = fp.Run(project); st = r.state()
     v = int(version or st.get("current") or 0)
-    rep = fp._report(r, v)
+    rep = fp._report(r, f"{v}-rebuild" if rebuild else v)
     preview = ROOT / rep["preview"] if rep.get("preview") else None
     if not preview or not preview.exists():
         return {"delivered": False, "why": f"v{v} has no preview ({rep.get('status')})"}
-    name = review_name(project, v)
+    name = review_name(project, f"{v}-r{(rep.get('versions') or {}).get('renderer')}" if rebuild else v)
     if not NAME_OK.match(name):
         return {"delivered": False, "why": f"{name!r} is not a valid Studio project name"}
     dst = REVIEW_ROOT / "projects" / name
@@ -138,18 +139,18 @@ def deliver(project, version=None):
     if not (marker.exists() and json.loads(marker.read_text(encoding="utf-8")).get("preview_sha256") == want):
         plan = json.loads((r.fn / f"plan-v{v}.json").read_text(encoding="utf-8"))
         title = json.loads((r.dir / "project.json").read_text(encoding="utf-8")).get("title", project)
-        pj = compile_plan(plan, name, f"{title} (Field Notes draft v{v})")
+        pj = compile_plan(plan, name, f"{title} (Field Notes draft v{v}{', re-rendered' if rebuild else ''})")
         (dst / "fieldnotes").mkdir(parents=True, exist_ok=True)
         (dst / "project.json").write_text(json.dumps(pj, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
         if not (dst / "fonts").exists():
             shutil.copytree(fp.STYLE_DIR / "fonts", dst / "fonts")
-        for f in (f"brief-v{v}.txt", f"plan-v{v}.json", f"report-v{v}.json", f"storyboard-v{v}.md"):
+        for f in (f"brief-v{v}.txt", f"plan-v{v}.json", f"report-v{v}.json", f"storyboard-v{v}.md", f"report-v{v}-rebuild.json"):
             if (r.fn / f).exists():
                 shutil.copy(r.fn / f, dst / "fieldnotes" / f)
         out = dst / "build" / "out" / f"{name}-9x16" / "renders"
         out.mkdir(parents=True, exist_ok=True)
         shutil.copy(preview, out / f"{name}-9x16.mp4")
-        marker.write_text(json.dumps({"project": project, "version": v, "source": str(r.dir), "preview": str(preview),
+        marker.write_text(json.dumps({"project": project, "version": v, "rebuild": rebuild, "source": str(r.dir), "preview": str(preview),
                                       "preview_sha256": want, "draft_only": True,
                                       "delivered": datetime.now(timezone.utc).isoformat(timespec="seconds")}, indent=1) + "\n", encoding="utf-8")
     ok, proof = prove_link(name, preview)
@@ -238,9 +239,12 @@ def main(argv=None):
             res = _result(a.project, fp.migrate(a.project, version=a.version), "migrate")
         elif a.action == "rebuild":
             out = fp.rebuild(a.project, version=a.version)
-            res = {"ok": out.get("status") == "awaiting-approval", "action": "rebuild", "project": a.project, "status": out.get("status"),
-                   "preview": out.get("preview"), "model_usage": {"calls": 0},
-                   "note": "renderer-only re-render of the saved plan; not a new version (deliver a new version to review it)"}
+            ok = out.get("status") == "awaiting-approval"
+            res = {"ok": ok, "action": "rebuild", "project": a.project, "version": out.get("version"), "status": out.get("status"),
+                   "renderer": out["versions"]["renderer"], "model_usage": {"calls": 0},
+                   "preview": {"path": str(ROOT / out["preview"]), "seconds": out.get("duration"), "sound": "silent (dry timings)"} if ok else None,
+                   "review": deliver(a.project, out.get("version"), rebuild=True) if ok else None,
+                   "note": "the saved plan re-rendered with the current renderer and compiler; same story, no model call"}
         elif a.action == "deliver":
             res = {"ok": True, "action": "deliver", "project": a.project, "review": deliver(a.project, a.version)}
         else:

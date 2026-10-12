@@ -1,7 +1,7 @@
 /* ===================== FIELD NOTES EXPLAINER (engine/fieldnotes.js, experimental 2026-10-11) =====================
    studio/cuts.py splices this file in before the build section only for projects with a scene of type "fieldnotes",
    so every other page stays byte-identical. Look: templates-experimental/owner-explainer-field-notes-v1/STYLE.md.
-   Renderer version: 4 (bump with any visible change; studio/fieldnotes_compose.py VERSIONS reads it).
+   Renderer version: 5 (bump with any visible change; studio/fieldnotes_compose.py VERSIONS reads it).
    A fieldnotes scene is data, not code (FIELDNOTES.md): data.header, kicker, headline, objects and actions.
    Times: a number is seconds after the scene starts; a string is one of the scene's cue names (beats.py anchors cues to
    the narration words) with an optional +/- offset, or "start" / "end" (the scene's own start and end).
@@ -372,16 +372,21 @@ FN_KINDS.phone = function(o, ctx){ var k = FN.col, ink = k.ink, B = fnBox(o, ctx
   var area = sv("g", { "clip-path": "url(#" + cid + ")", "data-skip": 1 }, g), inner = sv("g", {}, area);
   st.msgs = st.msgs || []; st.scroll = st.scroll || 0;
   var TOP = -150, BOTTOM = 150;
-  var wrap = function(text, n, max){ var out = [], line = ""; String(text).split(/\s+/).forEach(function(w){ if((line + " " + w).trim().length > n){ if(line) out.push(line); line = w; } else line = (line + " " + w).trim(); }); if(line) out.push(line); return out.slice(0, max); };
-  var rowH = function(m){ return m.type === "email" ? 70 : 28 + 22 * wrap(m.text, 13, 3).length; };
+  var wrap = function(text, n){ var out = [], line = ""; String(text).split(/\s+/).forEach(function(w){ if((line + " " + w).trim().length > n){ if(line) out.push(line); line = w; } else line = (line + " " + w).trim(); }); if(line) out.push(line); return out; };
+  /* the whole message always shows: the largest type whose wrapped lines fit (renderer 5; 4 cut long messages off) */
+  var FITS = { email: [[11, 14, 18, 2], [14, 12, 15, 3], [17, 10, 13, 4]], text: [[13, 16, 22, 3], [16, 13, 18, 4], [19, 11, 15, 5]] };
+  var fit = function(m){ var fs = FITS[m.type === "email" ? "email" : "text"], L;
+    for(var i = 0; i < fs.length; i++){ L = wrap(m.text || (m.type === "email" ? "Email" : ""), fs[i][0]); if(L.length <= fs[i][3]) return { lines: L, size: fs[i][1], lh: fs[i][2] }; }
+    return { lines: L, size: fs[fs.length - 1][1], lh: fs[fs.length - 1][2] }; };
+  var rowH = function(m){ var f = fit(m); return m.type === "email" ? Math.max(70, 36 + f.lh * f.lines.length) : 28 + f.lh * f.lines.length; };
   /* each row: an outer group positioned by attribute (scroll and bury move it) and an inner one gsap animates */
   var build = function(m){ var pos = sv("g", {}, inner), r = sv("g", {}, pos), h = rowH(m); r.pos = pos;
     if(m.type === "email"){ sv("rect", { x: -68, y: 0, width: 136, height: h - 8, rx: 8, fill: k.card, stroke: k.inkSoft, "stroke-width": 2 }, r);
       sv("path", { d: "M-58,12 h26 v19 h-26 Z M-58,12 l13,10 l13,-10", fill: "none", stroke: ink, "stroke-width": 2.5, "stroke-linejoin": "round" }, r);
-      wrap(m.text || "Email", 11, 2).forEach(function(l, i){ fnText(r, -24, 24 + i * 18, l, { size: 14, ls: "0", upper: false, fill: ink, weight: 700 }); }); }
+      var fe = fit(m); fe.lines.forEach(function(l, i){ fnText(r, -24, 24 + i * fe.lh, l, { size: fe.size, ls: "0", upper: false, fill: ink, weight: 700 }); }); }
     else { var me = m.type === "reply", bx = me ? -50 : -68;
       sv("rect", { x: bx, y: 0, width: 118, height: h - 8, rx: 12, fill: me ? k.sageTint : k.blue, stroke: ink, "stroke-width": 2.5 }, r);
-      wrap(m.text, 13, 3).forEach(function(l, i){ fnText(r, bx + 10, 24 + i * 22, l, { size: 16, ls: "0", upper: false, fill: ink, weight: 700 }); }); }
+      var ft = fit(m); ft.lines.forEach(function(l, i){ fnText(r, bx + 10, 24 + i * ft.lh, l, { size: ft.size, ls: "0", upper: false, fill: ink, weight: 700 }); }); }
     return r; };
   var fillers = function(y){ var f = sv("g", { transform: "translate(0," + y + ")" }, inner); for(var i = 0; i < 3; i++){ sv("rect", { x: -68, y: i * 46, width: 136, height: 38, rx: 8, fill: k.track }, f); sv("rect", { x: -56, y: i * 46 + 14, width: 60, height: 6, rx: 3, fill: k.paper }, f); } return f; };
   var FH = 3 * 46 + 4, rows = [], y = TOP;

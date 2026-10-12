@@ -316,5 +316,8 @@ def rebuild(name, version=None, render=True):
         raise SystemExit(f"{name} v{v} {c['status']}: " + "; ".join(c["problems"])
                          + f"\n  run `studio.py fieldnotes migrate {name} --version {v}` to plan the same brief again")
     out = _compile_and_render(r, plan, json.loads((r.dir / "project.json").read_text(encoding="utf-8")).get("title", name), f"{v}-rebuild", render)
+    out.update(version=v, rebuild=True, versions=versions(), plan_sha=sha(json.dumps(plan, sort_keys=True)), model_calls=[],
+               created=datetime.now(timezone.utc).isoformat(timespec="seconds"))
+    (r.fn / f"report-v{v}-rebuild.json").write_text(json.dumps(out, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
     print(f"  rebuild of v{v}: {out['status']}")
     return out

@@ -15,7 +15,9 @@ scene, so every other project's page is byte-identical (checked against all 16 l
 | Scene data -> animated page -> silent MP4 | **working** |
 | Revision in plain words (`fieldnotes revise`), re-render from a saved plan (`fieldnotes rebuild`) | **working** |
 | Human approval of the preview | **manual by design** (a person watches it; then the normal Studio script approval gates paid narration) |
-| Studio UI or agent API for the workflow | **not built**: local command only (Nano or Ender can run it for Bob) |
+| Saved-plan versions, compatibility check and migration (`fieldnotes check`, `fieldnotes migrate`) | **working** |
+| Nano chat entry point (`python -m studio.fieldnotes_agent`, skill in `nano-skill/`) | **working locally, not activated** |
+| Studio UI or agent API route for the workflow | **not built** |
 
 ## The prompt workflow (`python studio.py fieldnotes ...`)
 
@@ -61,6 +63,56 @@ first-pass and final validation, render settings) and `preview-v<N>.mp4`.
   plan back for a repair (move the objects apart or drop the label).
 - Events on the same spoken word unfold 0.2 s apart and never pass the next cue, so a link is always drawn before it
   breaks.
+
+### Versions, compatibility and migration (2026-10-12)
+
+Every report records `versions`: plan `schema`, `planner` (prompt and compiler), `validator` and `renderer` (declared at
+the top of engine/fieldnotes.js); the history is in studio/fieldnotes_compose.py. Reports made before this have no
+`versions` and are marked unrecorded.
+
+- `fieldnotes check <project>` tests every saved version against the current schema and validator and writes
+  `fieldnotes/compat.json`. Briefs, plans, reports and previews are never rewritten. Each version is one of:
+  - `compatible`: `rebuild` can reuse the plan;
+  - `needs-migration`: the reasons are listed;
+  - `not-previewed`: the run had stopped, so there is nothing to migrate.
+- `fieldnotes rebuild` refuses a plan that needs migration. There is no bypass. A renderer or compiler change alone
+  never needs a new plan.
+- `fieldnotes migrate <project> --version N` plans version N's approved brief again, as a NEW version.
+  - The model gets the old plan for continuity and the exact problems to fix, and is told not to weaken the brief.
+  - Any brief it returns is ignored (`brief_unchanged` is recorded).
+  - The new version passes the same validator as any other plan, including the outcome-strength check.
+  - Its report lists `changes` (chapters, narration, cast, endings, labels, length) for a person to review.
+  - Revisions record `changes` the same way.
+
+State on 2026-10-12:
+- Compatible: dental v4; True North illustrated v2 (migrated from v1); True North cool-before-peak v2 (migrated from
+  the stage-diagram v1).
+- Needing migration: dental v1 to v3 (outcome shown as done, cramped labels); True North illustrated v1 (label room);
+  Harbor Lane v1 to v3 (stage diagram).
+
+### Nano entry point (draft only)
+
+`python -m studio.fieldnotes_agent <quote|new|revise|replan|migrate|rebuild|deliver|status> ...` prints one JSON object
+per step:
+- a storyboard in plain words;
+- changes, questions and stand-ins;
+- model usage;
+- the silent preview's path;
+- a review link that has been checked.
+
+How it behaves:
+- **Quote first.** Model-call actions need the same-day id from `quote`, so the cost is shown before anything runs.
+- **Review copies.** `deliver` (run automatically after a successful preview) copies the draft into the Studio as a
+  separate review project, `<project>-v<N>` (a rebuild is `-v<N>-r<renderer>`), with a `review-of.json` marker. It never
+  touches a folder it did not create.
+- **The link is checked three ways:**
+  - the running Studio's own service code resolves the same MP4 bytes;
+  - the media route answers 401 without a login (mounted, admin only);
+  - the page loads.
+- **Draft only.** There is no narration, remote render, approval or publishing action.
+
+Nano's instructions are in `nano-skill/SKILL.md`. Activation means installing that skill for the Nano chat and
+merging this branch into the live Studio checkout; both are pending approval.
 
 ### The primitive catalogue
 
@@ -127,7 +179,7 @@ the real words, then `render` (local) or `render-remote`.
 
 ## Remaining gaps
 
-- The prompt workflow is a local command; no Studio UI or agent API route yet.
+- The prompt workflow is a local command plus Nano's entry point; no Studio UI or agent API route yet.
 - Eleven primitives so far. Stories needing others (a map, a vehicle, a tooth, a cutaway, a bar comparison) are reported as
   missing primitives rather than drawn with an unrelated picture.
 - No dark or olive full-screen chapter card yet (only the bands wipe).

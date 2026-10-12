@@ -1,0 +1,19 @@
+{
+ "scene_problems": [],
+ "project_sha": "0bf4547f4da967c3",
+ "status": "awaiting-approval",
+ "preview": "projects/fn-maple-street-barbers/fieldnotes/preview-v3-rebuild.mp4",
+ "preview_sha": "f87c3b6f815022da",
+ "duration": 17.834,
+ "version": 3,
+ "rebuild": true,
+ "versions": {
+  "schema": 2,
+  "planner": 4,
+  "validator": 3,
+  "renderer": 5
+ },
+ "plan_sha": "6214a9326949e45f",
+ "model_calls": [],
+ "created": "2026-10-12T02:13:40+00:00"
+}

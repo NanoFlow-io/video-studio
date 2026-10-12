@@ -19,7 +19,8 @@ DRY_WPS = 2.6
 #   schema     1 stage diagrams (a280b4f); 2 cast of illustrated objects on a 3x3 grid (c7def36)
 #   planner    prompt + compiler. 1 a280b4f; 2 c7def36; 3 same-word stagger, label placement (4889af8); 4 zoom (9baa194)
 #   validator  1 stage plans; 2 composition plans (c7def36, 4889af8); 3 outcome strength, label room, zoom rules (9baa194)
-#   renderer   engine/fieldnotes.js "Renderer version: N". 1 f4e3192; 2 c7def36; 3 4889af8; 4 zoom, available (9baa194)
+#   renderer   engine/fieldnotes.js "Renderer version: N". 1 f4e3192; 2 c7def36; 3 4889af8; 4 zoom, available (9baa194);
+#              5 phone messages always shown whole (smaller type when long; 4 cut them off)
 # A saved plan is compatible when its schema is current and it passes the current validator. A renderer or compiler
 # change alone never needs a new plan (`fieldnotes rebuild` reuses it); a stricter validator can make an old plan need
 # migration, which plans the same approved brief again (`fieldnotes migrate`) and never rewrites the old version.
@@ -674,10 +675,10 @@ def event_text(e, kinds):
     if do == "draw": return f"draw {name}"
     if do == "hide": return f"hide {o}"
     if do == "state": return f"{o} becomes {e.get('state')}"
-    if do == "message": return f"{o} shows a {e.get('type')}: {_q(e.get('text', ''))}"
+    if do == "message": return f"{o} shows {'an' if str(e.get('type')).startswith('e') else 'a'} {e.get('type')}: {_q(e.get('text', ''))}"
     if do == "bury": return f"other notifications bury the messages on {o}"
     if do == "zoom": return f"{o} zooms its {e.get('msg')} into {e.get('to')} (the same message, enlarged)"
-    if do == "remind": return f"{o} marks a {e.get('medium')} reminder {e.get('days_before')} days before"
+    if do == "remind": return f"{o} marks a {e.get('medium')} reminder {e.get('days_before')} day{'' if e.get('days_before') == 1 else 's'} before"
     if do == "callout": return f"label on {o}: {_q(e.get('text', ''))}"
     if do == "speed": return f"the {o} fan runs {e.get('speed')}"
     if do == "cool": return f"cool air fills {o} ({e.get('level')})"

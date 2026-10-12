@@ -1,11 +1,11 @@
 {
  "project": "fn-tn-cool-before-peak",
- "checked": "2026-10-12T02:05:58+00:00",
+ "checked": "2026-10-12T02:14:20+00:00",
  "current": {
   "schema": 2,
   "planner": 4,
   "validator": 3,
-  "renderer": 4
+  "renderer": 5
  },
  "versions": {
   "1": {
@@ -13,7 +13,7 @@
     "schema": 2,
     "planner": 4,
     "validator": 3,
-    "renderer": 4
+    "renderer": 5
    },
    "recorded": {
     "recorded": false,
@@ -31,7 +31,7 @@
     "schema": 2,
     "planner": 4,
     "validator": 3,
-    "renderer": 4
+    "renderer": 5
    },
    "recorded": {
     "schema": 2,
@@ -41,6 +41,7 @@
    },
    "status": "compatible",
    "problems": [],
+   "note": "a rebuild will draw this plan with the current renderer and compiler; the saved preview used older ones",
    "preview": "projects/fn-tn-cool-before-peak/fieldnotes/preview-v2.mp4"
   }
  }

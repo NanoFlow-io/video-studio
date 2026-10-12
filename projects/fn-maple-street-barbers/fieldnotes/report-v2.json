@@ -1,0 +1,80 @@
+{
+ "version": 2,
+ "created": "2026-10-12T02:07:35+00:00",
+ "revision": null,
+ "brief_sha": "c3e5a3b63308fc5c",
+ "plan_sha": "e6d30a8b1f7355ea",
+ "style": {
+  "template": "owner-explainer-field-notes-v1",
+  "style_sha": "a390fe1b65101e30",
+  "renderer_sha": "acb9f39099b059bd",
+  "planner_sha": "8489e5d1ec41edee"
+ },
+ "versions": {
+  "schema": 2,
+  "planner": 4,
+  "validator": 3,
+  "renderer": 4
+ },
+ "studio_commit": "66a56dd",
+ "model_calls": [
+  {
+   "model": "claude-opus-5-5",
+   "input_tokens": 2,
+   "cache_read_input_tokens": 13142,
+   "cache_creation_input_tokens": 23991,
+   "output_tokens": 4454,
+   "equivalent_api_cost_usd": 0.28364439999999996,
+   "billing": "Claude Code login (subscription), not a metered API key",
+   "duration_ms": 40660
+  },
+  {
+   "model": "claude-opus-5-5",
+   "input_tokens": 2,
+   "cache_read_input_tokens": 8544,
+   "cache_creation_input_tokens": 35129,
+   "output_tokens": 3447,
+   "equivalent_api_cost_usd": 0.3516888,
+   "billing": "Claude Code login (subscription), not a metered API key",
+   "duration_ms": 31700
+  }
+ ],
+ "first_pass_problems": [
+  "connection c1 (chair to walkin): no clear room for its label 'Walk-in list'; place the two objects further apart (leave a free cell between or beside them) or shorten the label",
+  "the brief asks for about 15 s but this plan runs about 20.4 s; use about 30 words in total or fewer events after the last word of a chapter"
+ ],
+ "plan_problems": [],
+ "status": "awaiting-approval",
+ "render": {
+  "cut": "vertical",
+  "size": "1080x1920",
+  "fps": 30,
+  "quality": "looks",
+  "timings": "dry, 2.6 words/s (silent)"
+ },
+ "scene_problems": [],
+ "project_sha": "6290a241e1985569",
+ "preview": "projects/fn-maple-street-barbers/fieldnotes/preview-v2.mp4",
+ "preview_sha": "108075cee84f5b5a",
+ "duration": 16.296,
+ "changes_from": 1,
+ "changes": [
+  "chapter 1 headline: \"A booked chair / sits empty\" became \"Booked, but / the chair sits empty\"",
+  "chapter 1 narration: \"When someone booked doesn't turn up, a chair sits empty at a busy time.\" became \"A booked chair sits empty at a busy time.\"",
+  "chapter 2 headline: \"One early email / gets buried\" became \"One email, days / early, then buried\"",
+  "chapter 2 narration: \"Our only confirmation was an email, sent days earlier, and it got buried.\" became \"One email, days early, got buried.\"",
+  "chapter 3 headline: \"Reply, and the / chair can be offered\" became \"A text the / day before\"",
+  "chapter 3 narration: \"Now we text the day before. Reply if you can't come, and we can offer your chair to a walk-in.\" became \"Now we text the day before. Can't come? Reply, and we can offer a walk-in.\"",
+  "cast: cal moved or changed (slot r3c1 to r3c3)",
+  "cast: walkin moved or changed (slot r3c3 to r3c1)",
+  "connection label dropped: \"Offer to a walk-in\"",
+  "connection label added: \"Walk-in list\"",
+  "callout dropped: \"Booked but empty\"",
+  "callout added: \"Busy time, no one here\"",
+  "checklist dropped: \"Text the day before\"",
+  "checklist dropped: \"Reply if you can't make it\"",
+  "checklist dropped: \"Chair time can go to a walk-in\"",
+  "phone message dropped: \"Cut tomorrow. Can't come? Reply\"",
+  "phone message added: \"See you tomorrow. Can't make it?\""
+ ]
+}

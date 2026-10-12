@@ -1,0 +1,188 @@
+{
+ "facts": {
+  "business": "Maple Street Barbers",
+  "business_type": "neighbourhood barber shop",
+  "audience": "regular customers who book online",
+  "problem": "some booked customers don't turn up, so a barber's chair sits empty at a busy time",
+  "cause": "the only confirmation is an email sent at booking, often days earlier, and it gets buried under other notifications",
+  "solution": "a text the day before that the customer can reply to if they can't make it",
+  "outcome": "when someone replies, the shop can offer that chair time to someone on the walk-in list",
+  "narration_supplied": false
+ },
+ "questions": [],
+ "missing_primitives": [
+  {
+   "name": "walk_in_list",
+   "why": "The catalogue has no walk-in list. One `person` (present) stands in for someone on the list, and the dashed connection label names the list.",
+   "essential": false
+  }
+ ],
+ "narration_draft": true,
+ "cast": [
+  {
+   "id": "chair",
+   "kind": "chair",
+   "slot": "r1c1",
+   "span": "2x1",
+   "state": "empty"
+  },
+  {
+   "id": "phone",
+   "kind": "phone",
+   "slot": "r1c3",
+   "span": "1x2"
+  },
+  {
+   "id": "walkin",
+   "kind": "person",
+   "slot": "r3c1",
+   "span": "1x1",
+   "state": "present"
+  },
+  {
+   "id": "cal",
+   "kind": "calendar",
+   "slot": "r3c3",
+   "span": "1x1",
+   "state": "booked"
+  }
+ ],
+ "chapters": [
+  {
+   "chapter": "THE PROBLEM",
+   "kicker": "MAPLE STREET BARBERS",
+   "headline": [
+    "Booked, but",
+    "the chair sits empty"
+   ],
+   "emphasis": "ochre",
+   "emphasis_on": "empty",
+   "narration": "A booked chair sits empty at a busy time.",
+   "events": [
+    {
+     "on": "start",
+     "do": "draw",
+     "obj": "cal"
+    },
+    {
+     "on": "chair",
+     "do": "draw",
+     "obj": "chair"
+    },
+    {
+     "on": "empty",
+     "do": "state",
+     "obj": "cal",
+     "state": "empty"
+    },
+    {
+     "on": "busy",
+     "do": "callout",
+     "obj": "chair",
+     "text": "Busy time, no one here"
+    }
+   ]
+  },
+  {
+   "chapter": "THE CAUSE",
+   "kicker": "CONFIRMED DAYS AHEAD",
+   "headline": [
+    "One email, days",
+    "early, then buried"
+   ],
+   "emphasis": "blue",
+   "emphasis_on": "buried",
+   "narration": "One email, days early, got buried.",
+   "events": [
+    {
+     "on": "start",
+     "do": "draw",
+     "obj": "phone"
+    },
+    {
+     "on": "email",
+     "do": "message",
+     "obj": "phone",
+     "type": "email",
+     "text": "Your booking is confirmed"
+    },
+    {
+     "on": "buried",
+     "do": "bury",
+     "obj": "phone"
+    }
+   ]
+  },
+  {
+   "chapter": "THE FIX",
+   "kicker": "WHAT CHANGES",
+   "headline": [
+    "A text the",
+    "day before"
+   ],
+   "emphasis": "sage",
+   "emphasis_on": "text",
+   "narration": "Now we text the day before. Can't come? Reply, and we can offer a walk-in.",
+   "events": [
+    {
+     "on": "text",
+     "do": "message",
+     "obj": "phone",
+     "type": "text",
+     "text": "See you tomorrow. Can't make it?"
+    },
+    {
+     "on": "before",
+     "do": "remind",
+     "obj": "cal",
+     "days_before": 1,
+     "medium": "text"
+    },
+    {
+     "on": "Reply",
+     "do": "message",
+     "obj": "phone",
+     "type": "reply",
+     "text": "Sorry, can't make it"
+    },
+    {
+     "on": "can",
+     "do": "state",
+     "obj": "cal",
+     "state": "available"
+    },
+    {
+     "on": "offer",
+     "do": "draw",
+     "obj": "walkin"
+    },
+    {
+     "on": "walk-in",
+     "do": "connect",
+     "id": "c1",
+     "from": "chair",
+     "to": "walkin",
+     "style": "dashed",
+     "label": "Walk-in list"
+    }
+   ]
+  }
+ ],
+ "checks": [
+  "Facts come only from the brief. There are no digits, prices, times of day, stats or customer quotes, and none of the forbidden words.",
+  "All six essential facts are present, so there are no questions.",
+  "The narration is drafted at 30 words in total (9 + 6 + 15), in the owner's voice, and keeps 'can' for the outcome.",
+  "Timing: the last-word events are cut back. The checklist is gone, and the walk-in person is drawn on 'offer', so only the connection lands on the final word 'walk-in'.",
+  "Show, don't label: a real chair, phone, calendar and person. No steps diagram is used.",
+  "Each thing is drawn once. The email, text and reply are all messages on the one phone.",
+  "The outcome is shown only as possible: the calendar goes to 'available' (not rebooked), the chair stays 'empty', and the walk-in has a dashed link only.",
+  "Four objects. The 2x1 chair and the 1x2 phone carry the story; the person and calendar are 1x1.",
+  "No overlaps: chair r1c1-r1c2, phone r1c3-r2c3, person r3c1, calendar r3c3. r2c1 is free between the chair and the person for the 'Walk-in list' label, and r2c2 and r3c2 are also free.",
+  "The callout is on the chair, which sits in row 1.",
+  "Every 'on' word is copied from its own chapter's narration: chair, empty, busy, email, buried, text, before, Reply, can, offer, walk-in.",
+  "Each object is drawn before it is changed or connected.",
+  "Text limits: kickers up to 20, headline lines up to 20, callout 22, messages up to 32, connection label 12.",
+  "No em or en dashes are used."
+ ],
+ "brief": null
+}

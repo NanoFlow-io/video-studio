@@ -179,6 +179,7 @@ class Agent(TempStudio):
         self.assertEqual(ag.review_name("fn-dental", 4), "fn-dental-v4")
         n = ag.review_name("a" * 40, 12)
         self.assertLessEqual(len(n), 40); self.assertTrue(ag.NAME_OK.match(n)); self.assertTrue(n.endswith("-v12"))
+        self.assertEqual(ag.review_name("fn-barbers", "3-r5"), "fn-barbers-v3-r5")   # a renderer-only rebuild of v3
 
     def test_deliver_copies_into_the_studio_once_and_never_touches_foreign_folders(self):
         live = self.tmp / "live"

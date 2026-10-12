@@ -1,11 +1,11 @@
 {
  "project": "fn-dental-illustrated",
- "checked": "2026-10-12T02:05:59+00:00",
+ "checked": "2026-10-12T02:14:21+00:00",
  "current": {
   "schema": 2,
   "planner": 4,
   "validator": 3,
-  "renderer": 4
+  "renderer": 5
  },
  "versions": {
   "1": {
@@ -13,7 +13,7 @@
     "schema": 2,
     "planner": 4,
     "validator": 3,
-    "renderer": 4
+    "renderer": 5
    },
    "recorded": {
     "recorded": false,
@@ -34,7 +34,7 @@
     "schema": 2,
     "planner": 4,
     "validator": 3,
-    "renderer": 4
+    "renderer": 5
    },
    "recorded": {
     "recorded": false,
@@ -54,7 +54,7 @@
     "schema": 2,
     "planner": 4,
     "validator": 3,
-    "renderer": 4
+    "renderer": 5
    },
    "recorded": {
     "recorded": false,
@@ -75,7 +75,7 @@
     "schema": 2,
     "planner": 4,
     "validator": 3,
-    "renderer": 4
+    "renderer": 5
    },
    "recorded": {
     "recorded": false,

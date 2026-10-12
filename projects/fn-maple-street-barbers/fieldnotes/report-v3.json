@@ -1,0 +1,53 @@
+{
+ "version": 3,
+ "created": "2026-10-12T02:09:45+00:00",
+ "revision": "Keep the story and style. End on a checklist card that says Reply if you can't make it, and keep it around 15 seconds.",
+ "brief_sha": "bfaed4655e14f80e",
+ "plan_sha": "6214a9326949e45f",
+ "style": {
+  "template": "owner-explainer-field-notes-v1",
+  "style_sha": "a390fe1b65101e30",
+  "renderer_sha": "acb9f39099b059bd",
+  "planner_sha": "efdad1ddb73f4e5b"
+ },
+ "versions": {
+  "schema": 2,
+  "planner": 4,
+  "validator": 3,
+  "renderer": 4
+ },
+ "studio_commit": "66a56dd",
+ "model_calls": [
+  {
+   "model": "claude-opus-5-5",
+   "input_tokens": 2,
+   "cache_read_input_tokens": 8544,
+   "cache_creation_input_tokens": 30525,
+   "output_tokens": 3283,
+   "equivalent_api_cost_usd": 0.3115768,
+   "billing": "Claude Code login (subscription), not a metered API key",
+   "duration_ms": 27093
+  }
+ ],
+ "first_pass_problems": [],
+ "plan_problems": [],
+ "status": "awaiting-approval",
+ "render": {
+  "cut": "vertical",
+  "size": "1080x1920",
+  "fps": 30,
+  "quality": "looks",
+  "timings": "dry, 2.6 words/s (silent)"
+ },
+ "scene_problems": [],
+ "project_sha": "0bf4547f4da967c3",
+ "preview": "projects/fn-maple-street-barbers/fieldnotes/preview-v3.mp4",
+ "preview_sha": "040e716d82a8bc98",
+ "duration": 17.834,
+ "changes_from": 2,
+ "changes": [
+  "chapter 3 narration: \"Now we text the day before. Can't come? Reply, and we can offer a walk-in.\" became \"Now we text the day before. Can't make it? Reply, and we can offer your chair to a walk-in.\"",
+  "checklist added: \"Reply if you can't make it\"",
+  "length: about 16.3 s became about 17.8 s"
+ ]
+}

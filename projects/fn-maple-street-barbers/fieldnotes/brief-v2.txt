@@ -1,0 +1,6 @@
+FICTIONAL TEST: Maple Street Barbers, a neighbourhood barber shop. Audience: regular customers who book online.
+Problem: some booked customers don't turn up, so a barber's chair sits empty at a busy time.
+Cause: the only confirmation is an email sent at booking, often days earlier, and it gets buried under other notifications.
+Solution: a text the day before that the customer can reply to if they can't make it.
+Outcome: when someone replies, the shop can offer that chair time to someone on the walk-in list.
+About 15 seconds.
