@@ -159,7 +159,9 @@ def _plan_with_repair(brief, revision=None, previous=None, supplied=None, migrat
         plan["brief"] = brief
     if revision and plan.get("brief"):
         brief = plan["brief"]
-    supplied = supplied or supplied_narration(brief)   # narration given in a revision is enforced word for word too
+    # narration in the (revised) brief wins: a revision that replaces the narration is checked against the NEW words
+    # (2026-10-12: the old brief's narration was kept and a correct revision was refused)
+    supplied = supplied_narration(brief) or supplied
     if supplied:
         plan["supplied_narration"] = supplied
     probs = validate_plan(plan, brief)

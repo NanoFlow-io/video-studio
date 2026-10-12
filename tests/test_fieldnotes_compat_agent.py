@@ -68,6 +68,19 @@ class LengthWithOtherProblems(unittest.TestCase):
         self.assertIn("the brief asks for about 6 s", p)
 
 
+class RevisedNarration(unittest.TestCase):
+    def test_a_revision_that_replaces_the_narration_is_checked_against_the_new_words(self):
+        new_words = " ".join(c["narration"] for c in DENTAL["chapters"])
+        old_brief = BRIEF_DENTAL + '\nNarration: "Some older words that the owner has since replaced entirely."'
+        reply = copy.deepcopy(DENTAL); reply["brief"] = BRIEF_DENTAL + f'\nNarration: "{new_words}"'
+        reply["facts"]["narration_supplied"] = True
+        with mock.patch.object(fp, "ask_model", return_value=(json.dumps(reply), USAGE)):
+            plan, probs, usage, brief, first = fp._plan_with_repair(old_brief, "use the new narration", copy.deepcopy(DENTAL),
+                                                                    fp.supplied_narration(old_brief))
+        self.assertEqual(plan["supplied_narration"], new_words)
+        self.assertFalse([p for p in probs if "supplied narration" in p], probs)
+
+
 class SavedPlans(unittest.TestCase):
     """The real True North and dental plans in this repository, checked without writing anything."""
     def check(self, name):
