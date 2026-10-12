@@ -158,6 +158,54 @@ def deliver(project, version=None, rebuild=False):
             "verified": ok, "proof": proof, "copy": str(dst)}
 
 
+PACES = {   # narration delivery for an owner-voiced copy: voice speed and the gaps around the words
+    "natural": {"speed": None, "lead_in": 0.4, "hold": None, "tail": 1.8},
+    "brisk": {"speed": 1.12, "lead_in": 0.25, "hold": 0.25, "tail": 1.5},   # Bob 2026-10-12: brisk, energetic, not instructional
+}
+
+
+def narrated_copy(project, version, voice_file, pace="natural", name=None):
+    """A separate narrated Studio project compiled from a saved plan: same scenes and cues, the owner's voice (a voice
+    contract JSON with voice_id, model_id and settings) and a delivery pace. The silent versions are never touched.
+    Free: nothing is generated; the paid narration needs a person's Approve Script in the Studio."""
+    r = fp.Run(project)
+    plan = json.loads((r.fn / f"plan-v{version}.json").read_text(encoding="utf-8"))
+    contract = json.loads(Path(voice_file).read_text(encoding="utf-8"))
+    vc = contract.get("voice", contract)
+    pc = PACES[pace]
+    name = name or review_name(project, f"{version}-voiced")
+    dst = REVIEW_ROOT / "projects" / name
+    marker = dst / "fieldnotes" / "narrated-from.json"
+    if dst.exists() and not marker.exists():
+        raise SystemExit(json.dumps({"ok": False, "error": f"projects/{name} exists and was not made by narrate; not touched"}))
+    if marker.exists() and (dst / "generated" / "vo").exists() and any((dst / "generated" / "vo").iterdir()):
+        raise SystemExit(json.dumps({"ok": False, "error": f"{name} already has paid narration; make a new copy instead"}))
+    title = json.loads((r.dir / "project.json").read_text(encoding="utf-8")).get("title", project)
+    pj = compile_plan(plan, name, f"{title} (narrated draft v{version}, owner voice, {pace})")
+    settings = dict(vc.get("settings") or {})
+    if pc["speed"]:
+        settings["speed"] = pc["speed"]
+    pj["voice"] = {"voice_id": vc["voice_id"], "voice_name": contract.get("voice_name") or vc.get("voice_name") or vc["voice_id"],
+                   "model": vc.get("model_id") or vc.get("model"), "settings": settings, "lead_in": pc["lead_in"], "tail": pc["tail"]}
+    if pc["hold"] is not None:
+        for sc in pj["scenes"]:
+            a, h = sc["line"].get("pause", [0, 0])
+            sc["line"]["pause"] = [a, min(h, pc["hold"])]
+    (dst / "fieldnotes").mkdir(parents=True, exist_ok=True)
+    (dst / "project.json").write_text(json.dumps(pj, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
+    if not (dst / "fonts").exists():
+        shutil.copytree(fp.STYLE_DIR / "fonts", dst / "fonts")
+    for f in (f"brief-v{version}.txt", f"plan-v{version}.json", f"report-v{version}.json", f"storyboard-v{version}.md"):
+        if (r.fn / f).exists():
+            shutil.copy(r.fn / f, dst / "fieldnotes" / f)
+    marker.write_text(json.dumps({"project": project, "version": version, "voice_file": str(voice_file), "pace": pace,
+                                  "created": datetime.now(timezone.utc).isoformat(timespec="seconds")}, indent=1) + "\n", encoding="utf-8")
+    chars = sum(len(sc["line"]["text"]) for sc in pj["scenes"])
+    return {"ok": True, "action": "narrate", "name": name, "voice": pj["voice"], "chars": chars,
+            "approve_url": f"{REVIEW_BASE}/admin/gtm/video-studio/{name}?step=approve",
+            "note": "free; a person approves the script in the Studio before the paid narration build"}
+
+
 def _result(project, rec, action):
     r = fp.Run(project)
     v = rec.get("version") or r.state().get("current")
@@ -197,13 +245,16 @@ def status(project):
 
 def main(argv=None):
     ap = argparse.ArgumentParser(prog="fieldnotes_agent")
-    ap.add_argument("action", choices=["quote", "new", "revise", "replan", "migrate", "rebuild", "deliver", "status"])
+    ap.add_argument("action", choices=["quote", "new", "revise", "replan", "migrate", "rebuild", "deliver", "status", "narrate"])
     ap.add_argument("project", nargs="?")
     ap.add_argument("extra", nargs="?", help="quote: the project")
     ap.add_argument("--quote", default=None)
     ap.add_argument("--change", default=None)
     ap.add_argument("--title", default=None)
     ap.add_argument("--version", type=int, default=None)
+    ap.add_argument("--voice-file", default=None, help="narrate: voice contract JSON (voice_id, model_id, settings)")
+    ap.add_argument("--pace", default="natural", choices=list(PACES))
+    ap.add_argument("--name", default=None)
     a = ap.parse_args(argv)
     if a.action == "quote":
         print(json.dumps(quote(a.project, a.extra), indent=1)); return
@@ -245,6 +296,10 @@ def main(argv=None):
                    "preview": {"path": str(ROOT / out["preview"]), "seconds": out.get("duration"), "sound": "silent (dry timings)"} if ok else None,
                    "review": deliver(a.project, out.get("version"), rebuild=True) if ok else None,
                    "note": "the saved plan re-rendered with the current renderer and compiler; same story, no model call"}
+        elif a.action == "narrate":
+            if not a.version or not a.voice_file:
+                raise SystemExit(json.dumps({"ok": False, "error": "narrate needs --version and --voice-file"}))
+            res = narrated_copy(a.project, a.version, a.voice_file, a.pace, a.name)
         elif a.action == "deliver":
             res = {"ok": True, "action": "deliver", "project": a.project, "review": deliver(a.project, a.version)}
         else:

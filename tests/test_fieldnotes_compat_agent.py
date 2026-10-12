@@ -226,6 +226,23 @@ class Agent(TempStudio):
         self.assertEqual(s["versions_now"], fc.versions())
 
 
+class Narrate(TempStudio):
+    def test_narrated_copy_keeps_the_scenes_and_sets_voice_and_pace(self):
+        (self.fn / "plan-v2.json").write_text(json.dumps(DENTAL), encoding="utf-8")
+        vf = self.tmp / "voice.json"
+        vf.write_text(json.dumps({"voice": {"voice_id": "abc", "model_id": "eleven_turbo_v2_5", "settings": {"stability": 0.4}}}))
+        with mock.patch.object(ag, "REVIEW_ROOT", self.tmp / "live"):
+            out = ag.narrated_copy(self.name, 2, vf, "brisk", "fn-test-v2-voiced")
+            pj = json.loads((self.tmp / "live" / "projects" / "fn-test-v2-voiced" / "project.json").read_text())
+        silent = fc.compile_plan(DENTAL, "x", "x")
+        self.assertEqual([s["line"]["text"] for s in pj["scenes"]], [s["line"]["text"] for s in silent["scenes"]])
+        self.assertEqual([s["cues"] for s in pj["scenes"]], [s["cues"] for s in silent["scenes"]])
+        self.assertEqual(pj["voice"]["settings"], {"stability": 0.4, "speed": 1.12})
+        self.assertTrue(all(s["line"]["pause"][1] <= 0.25 for s in pj["scenes"]))
+        self.assertEqual((pj["voice"]["lead_in"], pj["voice"]["tail"]), (0.25, 1.5))
+        self.assertEqual(out["chars"], sum(len(s["line"]["text"]) for s in pj["scenes"]))
+
+
 class DraftOnly(unittest.TestCase):
     def test_the_workflow_only_builds_silent_previews_and_renders_locally(self):
         src = (REPO / "studio" / "fieldnotes_plan.py").read_text(encoding="utf-8")
