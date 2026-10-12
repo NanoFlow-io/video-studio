@@ -243,8 +243,8 @@
    "line": {
     "text": "Be your own boss, they said.",
     "pause": [
-     0.15,
-     0.35
+     0.0,
+     0.0
     ]
    },
    "data": {
@@ -270,8 +270,8 @@
    "line": {
     "text": "You'll never be happier.",
     "pause": [
-     0.15,
-     0.35
+     0.0,
+     0.0
     ]
    },
    "data": {
@@ -293,8 +293,8 @@
    "line": {
     "text": "Looks like they were right.",
     "pause": [
-     0.15,
-     1.2
+     0.5,
+     0.5
     ]
    },
    "data": {

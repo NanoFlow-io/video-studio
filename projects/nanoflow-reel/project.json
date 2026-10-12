@@ -245,8 +245,8 @@
    "line": {
     "text": "You're up a ladder, the phone rings, and that job calls someone else. Unless this picks up.",
     "pause": [
-     0.45,
-     0.4
+     0.0,
+     0.0
     ]
    },
    "data": {
@@ -307,8 +307,8 @@
    "line": {
     "text": "It's NanoFlow. When you're busy or closed, it answers the call.",
     "pause": [
-     0.35,
-     0.3
+     0.0,
+     0.0
     ]
    },
    "data": {
@@ -336,8 +336,8 @@
    "line": {
     "text": "You get a transcript of what the caller needed.",
     "pause": [
-     0.3,
-     0.25
+     0.0,
+     0.0
     ]
    },
    "data": {
@@ -363,8 +363,8 @@
    "line": {
     "text": "And the next step, so you know who to call back first.",
     "pause": [
-     0.3,
-     0.25
+     0.0,
+     0.0
     ]
    },
    "data": {
@@ -390,8 +390,8 @@
    "line": {
     "text": "Review replies and posts wait in your overview. One tap approves them.",
     "pause": [
-     0.4,
-     0.35
+     0.0,
+     0.0
     ]
    },
    "data": {
