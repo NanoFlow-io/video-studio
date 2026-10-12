@@ -319,7 +319,7 @@ def validate_plan(plan, brief):
             if norm(wd) in BANNED and norm(wd) not in {norm(x) for x in words(src)}:
                 out.append(f"claim check: {wd!r} in {t!r} is not in the brief")
     out += grounding_problems(plan, brief, tagged)
-    if facts.get("narration_supplied") and plan.get("supplied_narration"):
+    if plan.get("supplied_narration"):   # enforced whatever the model says about narration_supplied
         if [norm(x) for x in words(" ".join(spoken))] != [norm(x) for x in words(plan["supplied_narration"])]:
             out.append("the chapters' narration must be the supplied narration, word for word and in order")
     total = len(words(" ".join(spoken)))
@@ -408,7 +408,7 @@ def grounding_problems(plan, brief, tagged):
     for c in plan.get("claims") or []:
         if isinstance(c, dict) and c.get("text"):
             ledger[_key(c["text"])] = c
-    supplied = bool((plan.get("facts") or {}).get("narration_supplied") and plan.get("supplied_narration"))
+    supplied = bool(plan.get("supplied_narration"))
     srck = _key(src)
     for text, kind, where in tagged:
         if kind not in LEDGER_KINDS or (kind == "narration" and supplied) or not str(text).strip():

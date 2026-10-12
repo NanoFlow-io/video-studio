@@ -319,6 +319,17 @@ class ClosingCard(unittest.TestCase):
         self.assertIn("chapter 1: one note per chapter", "\n".join(fc.validate_plan(bad, BRIEF_HOME)))
 
 
+class SuppliedNarration(unittest.TestCase):
+    def test_supplied_narration_is_enforced_even_if_the_model_says_otherwise(self):
+        plan = copy.deepcopy(HOME); plan["facts"]["narration_supplied"] = False
+        plan["supplied_narration"] = "Different words entirely for this test."
+        self.assertIn("must be the supplied narration, word for word", "\n".join(fc.validate_plan(plan, BRIEF_HOME)))
+
+    def test_a_revised_brief_with_narration_is_detected(self):
+        b = BRIEF_HOME + '\nNarration: "On a time-of-use plan, cooling can cost more."'
+        self.assertEqual(fp.supplied_narration(b), "On a time-of-use plan, cooling can cost more.")
+
+
 class SomeNotAll(unittest.TestCase):
     def test_shift_earlier_leaves_part_of_the_activity_in_the_window(self):
         pj = fc.compile_plan(HOME, "x", "x")
