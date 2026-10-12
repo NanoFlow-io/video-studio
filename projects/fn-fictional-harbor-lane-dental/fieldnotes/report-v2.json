@@ -1,0 +1,41 @@
+{
+ "version": 2,
+ "created": "2026-10-12T00:19:01+00:00",
+ "revision": "Keep it to about 15 seconds. Make the cause gentler: an evening-before email is simply easy to miss, nobody's fault. Finish on a checklist card that says Reply to reschedule.",
+ "brief_sha": "1c3c351b2cea6ff2",
+ "plan_sha": "2f49c18a150af08b",
+ "style": {
+  "template": "owner-explainer-field-notes-v1",
+  "style_sha": "a390fe1b65101e30",
+  "renderer_sha": "500ac93a68e00a38",
+  "planner_sha": "a1c907d848e6a850"
+ },
+ "studio_commit": "f4e3192",
+ "model_calls": [
+  {
+   "model": "claude-opus-5-5",
+   "input_tokens": 2,
+   "cache_read_input_tokens": 8544,
+   "cache_creation_input_tokens": 33475,
+   "output_tokens": 3783,
+   "equivalent_api_cost_usd": 0.34517679999999995,
+   "billing": "Claude Code login (subscription), not a metered API key",
+   "duration_ms": 31914
+  }
+ ],
+ "first_pass_problems": [],
+ "plan_problems": [],
+ "status": "awaiting-approval",
+ "render": {
+  "cut": "vertical",
+  "size": "1080x1920",
+  "fps": 30,
+  "quality": "looks",
+  "timings": "dry, 2.6 words/s (silent)"
+ },
+ "scene_problems": [],
+ "project_sha": "308a1a23fc48596c",
+ "preview": "projects/fn-fictional-harbor-lane-dental/fieldnotes/preview-v2.mp4",
+ "preview_sha": "d862b9e744cda376",
+ "duration": 18.823
+}

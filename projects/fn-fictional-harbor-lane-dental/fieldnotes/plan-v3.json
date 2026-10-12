@@ -1,0 +1,155 @@
+{
+ "facts": {
+  "business": "Harbor Lane Dental",
+  "business_type": "Small family dental practice",
+  "audience": "Busy parents who book check-ups for their kids",
+  "problem": "Appointments get missed and the chair sits empty",
+  "cause": "The only reminder is an email sent the evening before, which is easy to miss. Nobody's fault.",
+  "solution": "A text reminder two days ahead that patients can reply to, to confirm or reschedule",
+  "outcome": "When someone can't make it, they can tell the practice early, so the slot can be offered to another patient",
+  "narration_supplied": false
+ },
+ "questions": [],
+ "gap": null,
+ "stage": "process_flow",
+ "stage_params": {
+  "steps": [
+   {
+    "id": "s1",
+    "label": "Parent books a check-up"
+   },
+   {
+    "id": "s2",
+    "label": "Reminder goes out"
+   },
+   {
+    "id": "s3",
+    "label": "Parent sees the reminder"
+   },
+   {
+    "id": "s4",
+    "label": "Slot kept or offered to another patient"
+   }
+  ]
+ },
+ "narration_draft": true,
+ "chapters": [
+  {
+   "chapter": "THE PROBLEM",
+   "kicker": "HARBOR LANE DENTAL",
+   "headline": [
+    "Missed check-ups",
+    "an empty chair"
+   ],
+   "emphasis": "ochre",
+   "emphasis_on": "chair",
+   "narration": "Check-ups get missed. The chair sits empty.",
+   "events": [
+    {
+     "on": "start",
+     "do": "establish"
+    },
+    {
+     "on": "chair",
+     "do": "highlight",
+     "step": "s4",
+     "tone": "problem"
+    }
+   ]
+  },
+  {
+   "chapter": "THE CAUSE",
+   "kicker": "FROM FRONT DESK NOTES",
+   "headline": [
+    "One evening email",
+    "easy to miss"
+   ],
+   "emphasis": "blue",
+   "emphasis_on": "email",
+   "narration": "Our one evening email was easy to miss.",
+   "events": [
+    {
+     "on": "start",
+     "do": "note",
+     "text": "Nobody's fault"
+    },
+    {
+     "on": "evening",
+     "do": "break",
+     "link": [
+      "s2",
+      "s3"
+     ],
+     "label": "Evening email"
+    },
+    {
+     "on": "easy",
+     "do": "callout",
+     "target": "s3",
+     "text": "Easy to miss"
+    }
+   ]
+  },
+  {
+   "chapter": "THE FIX",
+   "kicker": "A TEXT YOU CAN REPLY TO",
+   "headline": [
+    "Text two days ahead",
+    "reply to reschedule"
+   ],
+   "emphasis": "sage",
+   "emphasis_on": "text",
+   "narration": "Now we text two days ahead. Reply, and we can offer your slot to another patient.",
+   "events": [
+    {
+     "on": "start",
+     "do": "highlight",
+     "step": "s2",
+     "tone": "fix"
+    },
+    {
+     "on": "text",
+     "do": "fix",
+     "link": [
+      "s2",
+      "s3"
+     ],
+     "label": "Text two days ahead"
+    },
+    {
+     "on": "Reply",
+     "do": "pulse",
+     "from": "s1",
+     "to": "s4"
+    },
+    {
+     "on": "offer",
+     "do": "highlight",
+     "step": "s4",
+     "tone": "fix"
+    },
+    {
+     "on": "slot",
+     "do": "checklist",
+     "text": "Reply to reschedule"
+    }
+   ]
+  }
+ ],
+ "checks": [
+  "Runtime fix: narration cut to 31 words (7 + 8 + 16) to fit about 15 seconds",
+  "Runtime fix: no event lands on the last word of any chapter, and there are fewer events overall",
+  "All facts come from the brief only. Nothing is invented about prices, times, rates or quotes",
+  "No digits are used. 'Two days' is written in words, as in the brief",
+  "None of the forbidden words (guarantee, always, never, best, lowest, save) are used",
+  "All six essential facts are in the brief, so there are no questions",
+  "No narration was supplied, so I drafted it in the owner's voice. It ends on the realistic outcome, offering the slot to another patient",
+  "process_flow fits because the weak link is reminder to parent, and the fix changes that link",
+  "All on-screen text is within its length limit",
+  "No em or en dashes are used",
+  "Each event's 'on' is 'start' or a single word copied exactly from that chapter's narration, in time order",
+  "There are 3 chapters: problem, cause, then fix and outcome. The last chapter ends on the checklist card Reply to reschedule",
+  "No gauge is used, so no gauge_label is needed"
+ ],
+ "brief": null
+}

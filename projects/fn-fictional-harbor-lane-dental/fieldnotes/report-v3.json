@@ -1,0 +1,53 @@
+{
+ "version": 3,
+ "created": "2026-10-12T00:22:18+00:00",
+ "revision": null,
+ "brief_sha": "7635fd2fb3d5b5c2",
+ "plan_sha": "c336f77be2d31c39",
+ "style": {
+  "template": "owner-explainer-field-notes-v1",
+  "style_sha": "a390fe1b65101e30",
+  "renderer_sha": "500ac93a68e00a38",
+  "planner_sha": "dde0bc49306a4ec1"
+ },
+ "studio_commit": "f4e3192",
+ "model_calls": [
+  {
+   "model": "claude-opus-5-5",
+   "input_tokens": 2,
+   "cache_read_input_tokens": 8544,
+   "cache_creation_input_tokens": 31768,
+   "output_tokens": 3814,
+   "equivalent_api_cost_usd": 0.33214079999999996,
+   "billing": "Claude Code login (subscription), not a metered API key",
+   "duration_ms": 33523
+  },
+  {
+   "model": "claude-opus-5-5",
+   "input_tokens": 2,
+   "cache_read_input_tokens": 8544,
+   "cache_creation_input_tokens": 28708,
+   "output_tokens": 2461,
+   "equivalent_api_cost_usd": 0.2806008,
+   "billing": "Claude Code login (subscription), not a metered API key",
+   "duration_ms": 22577
+  }
+ ],
+ "first_pass_problems": [
+  "the brief asks for about 15 s but this plan runs about 19.3 s; use about 30 words in total or fewer events after the last word of a chapter"
+ ],
+ "plan_problems": [],
+ "status": "awaiting-approval",
+ "render": {
+  "cut": "vertical",
+  "size": "1080x1920",
+  "fps": 30,
+  "quality": "looks",
+  "timings": "dry, 2.6 words/s (silent)"
+ },
+ "scene_problems": [],
+ "project_sha": "7ff19ff2ed07d3c3",
+ "preview": "projects/fn-fictional-harbor-lane-dental/fieldnotes/preview-v3.mp4",
+ "preview_sha": "4f9205d0ffaeb725",
+ "duration": 15.53
+}

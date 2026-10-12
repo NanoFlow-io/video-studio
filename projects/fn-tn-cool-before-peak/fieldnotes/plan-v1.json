@@ -1,0 +1,147 @@
+{
+ "facts": {
+  "business": "True North",
+  "business_type": "local HVAC company",
+  "audience": "Orange County residents on time-of-use electricity plans",
+  "problem": "Home AC activity overlaps the peak-price window on a time-of-use plan",
+  "cause": "Cooling runs during expensive peak hours instead of before them",
+  "solution": "Pre-cool the home before peak rates, then raise the thermostat a little during peak hours",
+  "outcome": "Some cooling can shift away from expensive hours; check your plan's peak times",
+  "narration_supplied": true
+ },
+ "questions": [],
+ "gap": null,
+ "stage": "home_energy",
+ "stage_params": {
+  "window_label": "PEAK PRICE",
+  "left": "EARLIER IN THE DAY",
+  "right": "LATER",
+  "window_note": "Peak times vary by plan",
+  "gauge_label": "COOLING DURING PEAK HOURS",
+  "thermostat": true
+ },
+ "narration_draft": false,
+ "chapters": [
+  {
+   "chapter": "THE PROBLEM",
+   "kicker": "TIME-OF-USE PLANS",
+   "headline": [
+    "Cooling runs",
+    "into peak hours"
+   ],
+   "emphasis": "ochre",
+   "emphasis_on": "time-of-use",
+   "narration": "On a time-of-use plan?",
+   "events": [
+    {
+     "on": "start",
+     "do": "establish"
+    },
+    {
+     "on": "On",
+     "do": "ac",
+     "speed": "high"
+    },
+    {
+     "on": "time-of-use",
+     "do": "window"
+    },
+    {
+     "on": "time-of-use",
+     "do": "activity",
+     "in": "window"
+    },
+    {
+     "on": "time-of-use",
+     "do": "gauge",
+     "level": "high"
+    }
+   ]
+  },
+  {
+   "chapter": "THE SHIFT",
+   "kicker": "COOL BEFORE PEAK",
+   "headline": [
+    "Cool your home",
+    "before peak"
+   ],
+   "emphasis": "blue",
+   "emphasis_on": "before",
+   "narration": "Cool your home before peak rates,",
+   "events": [
+    {
+     "on": "Cool",
+     "do": "playhead",
+     "through": "before"
+    },
+    {
+     "on": "home",
+     "do": "cool",
+     "level": "full"
+    },
+    {
+     "on": "before",
+     "do": "shift_earlier"
+    },
+    {
+     "on": "peak",
+     "do": "callout",
+     "target": "before",
+     "text": "Cool earlier"
+    }
+   ]
+  },
+  {
+   "chapter": "THE FIX",
+   "kicker": "THEN EASE OFF A LITTLE",
+   "headline": [
+    "Raise it a little",
+    "during peak"
+   ],
+   "emphasis": "sage",
+   "emphasis_on": "shift",
+   "narration": "then raise the thermostat a little. That can shift some cooling away from expensive hours. Check your plan's peak times.",
+   "events": [
+    {
+     "on": "raise",
+     "do": "raise_setting",
+     "label": "A LITTLE HIGHER"
+    },
+    {
+     "on": "thermostat",
+     "do": "ac",
+     "speed": "low"
+    },
+    {
+     "on": "shift",
+     "do": "reduce_in_window",
+     "level": "medium"
+    },
+    {
+     "on": "expensive",
+     "do": "gauge",
+     "level": "medium"
+    },
+    {
+     "on": "Check",
+     "do": "checklist",
+     "text": "Check your rate plan"
+    }
+   ]
+  }
+ ],
+ "checks": [
+  "The supplied narration is used word for word, split across three chapters in order",
+  "All facts come from the brief: no digits, rates, peak times, savings figures or guarantees",
+  "No forbidden words (guarantee, always, never, best, lowest, save)",
+  "home_energy stage fits the mechanism; the same house, AC unit and timeline are used throughout; no cutaway or shield",
+  "Beat 1: AC activity overlaps the ochre peak window; Beat 2: blue cooling plus shift_earlier; Beat 3: thermostat raised, less in-window activity, label 'Check your rate plan'",
+  "Outcome kept modest: reduce_in_window medium and gauge goes from high to medium, showing some cooling shifted rather than all",
+  "shift_earlier comes after activity; raise_setting has thermostat true; gauge has gauge_label",
+  "Every 'on' is start or a single word from that chapter's narration, in time order",
+  "Text limits met: labels up to 14, kickers up to 28, headline lines up to 20, callout up to 22, checklist up to 34, window label up to 14, gauge label up to 30; no em or en dashes",
+  "Chapter 1 shows the problem, chapter 2 the change, chapter 3 the fix and the outcome",
+  "All essential facts are present, so there are no questions"
+ ],
+ "supplied_narration": "On a time-of-use plan? Cool your home before peak rates, then raise the thermostat a little. That can shift some cooling away from expensive hours. Check your plan's peak times."
+}

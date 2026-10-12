@@ -197,8 +197,42 @@ def main():
                        "no API calls; layout preview only (also STUDIO_DRY_TIMINGS=1)")
         s.add_argument("--quality", default="looks", help="render quality: draft, looks, delivery")
         s.add_argument("--cues", default="", help="verify: cue ids to sync-check, e.g. S02.missed,S14.l1")
+    # field-notes explainer (experimental): an ordinary-language brief -> plan -> validated scenes -> silent preview
+    fn = sp.add_parser("fieldnotes", help="field-notes explainer from an ordinary-language brief (experimental)")
+    fn.add_argument("action", choices=["new", "revise", "replan", "rebuild", "status"])
+    fn.add_argument("name", help="project name (a new folder under projects/)")
+    fn.add_argument("text", nargs="?", default="", help="new: path to the brief (.txt/.md, plain words); revise: the change, in plain words")
+    fn.add_argument("--title", default=None)
+    fn.add_argument("--no-render", action="store_true", help="plan and validate only")
     a = ap.parse_args()
     globals()["cmd_" + a.cmd.replace("-", "_")](a)
+
+
+def cmd_fieldnotes(a):
+    from studio import fieldnotes_plan as fp
+    r = fp.Run(a.name)
+    if a.action == "status":
+        print(json.dumps(r.state(), indent=1, ensure_ascii=False)); return
+    if a.action == "rebuild":
+        fp.rebuild(a.name, render=not a.no_render); return
+    if a.action == "new":
+        if r.fn.exists() and r.state()["versions"]:
+            sys.exit(f"{a.name} already has a field-notes plan; use revise or replan")
+        if (r.dir / "project.json").exists() and not r.fn.exists():
+            sys.exit(f"projects/{a.name} exists and is not a field-notes project")
+        brief = Path(a.text).read_text(encoding="utf-8")
+        fp.run_version(a.name, brief, title=a.title, render=not a.no_render); return
+    st = r.state()
+    if not st["versions"]:
+        sys.exit(f"{a.name} has no field-notes plan yet; use new")
+    brief = (r.fn / f"brief-v{st['current']}.txt").read_text(encoding="utf-8")
+    if a.action == "replan":   # the owner edited the brief file in plain words: plan again from it
+        src = Path(a.text) if a.text else r.fn / "brief.txt"
+        brief = src.read_text(encoding="utf-8") if src.exists() else brief
+        fp.run_version(a.name, brief, title=a.title, render=not a.no_render); return
+    if not a.text.strip():
+        sys.exit("revise needs the change in plain words, e.g. \"make it shorter and end on booking a check\"")
+    fp.run_version(a.name, brief, title=a.title, revision=a.text.strip(), render=not a.no_render)
 
 
 if __name__ == "__main__":

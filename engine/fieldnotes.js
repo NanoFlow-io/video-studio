@@ -42,6 +42,7 @@ NOWIPE.fieldnotes = 1; NOCAPS.fieldnotes = 1;   /* fieldnotes draws its own chap
     ".fn-note{position:absolute;left:0;top:0;white-space:nowrap;font:italic 400 42px/1.1 'Instrument Serif',serif;color:#3A3630}",
     ".fn-card{position:absolute;left:0;top:0;display:flex;align-items:center;gap:22px;background:" + k.card + ";border:3px solid " + k.ink + ";box-shadow:10px 10px 0 " + k.ochre + ";padding:22px 28px;font:700 40px/1.1 'Inter Tight',sans-serif;letter-spacing:-.02em;color:" + k.ink + "}",
     ".fn-card .bx{width:44px;height:44px;border:3px solid " + k.ink + ";border-radius:7px;flex:none;display:flex;align-items:center;justify-content:center}",
+    ".fn-step{position:absolute;left:0;top:0;font:700 38px/1.1 'Inter Tight',sans-serif;letter-spacing:-.01em;color:" + k.ink + "}",
     ".fn-bands{position:absolute;left:0;top:0;width:" + W + "px;height:" + H + "px;overflow:hidden;z-index:60;pointer-events:none;visibility:hidden}",
     ".fn-bands i{position:absolute;top:-500px;height:2920px;width:900px;display:block}"
   ].join("\n");
@@ -173,7 +174,7 @@ FN_KINDS.timeline = function(o, ctx){ var d = o.def, k = FN.col, ink = k.ink, x 
       fnAttrTween(phx, "transform", function(v){ return "translate(" + v.toFixed(1) + ",0)"; }, X(p0), X(p1), t, a.dur || 1.2, "power1.inOut"); st.ph.pos = p1; } }; };
 
 FN_KINDS.gauge = function(o, ctx){ var d = o.def, k = FN.col, ink = k.ink, x = d.x, y = d.y, w = d.w || 600;
-  if(o.st.level == null) o.st.level = d.level == null ? 0.5 : d.level;
+  if(o.st.level == null || !o.st.drawn) o.st.level = d.level == null ? 0.5 : d.level;   /* not drawn yet: take the planned level */
   var root = sv("g", {}, ctx.svg);
   fnText(root, x, y - 16, d.label || "", { size: 19 });
   sv("rect", { x: x, y: y, width: w, height: 26, fill: k.track, stroke: ink, "stroke-width": 3 }, root);
@@ -219,6 +220,66 @@ FN_KINDS.arrow = function(o, ctx){ var d = o.def, k = FN.col, pts = d.points || 
       o.st.drawn = true; },
     flow: function(t, a){ if(!mask) return; tl.fromTo(line, { strokeDashoffset: 0 }, { strokeDashoffset: -26 * Math.round((a.dur || 2) * 3), duration: a.dur || 2, ease: "none" }, t); } }; };
 
+/* flow: a process drawn as numbered steps joined by links. Parts: each step by id, links "l1".."l<n-1>" (step i to i+1).
+   highlight a step (tone ochre / sage / blue / none), mark a link broken or ok (with a short label), pulse a dot along it */
+FN_KINDS.flow = function(o, ctx){ var d = o.def, k = FN.col, ink = k.ink, x = d.x, y = d.y, w = d.w || 560;
+  var nodes = d.nodes || [], bh = d.boxH || 118, gap = d.gap || 78, st = o.st, lx = x + 46;
+  st.nodes = st.nodes || {}; st.links = st.links || {};
+  nodes.forEach(function(n){ if(!st.nodes[n.id]) st.nodes[n.id] = { tone: null }; });
+  for(var li = 1; li < nodes.length; li++) if(!st.links["l" + li]) st.links["l" + li] = { state: null, label: "" };
+  var root = sv("g", {}, ctx.svg), subs = {}, tones = { ochre: k.ochre, sage: k.sageTint, blue: k.blue }, Y = function(i){ return y + i * (bh + gap); };
+  nodes.forEach(function(n, i){ var g = sv("g", {}, root), top = Y(i);
+    sv("rect", { x: x, y: top, width: w, height: bh, rx: 14, fill: k.card, stroke: ink, "stroke-width": 4 }, g);
+    var tint = sv("rect", { x: x + 2, y: top + 2, width: w - 4, height: bh - 4, rx: 12, fill: tones[st.nodes[n.id].tone] || k.card, "fill-opacity": st.nodes[n.id].tone ? 0.5 : 0, "data-skip": 1 }, g);
+    sv("circle", { cx: lx, cy: top + bh / 2, r: 28, fill: k.paper, stroke: ink, "stroke-width": 3 }, g);
+    fnText(g, lx, top + bh / 2 + 8, String(i + 1), { anchor: "middle", size: 24, ls: "0", fill: ink });
+    var lab = mk(ctx.html, "div", "fn-step", esc(n.label));
+    gsap.set(lab, { x: x + 100, y: top + bh / 2, yPercent: -50, width: w - 128 });
+    gsap.set(lab, { autoAlpha: o.st.drawn ? 1 : 0 });   /* the label arrives with its box */
+    subs[n.id] = { el: g, html: lab, tint: tint, kind: "node", i: i }; });
+  for(var j = 1; j < nodes.length; j++){ var y0 = Y(j - 1) + bh, y1 = Y(j), gl = sv("g", {}, root), ls = st.links["l" + j];
+    var line = sv("line", { x1: lx, y1: y0 + 4, x2: lx, y2: y1 - 6, stroke: ink, "stroke-width": 4 }, gl);
+    sv("path", { d: "M" + (lx - 10) + "," + (y1 - 18) + " L" + lx + "," + (y1 - 6) + " L" + (lx + 10) + "," + (y1 - 18), fill: "none", stroke: ink, "stroke-width": 4, "stroke-linecap": "round", "stroke-linejoin": "round", "data-fade": 1 }, gl);
+    var mid = (y0 + y1) / 2, bad = sv("g", { "data-skip": 1 }, gl), good = sv("g", { "data-skip": 1 }, gl);
+    sv("circle", { cx: lx, cy: mid, r: 18, fill: k.ochre, stroke: ink, "stroke-width": 3 }, bad);
+    sv("path", { d: "M" + (lx - 7) + "," + (mid - 7) + " L" + (lx + 7) + "," + (mid + 7) + " M" + (lx + 7) + "," + (mid - 7) + " L" + (lx - 7) + "," + (mid + 7), stroke: "#fff", "stroke-width": 4, "stroke-linecap": "round" }, bad);
+    sv("circle", { cx: lx, cy: mid, r: 18, fill: k.sage, stroke: ink, "stroke-width": 3 }, good);
+    sv("path", { d: "M" + (lx - 8) + "," + mid + " L" + (lx - 2) + "," + (mid + 6) + " L" + (lx + 9) + "," + (mid - 6), fill: "none", stroke: "#fff", "stroke-width": 4, "stroke-linecap": "round", "stroke-linejoin": "round" }, good);
+    var tag = mk(ctx.html, "div", "fn-tag", esc(ls.label || ""), "background:" + (ls.state === "ok" ? k.sage : k.ochre));
+    gsap.set(tag, { x: lx + 40, y: mid, yPercent: -50 });
+    gsap.set(bad, { autoAlpha: ls.state === "broken" ? 1 : 0 }); gsap.set(good, { autoAlpha: ls.state === "ok" ? 1 : 0 });
+    gsap.set(tag, { autoAlpha: ls.state && ls.label ? 1 : 0 });
+    if(ls.state === "broken") gsap.set(line, { attr: { stroke: k.ochre, "stroke-dasharray": "10 9" } });
+    if(ls.state === "ok") gsap.set(line, { attr: { stroke: k.sage } });
+    subs["l" + j] = { el: gl, kind: "link", line: line, bad: bad, good: good, tag: tag, mid: mid }; }
+  return { root: root,
+    sub: function(id){ if(!subs[id]) throw new Error("flow " + o.id + " has no step or link '" + id + "'"); return subs[id]; },
+    draw: function(t, a){ tl.set(root, { autoAlpha: 1 }, t); var step = Math.min(0.35, (a.dur || 1.4) / Math.max(1, nodes.length));
+      nodes.forEach(function(n, i){ var s2 = subs[n.id]; fnDraw(s2.el, t + i * step, 0.5); fnFade(s2.html, t + i * step + 0.3, 0.3, true);
+        if(i > 0){ fnDraw(subs["l" + i].el, t + i * step - 0.1, 0.3); } });
+      o.st.drawn = true; },
+    partShow: function(t, a, id){ var s2 = this.sub(id); fnFade(s2.el, t, a.dur, true); if(s2.html) fnFade(s2.html, t, a.dur, true); },
+    partHide: function(t, a, id){ var s2 = this.sub(id); fnFade(s2.el, t, a.dur, false); if(s2.html) fnFade(s2.html, t, a.dur, false); },
+    highlight: function(t, a, id){ var s2 = this.sub(id), tone = a.tone || "ochre";
+      if(s2.kind !== "node") throw new Error("flow: highlight takes a step, not " + id);
+      tl.to(s2.tint, { attr: { fill: tones[tone] || k.card, "fill-opacity": tone === "none" ? 0 : 0.5 }, duration: 0.35 }, t); st.nodes[id].tone = tone === "none" ? null : tone; },
+    mark: function(t, a, id){ var s2 = this.sub(id), on = a.state === "ok" ? s2.good : s2.bad, off = a.state === "ok" ? s2.bad : s2.good;
+      if(s2.kind !== "link") throw new Error("flow: mark takes a link (l1, l2...), not " + id);
+      tl.to(off, { autoAlpha: 0, duration: 0.15 }, t);
+      tl.to(s2.line, { attr: { stroke: a.state === "ok" ? k.sage : k.ochre }, duration: 0.25 }, t);
+      tl.set(s2.line, { attr: { "stroke-dasharray": a.state === "ok" ? "none" : "10 9" } }, t);
+      tl.fromTo(on, { autoAlpha: 0, scale: 0.6, transformOrigin: "50% 50%" }, { autoAlpha: 1, scale: 1, duration: 0.3, ease: "back.out(1.6)" }, t + 0.1);
+      if(a.label){ s2.tag.textContent = a.label; tl.set(s2.tag, { background: a.state === "ok" ? k.sage : k.ochre }, t);
+        tl.fromTo(s2.tag, { autoAlpha: 0, x: lx + 26 }, { autoAlpha: 1, x: lx + 40, duration: 0.3, ease: "power2.out" }, t + 0.25); }
+      else tl.to(s2.tag, { autoAlpha: 0, duration: 0.2 }, t);
+      st.links[id] = { state: a.state === "ok" ? "ok" : "broken", label: a.label || "" }; },
+    pulse: function(t, a){ var from = subs[a.from], to = subs[a.to];
+      if(!from || !to || from.kind !== "node" || to.kind !== "node") throw new Error("flow: pulse needs from and to steps");
+      var dot = sv("circle", { cx: lx, cy: Y(from.i) + bh / 2, r: 11, fill: k.blueStroke, stroke: ink, "stroke-width": 3 }, root);
+      gsap.set(dot, { autoAlpha: 0 }); tl.set(dot, { autoAlpha: 1 }, t);
+      fnAttrTween(dot, "cy", String, Y(from.i) + bh / 2, Y(to.i) + bh / 2, t, a.dur || 1.2, "power1.inOut");
+      tl.to(dot, { autoAlpha: 0, duration: 0.2 }, t + (a.dur || 1.2)); } }; };
+
 /* html kinds (text wraps and sizes itself): callout leader in the svg, label / tag / note / card as html */
 function fnPlace(el, x, y, align){ gsap.set(el, { x: x, y: y, xPercent: align === "right" ? -100 : align === "center" ? -50 : 0, yPercent: -50 }); }
 FN_KINDS.callout = function(o, ctx){ var d = o.def, k = FN.col, ink = k.ink;
@@ -228,7 +289,8 @@ FN_KINDS.callout = function(o, ctx){ var d = o.def, k = FN.col, ink = k.ink;
   var path = up ? "M" + d.x + "," + d.y + " L" + d.x + "," + ly : "M" + d.x + "," + d.y + " L" + d.x + "," + ly + " L" + d.lx + "," + ly;
   var lead = sv("path", { d: path, fill: "none", stroke: ink, "stroke-width": 3, "stroke-linejoin": "round" }, root);
   var dot = sv("circle", { cx: d.x, cy: d.y, r: 7, fill: ink }, root);
-  var lab = mk(ctx.html, "div", d.style === "tag" ? "fn-tag" : d.style === "note" ? "fn-note" : "fn-lab", esc(d.text));
+  var lab = mk(ctx.html, "div", d.style === "tag" ? "fn-tag" : d.style === "note" ? "fn-note" : "fn-lab", esc(d.text),
+    d.maxw ? "white-space:normal;max-width:" + d.maxw + "px;line-height:1.25" : "");
   var px = up ? d.x : right ? d.lx + 12 : d.lx - 12, py = up ? ly - 10 : ly;
   gsap.set(lab, { x: px, y: py, xPercent: up ? -50 : right ? 0 : -100, yPercent: up ? -100 : -50 });
   gsap.set([root, lab], { autoAlpha: 0 });

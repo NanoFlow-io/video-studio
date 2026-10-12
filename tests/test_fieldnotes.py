@@ -52,7 +52,7 @@ class Validation(unittest.TestCase):
         f2["actions"].append({"at": 1, "do": "show", "target": "acpeak"})      # a callout does not carry over
         p = "\n".join(problems(d))
         for want in ("emphasis must be one of", "kind must be one of", "'nope' is not one of this scene's cues",
-                     "a house takes", "no band or segment 'ghost'", "no object 'acpeak'"):
+                     "a house takes", "the timeline has no part 'ghost'", "no object 'acpeak'"):
             self.assertIn(want, p)
 
     def test_objects_carry_to_the_next_scene_unless_continue_is_false(self):

@@ -1,0 +1,40 @@
+{
+ "version": 1,
+ "created": "2026-10-12T00:13:04+00:00",
+ "revision": null,
+ "brief_sha": "985c0b9142adf569",
+ "plan_sha": "901ccbd60efca87c",
+ "style": {
+  "template": "owner-explainer-field-notes-v1",
+  "style_sha": "a390fe1b65101e30",
+  "renderer_sha": "97c3378c917af9b1",
+  "planner_sha": "d64ede1096f8b792"
+ },
+ "studio_commit": "f4e3192",
+ "model_calls": [
+  {
+   "model": "claude-opus-5-5",
+   "input_tokens": 2,
+   "cache_read_input_tokens": 6902,
+   "cache_creation_input_tokens": 33531,
+   "output_tokens": 4025,
+   "equivalent_api_cost_usd": 0.3501364,
+   "billing": "Claude Code login (subscription), not a metered API key",
+   "duration_ms": 37275
+  }
+ ],
+ "plan_problems": [],
+ "status": "awaiting-approval",
+ "render": {
+  "cut": "vertical",
+  "size": "1080x1920",
+  "fps": 30,
+  "quality": "looks",
+  "timings": "dry, 2.6 words/s (silent)"
+ },
+ "scene_problems": [],
+ "project_sha": "a5e4aad045f11aae",
+ "preview": "projects/fn-tn-cool-before-peak/fieldnotes/preview-v1.mp4",
+ "preview_sha": "8fdb514fcfacb093",
+ "duration": 17.406
+}

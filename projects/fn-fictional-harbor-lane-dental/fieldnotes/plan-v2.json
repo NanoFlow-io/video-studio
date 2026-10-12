@@ -1,0 +1,172 @@
+{
+ "brief": "FICTIONAL TEST BRIEF (not a real business; for testing the field-notes workflow only).\n\nHarbor Lane Dental is a small family dental practice.\nAudience: busy parents who book check-ups for their kids.\nProblem: appointments get missed and the chair sits empty.\nVerified cause (from the practice's own front-desk notes): the only reminder is an email sent the evening before, which is simply easy to miss. Nobody's fault.\nSolution: a text reminder two days ahead that patients can reply to, to confirm or reschedule.\nRealistic outcome: when someone can't make it, they can tell the practice early, so the slot can be offered to another patient.\nNo narration supplied. About 15 seconds. Finish on a checklist card that says Reply to reschedule.",
+ "facts": {
+  "business": "Harbor Lane Dental",
+  "business_type": "small family dental practice",
+  "audience": "busy parents who book check-ups for their kids",
+  "problem": "appointments get missed and the chair sits empty",
+  "cause": "the only reminder is an email sent the evening before, which is simply easy to miss, nobody's fault (from the practice's front-desk notes)",
+  "solution": "a text reminder two days ahead that patients can reply to, to confirm or reschedule",
+  "outcome": "when someone can't make it, they can tell the practice early, so the slot can be offered to another patient",
+  "narration_supplied": false
+ },
+ "questions": [],
+ "gap": null,
+ "stage": "process_flow",
+ "stage_params": {
+  "steps": [
+   {
+    "id": "s1",
+    "label": "Check-up is booked"
+   },
+   {
+    "id": "s2",
+    "label": "Reminder reaches the parent"
+   },
+   {
+    "id": "s3",
+    "label": "Parent tells the practice"
+   },
+   {
+    "id": "s4",
+    "label": "Slot goes to another patient"
+   }
+  ]
+ },
+ "narration_draft": true,
+ "chapters": [
+  {
+   "chapter": "THE PROBLEM",
+   "kicker": "HARBOR LANE DENTAL",
+   "headline": [
+    "Booked check-ups",
+    "end in empty chairs"
+   ],
+   "emphasis": "ochre",
+   "emphasis_on": "empty",
+   "narration": "Check-ups get missed, and the chair sits empty.",
+   "events": [
+    {
+     "on": "start",
+     "do": "establish"
+    },
+    {
+     "on": "missed",
+     "do": "highlight",
+     "step": "s4",
+     "tone": "problem"
+    },
+    {
+     "on": "chair",
+     "do": "callout",
+     "target": "s4",
+     "text": "The chair sits empty"
+    }
+   ]
+  },
+  {
+   "chapter": "THE CAUSE",
+   "kicker": "FROM OUR FRONT DESK NOTES",
+   "headline": [
+    "An evening email",
+    "is easy to miss"
+   ],
+   "emphasis": "blue",
+   "emphasis_on": "miss",
+   "narration": "Our evening email was easy to miss. Nobody's fault.",
+   "events": [
+    {
+     "on": "start",
+     "do": "highlight",
+     "step": "s2",
+     "tone": "neutral"
+    },
+    {
+     "on": "evening",
+     "do": "break",
+     "link": [
+      "s1",
+      "s2"
+     ],
+     "label": "Evening email only"
+    },
+    {
+     "on": "fault",
+     "do": "note",
+     "text": "Easy to miss, nobody's fault"
+    }
+   ]
+  },
+  {
+   "chapter": "THE FIX",
+   "kicker": "THE NEW REMINDER",
+   "headline": [
+    "Text two days ahead",
+    "and let them reply"
+   ],
+   "emphasis": "sage",
+   "emphasis_on": "Reply",
+   "narration": "Now a text comes two days ahead. Reply to reschedule, and we can offer the slot to another patient.",
+   "events": [
+    {
+     "on": "start",
+     "do": "highlight",
+     "step": "s2",
+     "tone": "fix"
+    },
+    {
+     "on": "text",
+     "do": "fix",
+     "link": [
+      "s1",
+      "s2"
+     ],
+     "label": "Text two days ahead"
+    },
+    {
+     "on": "Reply",
+     "do": "fix",
+     "link": [
+      "s2",
+      "s3"
+     ],
+     "label": "Confirm or reschedule"
+    },
+    {
+     "on": "offer",
+     "do": "pulse",
+     "from": "s1",
+     "to": "s4"
+    },
+    {
+     "on": "slot",
+     "do": "highlight",
+     "step": "s4",
+     "tone": "fix"
+    },
+    {
+     "on": "patient",
+     "do": "checklist",
+     "text": "Reply to reschedule"
+    }
+   ]
+  }
+ ],
+ "checks": [
+  "Revision applied to the brief first: the cause is now gentler (the evening-before email is simply easy to miss, nobody's fault), the length stays at about 15 seconds, and the ending is a checklist card",
+  "All six essential facts are in the revised brief, so there are no questions",
+  "Every fact comes from the revised brief. There are no prices, times of day, rates, statistics or guarantees",
+  "There are no digits. 'Two days' is spelled out, as in the brief",
+  "None of the forbidden words appear (guarantee, always, never, best, lowest, save)",
+  "No narration was supplied, so I drafted it in the owner's voice. It is 36 words, which suits about 15 seconds, and it ends on the outcome the brief supports",
+  "The cause chapter no longer frames anything as a failure: its first highlight uses the neutral tone and the note says it is nobody's fault",
+  "I chose process_flow because the mechanism is a reminder link that falls short and is then repaired. home_energy is unrelated",
+  "There are 3 chapters: the problem, then the cause, then the fix and outcome",
+  "The last event is a checklist card reading 'Reply to reschedule' (19 characters, within the 34 limit)",
+  "Step labels are within 40 characters, kickers within 28, headline lines within 20, the callout within 22 (20), the note within 30 (28), and the break and fix labels are short (18, 19 and 21)",
+  "There are no em or en dashes",
+  "Every event's 'on' is 'start' or a single word copied exactly from that chapter's narration ('Reply' keeps its capital), and events are in narration order",
+  "Break and fix use the adjacent pairs s1 to s2 and s2 to s3, and the pulse uses declared step ids",
+  "The emphasis_on words (empty, miss, Reply) each appear in their chapter's narration"
+ ]
+}

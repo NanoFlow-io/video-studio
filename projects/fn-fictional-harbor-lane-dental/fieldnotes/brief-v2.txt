@@ -1,0 +1,9 @@
+FICTIONAL TEST BRIEF (not a real business; for testing the field-notes workflow only).
+
+Harbor Lane Dental is a small family dental practice.
+Audience: busy parents who book check-ups for their kids.
+Problem: appointments get missed and the chair sits empty.
+Verified cause (from the practice's own front-desk notes): the only reminder is an email sent the evening before, which is simply easy to miss. Nobody's fault.
+Solution: a text reminder two days ahead that patients can reply to, to confirm or reschedule.
+Realistic outcome: when someone can't make it, they can tell the practice early, so the slot can be offered to another patient.
+No narration supplied. About 15 seconds. Finish on a checklist card that says Reply to reschedule.

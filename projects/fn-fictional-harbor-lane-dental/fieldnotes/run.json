@@ -1,0 +1,33 @@
+{
+ "name": "fn-fictional-harbor-lane-dental",
+ "versions": [
+  {
+   "version": 1,
+   "created": "2026-10-12T00:15:48+00:00",
+   "status": "awaiting-approval",
+   "revision": null,
+   "brief_sha": "a328695a0759afbc",
+   "plan_sha": "f52a3429d50faa67",
+   "preview": "projects/fn-fictional-harbor-lane-dental/fieldnotes/preview-v1.mp4"
+  },
+  {
+   "version": 2,
+   "created": "2026-10-12T00:19:01+00:00",
+   "status": "awaiting-approval",
+   "revision": "Keep it to about 15 seconds. Make the cause gentler: an evening-before email is simply easy to miss, nobody's fault. Finish on a checklist card that says Reply to reschedule.",
+   "brief_sha": "1c3c351b2cea6ff2",
+   "plan_sha": "2f49c18a150af08b",
+   "preview": "projects/fn-fictional-harbor-lane-dental/fieldnotes/preview-v2.mp4"
+  },
+  {
+   "version": 3,
+   "created": "2026-10-12T00:22:18+00:00",
+   "status": "awaiting-approval",
+   "revision": null,
+   "brief_sha": "7635fd2fb3d5b5c2",
+   "plan_sha": "c336f77be2d31c39",
+   "preview": "projects/fn-fictional-harbor-lane-dental/fieldnotes/preview-v3.mp4"
+  }
+ ],
+ "current": 3
+}

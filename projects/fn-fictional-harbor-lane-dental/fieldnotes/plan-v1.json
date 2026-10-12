@@ -1,0 +1,171 @@
+{
+ "facts": {
+  "business": "Harbor Lane Dental",
+  "business_type": "small family dental practice",
+  "audience": "busy parents who book check-ups for their kids",
+  "problem": "appointments get missed and the chair sits empty",
+  "cause": "the only reminder is an email sent the evening before, which many parents don't see until it is too late to rearrange (from the practice's front-desk notes)",
+  "solution": "a text reminder two days ahead that patients can reply to, to confirm or reschedule",
+  "outcome": "when someone can't make it, they can tell the practice early, so the slot can be offered to another patient",
+  "narration_supplied": false
+ },
+ "questions": [],
+ "gap": null,
+ "stage": "process_flow",
+ "stage_params": {
+  "steps": [
+   {
+    "id": "s1",
+    "label": "Check-up is booked"
+   },
+   {
+    "id": "s2",
+    "label": "Reminder reaches the parent"
+   },
+   {
+    "id": "s3",
+    "label": "Parent tells the practice"
+   },
+   {
+    "id": "s4",
+    "label": "Slot goes to another patient"
+   }
+  ]
+ },
+ "narration_draft": true,
+ "chapters": [
+  {
+   "chapter": "THE PROBLEM",
+   "kicker": "HARBOR LANE DENTAL",
+   "headline": [
+    "Booked check-ups",
+    "end in empty chairs"
+   ],
+   "emphasis": "ochre",
+   "emphasis_on": "empty",
+   "narration": "Parents book check-ups, but appointments get missed and the chair sits empty.",
+   "events": [
+    {
+     "on": "start",
+     "do": "establish"
+    },
+    {
+     "on": "book",
+     "do": "highlight",
+     "step": "s1",
+     "tone": "neutral"
+    },
+    {
+     "on": "missed",
+     "do": "highlight",
+     "step": "s4",
+     "tone": "problem"
+    },
+    {
+     "on": "chair",
+     "do": "callout",
+     "target": "s4",
+     "text": "The chair sits empty"
+    }
+   ]
+  },
+  {
+   "chapter": "THE CAUSE",
+   "kicker": "FROM OUR FRONT DESK NOTES",
+   "headline": [
+    "The reminder",
+    "came too late"
+   ],
+   "emphasis": "blue",
+   "emphasis_on": "late",
+   "narration": "Our only reminder was an email the evening before, and many parents saw it too late.",
+   "events": [
+    {
+     "on": "start",
+     "do": "highlight",
+     "step": "s2",
+     "tone": "problem"
+    },
+    {
+     "on": "email",
+     "do": "break",
+     "link": [
+      "s1",
+      "s2"
+     ],
+     "label": "Evening email only"
+    },
+    {
+     "on": "late",
+     "do": "note",
+     "text": "Seen too late to rearrange"
+    }
+   ]
+  },
+  {
+   "chapter": "THE FIX",
+   "kicker": "THE NEW REMINDER",
+   "headline": [
+    "Text two days ahead",
+    "and let them reply"
+   ],
+   "emphasis": "sage",
+   "emphasis_on": "reply",
+   "narration": "Now a text two days ahead lets parents reply, so we can offer the slot to another patient.",
+   "events": [
+    {
+     "on": "start",
+     "do": "highlight",
+     "step": "s2",
+     "tone": "fix"
+    },
+    {
+     "on": "text",
+     "do": "fix",
+     "link": [
+      "s1",
+      "s2"
+     ],
+     "label": "Text two days ahead"
+    },
+    {
+     "on": "reply",
+     "do": "fix",
+     "link": [
+      "s2",
+      "s3"
+     ],
+     "label": "Confirm or reschedule"
+    },
+    {
+     "on": "offer",
+     "do": "pulse",
+     "from": "s1",
+     "to": "s4"
+    },
+    {
+     "on": "patient",
+     "do": "highlight",
+     "step": "s4",
+     "tone": "fix"
+    }
+   ]
+  }
+ ],
+ "checks": [
+  "All six essential facts are in the brief, so there are no questions",
+  "Every fact comes from the brief, with no prices, times of day, rates, statistics or guarantees",
+  "There are no digits, and 'two days' is spelled out as in the brief",
+  "None of the forbidden words appear (guarantee, always, never, best, lowest, save)",
+  "No narration was supplied, so I drafted it in the owner's voice. At about 47 words it runs over the 36-word target for 15 seconds, and it ends on the outcome the brief supports",
+  "I used process_flow because the mechanism is a reminder link that fails and is then repaired; home_energy is unrelated",
+  "There are 3 chapters: the problem, then the cause, then the fix and outcome",
+  "Fixed from the last reply: the break label 'Evening email only' is 18 characters and the fix label 'Confirm or reschedule' is 21, so both fit the 22 limit",
+  "Step labels are within 40 characters, kickers within 28, headline lines within 20, the callout within 22 and the note within 30",
+  "There are no em or en dashes",
+  "Every event's 'on' is 'start' or a single word from that chapter's narration, and events are in narration order",
+  "Break and fix use the adjacent pairs s1 to s2 and s2 to s3, and the pulse uses declared step ids",
+  "The emphasis_on words (empty, late, reply) each appear in their chapter's narration"
+ ],
+ "brief": null
+}

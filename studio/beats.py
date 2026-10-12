@@ -54,7 +54,9 @@ def headline_problems(sid, h, layout):
 # field-notes scene data (engine/fieldnotes.js). Kinds and the actions each accepts; "draw", "show" and "hide" work on any
 # object, and timeline parts ("timeline.peak") take show / hide / seg; the playhead also takes playhead.
 FN_KINDS = {"house": {"fill"}, "ac_unit": {"run"}, "timeline": {"seg", "playhead"}, "gauge": {"set"},
-            "thermostat": {"turn"}, "arrow": {"flow"}, "callout": set(), "note": set(), "card": set()}
+            "thermostat": {"turn"}, "arrow": {"flow"}, "callout": set(), "note": set(), "card": set(), "flow": {"pulse"}}
+# kinds with named parts ("timeline.peak", "flow.l2") and the actions a part takes
+FN_PART_VERBS = {"timeline": {"show", "hide", "seg", "playhead"}, "flow": {"show", "hide", "highlight", "mark"}}
 FN_LOCAL = {"callout", "note", "card"}
 FN_EMPHASIS = {None, "ochre", "blue", "sage", "italic"}
 FN_TIME_RE = re.compile(r"^([A-Za-z0-9_]+)([+-]\d+(?:\.\d+)?)?$")
@@ -99,6 +101,9 @@ def fieldnotes_problems(sid, d, cue_names, carried):
         kinds[o["id"]] = kind
         if kind == "timeline":
             parts.setdefault(o["id"], {"playhead"}).update(x.get("id") for x in (o.get("bands") or []) + (o.get("segs") or []) if isinstance(x, dict))
+        if kind == "flow":
+            ns = [x.get("id") for x in (o.get("nodes") or []) if isinstance(x, dict)]
+            parts.setdefault(o["id"], set()).update(ns + [f"l{i}" for i in range(1, len(ns))])
     for i, a in enumerate(d.get("actions") or []):
         if not isinstance(a, dict):
             out.append(f"{pre}: actions[{i}] must be an object"); continue
@@ -110,12 +115,12 @@ def fieldnotes_problems(sid, d, cue_names, carried):
             out.append(f"{pre}: {where}: no object '{oid}' in this scene or carried from the previous one"); continue
         kind = kinds[oid]
         if part:
-            if kind != "timeline":
-                out.append(f"{pre}: {where}: only a timeline has parts")
-            elif verb not in ("show", "hide", "seg", "playhead"):
-                out.append(f"{pre}: {where}: a timeline part takes show, hide, seg or playhead")
-            elif part not in parts.get(oid, {"playhead"}) and oid not in carried:
-                out.append(f"{pre}: {where}: the timeline has no band or segment '{part}'")
+            if kind not in FN_PART_VERBS:
+                out.append(f"{pre}: {where}: only a timeline or a flow has parts")
+            elif verb not in FN_PART_VERBS[kind]:
+                out.append(f"{pre}: {where}: a {kind} part takes {', '.join(sorted(FN_PART_VERBS[kind]))}")
+            elif part not in parts.get(oid, {"playhead"} if kind == "timeline" else set()) and oid not in carried:
+                out.append(f"{pre}: {where}: the {kind} has no part '{part}'")
         elif verb not in {"draw", "show", "hide"} | FN_KINDS[kind]:
             out.append(f"{pre}: {where}: a {kind} takes {', '.join(sorted({'draw', 'show', 'hide'} | FN_KINDS[kind]))}")
     if d.get("transition") not in (None, "bands"):
