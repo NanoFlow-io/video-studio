@@ -1,0 +1,68 @@
+{
+ "version": 2,
+ "created": "2026-10-12T02:02:24+00:00",
+ "revision": null,
+ "brief_sha": "985c0b9142adf569",
+ "plan_sha": "8fda669ca9ba0d12",
+ "style": {
+  "template": "owner-explainer-field-notes-v1",
+  "style_sha": "a390fe1b65101e30",
+  "renderer_sha": "acb9f39099b059bd",
+  "planner_sha": "7fe98970d7e992df"
+ },
+ "versions": {
+  "schema": 2,
+  "planner": 4,
+  "validator": 3,
+  "renderer": 4
+ },
+ "studio_commit": "56fc06f",
+ "model_calls": [
+  {
+   "model": "claude-opus-5-5",
+   "input_tokens": 2,
+   "cache_read_input_tokens": 8544,
+   "cache_creation_input_tokens": 35016,
+   "output_tokens": 3581,
+   "equivalent_api_cost_usd": 0.35346479999999997,
+   "billing": "Claude Code login (subscription), not a metered API key",
+   "duration_ms": 29422
+  },
+  {
+   "model": "claude-opus-5-5",
+   "input_tokens": 2,
+   "cache_read_input_tokens": 8544,
+   "cache_creation_input_tokens": 31315,
+   "output_tokens": 2785,
+   "equivalent_api_cost_usd": 0.3079368,
+   "billing": "Claude Code login (subscription), not a metered API key",
+   "duration_ms": 20190
+  }
+ ],
+ "first_pass_problems": [
+  "chapter 2 event 4 (callout day): no free room next to day for a callout label; free a neighbouring cell or drop it"
+ ],
+ "plan_problems": [],
+ "status": "awaiting-approval",
+ "render": {
+  "cut": "vertical",
+  "size": "1080x1920",
+  "fps": 30,
+  "quality": "looks",
+  "timings": "dry, 2.6 words/s (silent)"
+ },
+ "migrated_from": 1,
+ "brief_unchanged": true,
+ "scene_problems": [],
+ "project_sha": "812a60764058fe6a",
+ "preview": "projects/fn-tn-cool-before-peak/fieldnotes/preview-v2.mp4",
+ "preview_sha": "90a5506262a050c7",
+ "duration": 16.306,
+ "changes_from": 1,
+ "changes": [
+  "format: schema 1 (stage diagram) replaced by schema 2 (illustrated cast); the old diagram was 'home_energy'",
+  "cast: house (house), ac (ac_unit), thermo (thermostat), day (timeline)",
+  "callout added: \"A little higher\"",
+  "length: about 17.406 s became about 16.306 s"
+ ]
+}

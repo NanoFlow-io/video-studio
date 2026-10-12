@@ -28,6 +28,7 @@ Each command prints one JSON object. Relay it in plain words; do not paste the J
    - Change: `revise <project> --quote <id> --change "<the person's words>"`.
    - Old plan: `migrate <project> --quote <id> --version <N>` (same approved brief, planned again under the
      current rules; the old version stays as it was).
+   - Stopped run (no preview), same brief: `replan <project> --quote <id>`.
    - Renderer-only fix: `rebuild <project>`. No model call; refuses a plan that needs migration.
    - Link again: `deliver <project> --version <N>`. Status of all versions: `status <project>`.
 4. **Report.** On `ok: true`, give:

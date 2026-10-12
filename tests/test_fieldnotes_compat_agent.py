@@ -58,6 +58,16 @@ class Compatibility(unittest.TestCase):
         self.assertEqual(fc.compatibility(DENTAL, BRIEF_DENTAL, {"status": "needs-answers"})["status"], "not-previewed")
 
 
+class LengthWithOtherProblems(unittest.TestCase):
+    def test_the_length_is_reported_together_with_other_problems(self):
+        """2026-10-12: a repair fixed a cramped label but ran 22 s for a 15 s brief, because the length was only
+        checked once everything else passed; one repair call now sees both."""
+        bad = copy.deepcopy(DENTAL); bad["chapters"][0]["emphasis"] = "neon"
+        p = "\n".join(fc.validate_plan(bad, BRIEF_DENTAL + " About 6 seconds."))
+        self.assertIn("emphasis must be", p)
+        self.assertIn("the brief asks for about 6 s", p)
+
+
 class SavedPlans(unittest.TestCase):
     """The real True North and dental plans in this repository, checked without writing anything."""
     def check(self, name):

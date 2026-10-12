@@ -318,9 +318,12 @@ def validate_plan(plan, brief):
     if not 12 <= total <= 90:
         out.append(f"narration is {total} words; keep it between 12 and 90")
     target = target_seconds(brief)
-    if target and not facts.get("narration_supplied") and chapters and not out:
-        est = estimated_seconds(compile_plan(plan, "check", "check"))
-        if not 0.8 * target <= est <= 1.2 * target:
+    if target and not facts.get("narration_supplied") and chapters:
+        try:   # also with other problems, so one repair call sees the length too (2026-10-12)
+            est = estimated_seconds(compile_plan(plan, "check", "check"))
+        except Exception:
+            est = None   # a plan too broken to compile; its other problems come first
+        if est and not 0.8 * target <= est <= 1.2 * target:
             want = max(10, round(total * target / est))
             out.append(f"the brief asks for about {target} s but this plan runs about {est} s; use about {want} words in total"
                        + (" or fewer events after the last word of a chapter" if est > target else ""))
@@ -676,6 +679,17 @@ def event_text(e, kinds):
     if do == "zoom": return f"{o} zooms its {e.get('msg')} into {e.get('to')} (the same message, enlarged)"
     if do == "remind": return f"{o} marks a {e.get('medium')} reminder {e.get('days_before')} days before"
     if do == "callout": return f"label on {o}: {_q(e.get('text', ''))}"
+    if do == "speed": return f"the {o} fan runs {e.get('speed')}"
+    if do == "cool": return f"cool air fills {o} ({e.get('level')})"
+    if do == "turn": return f"{o} turns {e.get('direction')}"
+    if do == "window": return f"{o} shows its price or time window"
+    if do == "activity": return f"activity bars appear on {o}"
+    if do == "shift_earlier": return f"the activity on {o} shifts earlier"
+    if do == "reduce": return f"the activity on {o} shrinks to {e.get('level')}"
+    if do == "playhead": return f"the marker on {o} moves through {'the window' if e.get('through') == 'window' else 'the time before it'}"
+    if do == "highlight": return f"step {e.get('step')} on {o} is highlighted ({e.get('tone')})"
+    if do in ("break", "fix") and o: return f"the link after step {e.get('step')} on {o} {'breaks' if do == 'break' else 'is fixed'}{lab}"
+    if do == "pulse" and o: return f"a pulse runs along {o}"
     if do == "connect": return f"{e.get('style', 'solid')} connection {e.get('id')} from {e.get('from')} to {e.get('to')}{lab}"
     if do in ("break", "fix") and not o: return f"connection {e.get('link')} {'breaks' if do == 'break' else 'is fixed'}{lab}"
     if do == "pulse" and not o: return f"a pulse travels along {e.get('link')}"
@@ -691,7 +705,7 @@ def storyboard(plan, version=None, duration=None):
     if plan_schema(plan) != 2:
         return "(this plan uses an older format; migrate it to get a storyboard)"
     kinds = {o["id"]: o["kind"] for o in plan.get("cast") or [] if o.get("id")}
-    head = f"**Storyboard{' v' + str(version) if version else ''}**" + (f" (about {duration} s, silent preview)" if duration else "")
+    head = f"**Storyboard{' v' + str(version) if version else ''}**" + (f" (about {round(float(duration), 1)} s, silent preview)" if duration else "")
     cast = "; ".join(f"{o['id']} = {o['kind']} {o.get('span')} at {o.get('slot')}" + (f", starts {o['state']}" if o.get("state") else "")
                      for o in plan.get("cast") or [])
     lines = [head, "", f"Cast: {cast}", ""]
@@ -761,7 +775,7 @@ def plan_changes(old, new, old_seconds=None, new_seconds=None):
         for t in [x for x in a if x not in b]: out.append(f"{what} dropped: {_q(t)}")
         for t in [x for x in b if x not in a]: out.append(f"{what} added: {_q(t)}")
     if old_seconds and new_seconds and abs(old_seconds - new_seconds) >= 0.3:
-        out.append(f"length: about {old_seconds} s became about {new_seconds} s")
+        out.append(f"length: about {round(old_seconds, 1)} s became about {round(new_seconds, 1)} s")
     return out or ["no visible changes"]
 
 

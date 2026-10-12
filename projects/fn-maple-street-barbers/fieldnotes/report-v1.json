@@ -1,0 +1,56 @@
+{
+ "version": 1,
+ "created": "2026-10-12T02:05:31+00:00",
+ "revision": null,
+ "brief_sha": "c3e5a3b63308fc5c",
+ "plan_sha": "262da3140783d5cf",
+ "style": {
+  "template": "owner-explainer-field-notes-v1",
+  "style_sha": "a390fe1b65101e30",
+  "renderer_sha": "acb9f39099b059bd",
+  "planner_sha": "c036b810c2320a9f"
+ },
+ "versions": {
+  "schema": 2,
+  "planner": 4,
+  "validator": 3,
+  "renderer": 4
+ },
+ "studio_commit": "56fc06f",
+ "model_calls": [
+  {
+   "model": "claude-opus-5-5",
+   "input_tokens": 2,
+   "cache_read_input_tokens": 8544,
+   "cache_creation_input_tokens": 28589,
+   "output_tokens": 5654,
+   "equivalent_api_cost_usd": 0.3435088,
+   "billing": "Claude Code login (subscription), not a metered API key",
+   "duration_ms": 52677
+  },
+  {
+   "model": "claude-opus-5-5",
+   "input_tokens": 2,
+   "cache_read_input_tokens": 8544,
+   "cache_creation_input_tokens": 35357,
+   "output_tokens": 2960,
+   "equivalent_api_cost_usd": 0.3437728,
+   "billing": "Claude Code login (subscription), not a metered API key",
+   "duration_ms": 25364
+  }
+ ],
+ "first_pass_problems": [
+  "connection c1 (cal to walkin): no clear room for its label 'Offer this chair time'; place the two objects further apart (leave a free cell between or beside them) or shorten the label"
+ ],
+ "plan_problems": [
+  "the brief asks for about 15 s but this plan runs about 22.2 s; use about 32 words in total or fewer events after the last word of a chapter"
+ ],
+ "status": "invalid-plan",
+ "render": {
+  "cut": "vertical",
+  "size": "1080x1920",
+  "fps": 30,
+  "quality": "looks",
+  "timings": "dry, 2.6 words/s (silent)"
+ }
+}

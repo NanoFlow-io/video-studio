@@ -1,0 +1,15 @@
+{
+ "name": "fn-maple-street-barbers",
+ "versions": [
+  {
+   "version": 1,
+   "created": "2026-10-12T02:05:31+00:00",
+   "status": "invalid-plan",
+   "revision": null,
+   "brief_sha": "c3e5a3b63308fc5c",
+   "plan_sha": "262da3140783d5cf",
+   "preview": null
+  }
+ ],
+ "current": 1
+}

@@ -5,6 +5,7 @@ A person talks to Nano in plain English; Nano runs ONE command per step and rela
     python -m studio.fieldnotes_agent quote   <new|revise|migrate|rebuild|deliver|status> [project]
     python -m studio.fieldnotes_agent new     <project> --quote ID [--title T] < brief.txt   (brief text on stdin)
     python -m studio.fieldnotes_agent revise  <project> --quote ID --change "make it shorter and end on ..."
+    python -m studio.fieldnotes_agent replan  <project> --quote ID              (plan the same brief again, e.g. after a stop)
     python -m studio.fieldnotes_agent migrate <project> --quote ID [--version N]
     python -m studio.fieldnotes_agent rebuild <project> [--version N]     (renderer-only fixes; no model call)
     python -m studio.fieldnotes_agent deliver <project> [--version N]     (review link again; no model call)
@@ -29,7 +30,7 @@ from .fieldnotes_compose import compile_plan, storyboard, compatibility
 REVIEW_ROOT = Path(os.environ.get("FIELDNOTES_REVIEW_ROOT", "/home/adam/video-studio"))   # the Studio the admin panel reads
 REVIEW_BASE = os.environ.get("FIELDNOTES_REVIEW_BASE", "https://techbots.io")
 PLATFORM_DIR = Path(os.environ.get("TECHBOTS_DIR", "/home/adam/techbots-platform"))
-MODEL_ACTIONS = {"new": (1, 2), "revise": (1, 2), "migrate": (1, 2)}
+MODEL_ACTIONS = {"new": (1, 2), "revise": (1, 2), "replan": (1, 2), "migrate": (1, 2)}
 NAME_OK = __import__("re").compile(r"^[a-z0-9][a-z0-9-]{1,39}$")
 MARKER = "review-of.json"
 
@@ -195,7 +196,7 @@ def status(project):
 
 def main(argv=None):
     ap = argparse.ArgumentParser(prog="fieldnotes_agent")
-    ap.add_argument("action", choices=["quote", "new", "revise", "migrate", "rebuild", "deliver", "status"])
+    ap.add_argument("action", choices=["quote", "new", "revise", "replan", "migrate", "rebuild", "deliver", "status"])
     ap.add_argument("project", nargs="?")
     ap.add_argument("extra", nargs="?", help="quote: the project")
     ap.add_argument("--quote", default=None)
@@ -227,6 +228,12 @@ def main(argv=None):
                 raise SystemExit(json.dumps({"ok": False, "error": "revise needs an existing project and --change in plain words"}))
             brief = (r.fn / f"brief-v{st['current']}.txt").read_text(encoding="utf-8")
             res = _result(a.project, fp.run_version(a.project, brief, revision=a.change.strip()), "revise")
+        elif a.action == "replan":
+            st = r.state()
+            if not st["versions"]:
+                raise SystemExit(json.dumps({"ok": False, "error": "nothing to plan again; use new"}))
+            brief = (r.fn / f"brief-v{st['current']}.txt").read_text(encoding="utf-8")
+            res = _result(a.project, fp.run_version(a.project, brief), "replan")
         elif a.action == "migrate":
             res = _result(a.project, fp.migrate(a.project, version=a.version), "migrate")
         elif a.action == "rebuild":

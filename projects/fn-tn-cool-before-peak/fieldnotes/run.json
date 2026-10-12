@@ -9,7 +9,16 @@
    "brief_sha": "985c0b9142adf569",
    "plan_sha": "901ccbd60efca87c",
    "preview": "projects/fn-tn-cool-before-peak/fieldnotes/preview-v1.mp4"
+  },
+  {
+   "version": 2,
+   "created": "2026-10-12T02:02:24+00:00",
+   "status": "awaiting-approval",
+   "revision": null,
+   "brief_sha": "985c0b9142adf569",
+   "plan_sha": "8fda669ca9ba0d12",
+   "preview": "projects/fn-tn-cool-before-peak/fieldnotes/preview-v2.mp4"
   }
  ],
- "current": 1
+ "current": 2
 }

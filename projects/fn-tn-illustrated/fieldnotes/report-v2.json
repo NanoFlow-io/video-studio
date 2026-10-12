@@ -1,0 +1,54 @@
+{
+ "version": 2,
+ "created": "2026-10-12T01:59:24+00:00",
+ "revision": null,
+ "brief_sha": "985c0b9142adf569",
+ "plan_sha": "a7d9f21c3ceea222",
+ "style": {
+  "template": "owner-explainer-field-notes-v1",
+  "style_sha": "a390fe1b65101e30",
+  "renderer_sha": "acb9f39099b059bd",
+  "planner_sha": "d672140202c6549a"
+ },
+ "versions": {
+  "schema": 2,
+  "planner": 4,
+  "validator": 3,
+  "renderer": 4
+ },
+ "studio_commit": "56fc06f",
+ "model_calls": [
+  {
+   "model": "claude-opus-5-5",
+   "input_tokens": 2,
+   "cache_read_input_tokens": 8544,
+   "cache_creation_input_tokens": 30820,
+   "output_tokens": 2620,
+   "equivalent_api_cost_usd": 0.3006768,
+   "billing": "Claude Code login (subscription), not a metered API key",
+   "duration_ms": 20780
+  }
+ ],
+ "first_pass_problems": [],
+ "plan_problems": [],
+ "status": "awaiting-approval",
+ "render": {
+  "cut": "vertical",
+  "size": "1080x1920",
+  "fps": 30,
+  "quality": "looks",
+  "timings": "dry, 2.6 words/s (silent)"
+ },
+ "migrated_from": 1,
+ "brief_unchanged": true,
+ "scene_problems": [],
+ "project_sha": "a75027ce06f406a5",
+ "preview": "projects/fn-tn-illustrated/fieldnotes/preview-v2.mp4",
+ "preview_sha": "b9478e8e952394ff",
+ "duration": 16.396,
+ "changes_from": 1,
+ "changes": [
+  "cast: stat moved or changed (slot r2c1 to r1c3)",
+  "cast: ac moved or changed (slot r1c3 to r2c3)"
+ ]
+}
