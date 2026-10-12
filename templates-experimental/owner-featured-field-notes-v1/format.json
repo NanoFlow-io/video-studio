@@ -1,0 +1,23 @@
+{
+ "format": "owner-featured-field-notes-v1",
+ "name": "Owner Featured: Field Notes v1",
+ "status": "draft for review (2026-10-12); no paid assets made",
+ "extends": "owner-explainer-field-notes-v1 (part 3 is an accepted narrated Field Notes render, reused byte for byte)",
+ "aspect": "9:16, 1080x1920, 30 fps",
+ "pace": "owner talking to a customer: brisk, conversational; Dim voice speed 1.12 (as the accepted animation)",
+ "parts": [
+  {"part": 1, "role": "customer_problem", "changeable": true,
+   "visual": "realistic customer-problem footage (Higgsfield keyframe, reviewed, then Kling animation from it)",
+   "audio": "owner voiceover (ElevenLabs, owner voice contract)", "length": "set by footage hold and voiceover, not a fixed clip length"},
+  {"part": 2, "role": "owner_intro", "changeable": true,
+   "visual": "owner talking head (Argil look of the owner's actor; same look as the close)", "audio": "owner voice (ElevenLabs), lip-synced by Argil"},
+  {"part": 3, "role": "explainer", "changeable": true,
+   "source": "an accepted narrated Field Notes render (project + sha256), reused unchanged including its audio"},
+  {"part": 4, "role": "business_close", "changeable": false, "selectable": true,
+   "source": "a saved, versioned business close asset (clip, audio, overlay layout, final frame); reused, never regenerated per reel"}
+ ],
+ "tenant_fields": ["owner name, voice contract, Argil actor + look", "logo file + sha256", "business name", "contact number (verified)"],
+ "rules": ["no invented branding, vehicles or contact details", "no readable invented bills, amounts or customer details",
+           "close: logo + business name across the top clear of the face, number large and high-contrast beneath, both persistent to the last frame, about 2 s hold after speech, no fade to black",
+           "every paid item quoted and approved before generation; retakes only on request"]
+}
