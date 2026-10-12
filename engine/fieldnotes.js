@@ -193,7 +193,8 @@ FN_KINDS.thermostat = function(o, ctx){ var d = o.def, k = FN.col, ink = k.ink, 
   var hand = sv("g", { transform: "rotate(" + (o.st.angle || d.angle || -30) + ")" }, g);
   sv("line", { x1: 0, y1: 0, x2: 0, y2: -(r - 24), stroke: k.ochre, "stroke-width": 6, "stroke-linecap": "round" }, hand);
   sv("circle", { cx: 0, cy: 0, r: 7, fill: ink }, g);
-  var chev = sv("path", { d: "M-14,10 L0,-6 L14,10", fill: "none", stroke: k.ochre, "stroke-width": 7, "stroke-linecap": "round", "stroke-linejoin": "round", transform: "translate(" + (r + 26) + "," + (-r * 0.35) + ")", "data-skip": 1 }, g);
+  var cpos = sv("g", { transform: "translate(" + (r + 26) + "," + (-r * 0.35) + ")", "data-skip": 1 }, g);   /* position here, gsap moves the path */
+  var chev = sv("path", { d: "M-14,10 L0,-6 L14,10", fill: "none", stroke: k.ochre, "stroke-width": 7, "stroke-linecap": "round", "stroke-linejoin": "round" }, cpos);
   gsap.set(chev, { autoAlpha: 0 });
   if(o.st.angle == null) o.st.angle = d.angle == null ? -30 : d.angle;
   return { root: G.root,
@@ -279,6 +280,196 @@ FN_KINDS.flow = function(o, ctx){ var d = o.def, k = FN.col, ink = k.ink, x = d.
       gsap.set(dot, { autoAlpha: 0 }); tl.set(dot, { autoAlpha: 1 }, t);
       fnAttrTween(dot, "cy", String, Y(from.i) + bh / 2, Y(to.i) + bh / 2, t, a.dur || 1.2, "power1.inOut");
       tl.to(dot, { autoAlpha: 0, duration: 0.2 }, t + (a.dur || 1.2)); } }; };
+
+/* ---------- illustration primitives (2026-10-12): each fits its layout box (cx, cy, bw, bh) and has named states ---------- */
+function fnBox(o, ctx, natW, natH){ var d = o.def, s = Math.min(d.bw / natW, d.bh / natH);
+  var G = fnG(ctx.svg, d.cx, d.cy, s); return { root: G.root, g: G.g, s: s }; }
+function fnSwap(t, on, off){ if(off) tl.to(off, { autoAlpha: 0, duration: 0.25 }, t); if(on) tl.fromTo(on, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.3, ease: "power1.out" }, t + 0.1); }
+
+FN_KINDS.person = function(o, ctx){ var k = FN.col, ink = k.ink, B = fnBox(o, ctx, 190, 250), g = B.g;
+  var solid = sv("g", {}, g), ghost = sv("g", { "data-skip": 1 }, g), smile = sv("path", { d: "M-14,-50 Q0,-38 14,-50", fill: "none", stroke: ink, "stroke-width": 4, "stroke-linecap": "round", "data-skip": 1 }, g);
+  sv("path", { d: "M-74,118 L-74,68 C-74,18 -42,-8 0,-8 C42,-8 74,18 74,68 L74,118 Z", fill: k.blue, stroke: ink, "stroke-width": 4, "stroke-linejoin": "round" }, solid);
+  sv("circle", { cx: 0, cy: -62, r: 40, fill: k.annex, stroke: ink, "stroke-width": 4 }, solid);
+  sv("path", { d: "M-74,118 L-74,68 C-74,18 -42,-8 0,-8 C42,-8 74,18 74,68 L74,118", fill: "none", stroke: k.ochre, "stroke-width": 4, "stroke-dasharray": "10 9" }, ghost);
+  sv("circle", { cx: 0, cy: -62, r: 40, fill: "none", stroke: k.ochre, "stroke-width": 4, "stroke-dasharray": "10 9" }, ghost);
+  var st = o.st.state || o.def.state || "present"; o.st.state = st;
+  gsap.set(solid, { autoAlpha: st === "away" ? 0 : 1 }); gsap.set(ghost, { autoAlpha: st === "away" ? 1 : 0 }); gsap.set(smile, { autoAlpha: st === "happy" ? 1 : 0 });
+  return { root: B.root,
+    state: function(t, a){ var to = a.state;
+      if(to === "away"){ fnSwap(t, ghost, solid); tl.to(smile, { autoAlpha: 0, duration: 0.2 }, t); }
+      else { fnSwap(t, solid, ghost); tl.to(smile, { autoAlpha: to === "happy" ? 1 : 0, duration: 0.25 }, t + 0.2); }
+      o.st.state = to; } }; };
+
+FN_KINDS.chair = function(o, ctx){ var k = FN.col, ink = k.ink, B = fnBox(o, ctx, 270, 250), g = B.g;
+  sv("ellipse", { cx: 0, cy: 112, rx: 92, ry: 12, fill: k.ground }, g);
+  sv("rect", { x: -14, y: 54, width: 28, height: 56, fill: k.inkSoft, stroke: ink, "stroke-width": 3 }, g);
+  sv("path", { d: "M-118,40 L70,40 L70,62 L-110,62 Z", fill: k.blue, stroke: ink, "stroke-width": 4, "stroke-linejoin": "round" }, g);
+  sv("path", { d: "M60,40 L92,-92 L124,-86 L98,46 Z", fill: k.blue, stroke: ink, "stroke-width": 4, "stroke-linejoin": "round" }, g);
+  sv("rect", { x: 84, y: -122, width: 44, height: 28, rx: 10, fill: k.blue, stroke: ink, "stroke-width": 4 }, g);
+  sv("path", { d: "M-40,22 L30,22", fill: "none", stroke: ink, "stroke-width": 6, "stroke-linecap": "round" }, g);
+  var who = sv("g", { "data-skip": 1 }, g), ghost = sv("g", { "data-skip": 1 }, g);
+  var body = "M78,-60 C60,-20 50,10 30,36 L-96,36 L-100,22 C-60,14 -10,10 10,-10 C26,-30 40,-66 56,-78 Z";
+  sv("path", { d: body, fill: k.sageTint, stroke: ink, "stroke-width": 4, "stroke-linejoin": "round" }, who);
+  sv("circle", { cx: 84, cy: -98, r: 26, fill: k.annex, stroke: ink, "stroke-width": 4 }, who);
+  sv("path", { d: body, fill: "none", stroke: k.ochre, "stroke-width": 4, "stroke-dasharray": "10 9" }, ghost);
+  sv("circle", { cx: 84, cy: -98, r: 26, fill: "none", stroke: k.ochre, "stroke-width": 4, "stroke-dasharray": "10 9" }, ghost);
+  var st = o.st.state || o.def.state || "empty"; o.st.state = st;
+  gsap.set(who, { autoAlpha: st === "occupied" ? 1 : 0 }); gsap.set(ghost, { autoAlpha: st === "empty" ? 1 : 0 });
+  return { root: B.root,
+    state: function(t, a){ if(a.state === "occupied") fnSwap(t, who, ghost); else fnSwap(t, ghost, who); o.st.state = a.state; } }; };
+
+FN_KINDS.calendar = function(o, ctx){ var k = FN.col, ink = k.ink, B = fnBox(o, ctx, 300, 260), g = B.g;
+  var cols = 5, cw = 50, gap = 6, x0 = -((cols * cw + (cols - 1) * gap) / 2), y0 = -50, ap = { r: 1, c: 4 };
+  sv("rect", { x: -150, y: -116, width: 300, height: 236, rx: 14, fill: k.card, stroke: ink, "stroke-width": 4 }, g);
+  sv("path", { d: "M-150,-70 L-150,-102 Q-150,-116 -136,-116 L136,-116 Q150,-116 150,-102 L150,-70 Z", fill: ink }, g);
+  [-90, 90].forEach(function(x){ sv("rect", { x: x - 6, y: -132, width: 12, height: 30, rx: 6, fill: k.paper, stroke: ink, "stroke-width": 3 }, g); });
+  var cell = function(r, c){ return { x: x0 + c * (cw + gap), y: y0 + r * (cw + gap) }; };
+  for(var r = 0; r < 3; r++) for(var c = 0; c < cols; c++){ var p = cell(r, c);
+    sv("rect", { x: p.x, y: p.y, width: cw, height: cw, rx: 6, fill: k.paper, stroke: k.inkSoft, "stroke-width": 2, "data-fade": 1 }, g); }
+  var A = cell(ap.r, ap.c), mk2 = function(fill, stroke, dash){ return sv("rect", { x: A.x, y: A.y, width: cw, height: cw, rx: 6, fill: fill, stroke: stroke, "stroke-width": 4, "stroke-dasharray": dash || "none", "data-skip": 1 }, g); };
+  var states = { booked: mk2(k.blue, ink), empty: mk2(k.paper, k.ochre, "8 7"), rebooked: mk2(k.sageTint, k.sage) };
+  var check = sv("path", { d: "M" + (A.x + 13) + "," + (A.y + 26) + " L" + (A.x + 22) + "," + (A.y + 35) + " L" + (A.x + 38) + "," + (A.y + 16), fill: "none", stroke: k.sage, "stroke-width": 5, "stroke-linecap": "round", "stroke-linejoin": "round", "data-skip": 1 }, g);
+  var cross = sv("path", { d: "M" + (A.x + 16) + "," + (A.y + 16) + " L" + (A.x + 34) + "," + (A.y + 34) + " M" + (A.x + 34) + "," + (A.y + 16) + " L" + (A.x + 16) + "," + (A.y + 34), stroke: k.ochre, "stroke-width": 5, "stroke-linecap": "round", "data-skip": 1 }, g);
+  var rem = sv("g", { "data-skip": 1 }, g);
+  var st = o.st.state || o.def.state || "booked"; o.st.state = st;
+  var show = function(name){ Object.keys(states).forEach(function(n){ gsap.set(states[n], { autoAlpha: n === name ? 1 : 0 }); });
+    gsap.set(check, { autoAlpha: name === "rebooked" ? 1 : 0 }); gsap.set(cross, { autoAlpha: name === "empty" ? 1 : 0 }); };
+  show(st);
+  var drawRem = function(days, medium){ while(rem.firstChild) rem.removeChild(rem.firstChild);
+    var R = cell(ap.r, ap.c - days), cx1 = R.x + cw / 2, cx2 = A.x + cw / 2, top = y0 + ap.r * (cw + gap) - 6;
+    sv("rect", { x: R.x, y: R.y, width: cw, height: cw, rx: 6, fill: medium === "email" ? k.track : k.blue, stroke: ink, "stroke-width": 3 }, rem);
+    if(medium === "email") sv("path", { d: "M" + (R.x + 12) + "," + (R.y + 16) + " h26 v18 h-26 Z M" + (R.x + 12) + "," + (R.y + 16) + " l13,10 l13,-10", fill: "none", stroke: ink, "stroke-width": 2.5, "stroke-linejoin": "round" }, rem);
+    else sv("path", { d: "M" + (R.x + 11) + "," + (R.y + 14) + " h28 v16 h-16 l-7,7 v-7 h-5 Z", fill: k.wall, stroke: ink, "stroke-width": 2.5, "stroke-linejoin": "round" }, rem);
+    var arc = sv("path", { d: "M" + cx1 + "," + top + " Q" + ((cx1 + cx2) / 2) + "," + (top - 44) + " " + cx2 + "," + top, fill: "none", stroke: k.ochre, "stroke-width": 4, "stroke-dasharray": "8 6" }, rem);
+    sv("path", { d: "M" + (cx2 - 9) + "," + (top - 12) + " L" + cx2 + "," + top + " L" + (cx2 + 8) + "," + (top - 13), fill: "none", stroke: k.ochre, "stroke-width": 4, "stroke-linecap": "round" }, rem);
+    return arc; };
+  if(o.st.remind) drawRem(o.st.remind.days, o.st.remind.medium); else gsap.set(rem, { autoAlpha: 0 });
+  return { root: B.root,
+    state: function(t, a){ var to = a.state, from = o.st.state;
+      tl.to([states[from], check, cross], { autoAlpha: 0, duration: 0.2 }, t);
+      tl.fromTo(states[to], { autoAlpha: 0, scale: 0.7, transformOrigin: "50% 50%" }, { autoAlpha: 1, scale: 1, duration: 0.35, ease: "back.out(1.6)" }, t + 0.15);
+      if(to === "rebooked") tl.fromTo(check, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.25 }, t + 0.4);
+      if(to === "empty") tl.fromTo(cross, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.25 }, t + 0.4);
+      o.st.state = to; },
+    remind: function(t, a){ var days = Math.max(1, Math.min(3, a.days_before || 1)), arc = drawRem(days, a.medium || "text");
+      tl.set(rem, { autoAlpha: 1 }, t); gsap.set(rem.firstChild, { opacity: 0 }); tl.to(rem.firstChild, { opacity: 1, duration: 0.3 }, t);
+      var len = Math.ceil(arc.getTotalLength()) + 2; gsap.set(arc, { strokeDasharray: len + " " + len, strokeDashoffset: len });
+      tl.to(arc, { strokeDashoffset: 0, duration: 0.6, ease: "power2.inOut" }, t + 0.25);
+      tl.set(arc, { strokeDasharray: "8 6", strokeDashoffset: 0 }, t + 0.9);
+      o.st.remind = { days: days, medium: a.medium || "text" }; } }; };
+
+/* phone: messages in order (email notification, the business's text, the customer's reply); the screen clips and
+   scrolls like a real one. "bury" stacks other notifications above the messages so they sink out of sight. */
+FN_KINDS.phone = function(o, ctx){ var k = FN.col, ink = k.ink, B = fnBox(o, ctx, 200, 380), g = B.g, st = o.st, cid = "fnc" + (++FN.uid);
+  sv("rect", { x: -92, y: -182, width: 184, height: 364, rx: 30, fill: ink }, g);
+  sv("rect", { x: -78, y: -160, width: 156, height: 318, rx: 14, fill: k.wall }, g);
+  sv("rect", { x: -24, y: -174, width: 48, height: 6, rx: 3, fill: k.inkSoft }, g);
+  var cp = sv("clipPath", { id: cid }, ctx.defs); sv("rect", { x: -78, y: -160, width: 156, height: 318, rx: 14 }, cp);
+  var area = sv("g", { "clip-path": "url(#" + cid + ")", "data-skip": 1 }, g), inner = sv("g", {}, area);
+  st.msgs = st.msgs || []; st.scroll = st.scroll || 0;
+  var TOP = -150, BOTTOM = 150;
+  var wrap = function(text, n, max){ var out = [], line = ""; String(text).split(/\s+/).forEach(function(w){ if((line + " " + w).trim().length > n){ if(line) out.push(line); line = w; } else line = (line + " " + w).trim(); }); if(line) out.push(line); return out.slice(0, max); };
+  var rowH = function(m){ return m.type === "email" ? 70 : 28 + 22 * wrap(m.text, 13, 3).length; };
+  /* each row: an outer group positioned by attribute (scroll and bury move it) and an inner one gsap animates */
+  var build = function(m){ var pos = sv("g", {}, inner), r = sv("g", {}, pos), h = rowH(m); r.pos = pos;
+    if(m.type === "email"){ sv("rect", { x: -68, y: 0, width: 136, height: h - 8, rx: 8, fill: k.card, stroke: k.inkSoft, "stroke-width": 2 }, r);
+      sv("path", { d: "M-58,12 h26 v19 h-26 Z M-58,12 l13,10 l13,-10", fill: "none", stroke: ink, "stroke-width": 2.5, "stroke-linejoin": "round" }, r);
+      wrap(m.text || "Email", 11, 2).forEach(function(l, i){ fnText(r, -24, 24 + i * 18, l, { size: 14, ls: "0", upper: false, fill: ink, weight: 700 }); }); }
+    else { var me = m.type === "reply", bx = me ? -50 : -68;
+      sv("rect", { x: bx, y: 0, width: 118, height: h - 8, rx: 12, fill: me ? k.sageTint : k.blue, stroke: ink, "stroke-width": 2.5 }, r);
+      wrap(m.text, 13, 3).forEach(function(l, i){ fnText(r, bx + 10, 24 + i * 22, l, { size: 16, ls: "0", upper: false, fill: ink, weight: 700 }); }); }
+    return r; };
+  var fillers = function(y){ var f = sv("g", { transform: "translate(0," + y + ")" }, inner); for(var i = 0; i < 3; i++){ sv("rect", { x: -68, y: i * 46, width: 136, height: 38, rx: 8, fill: k.track }, f); sv("rect", { x: -56, y: i * 46 + 14, width: 60, height: 6, rx: 3, fill: k.paper }, f); } return f; };
+  var FH = 3 * 46 + 4, rows = [], y = TOP;
+  if(st.buried){ fillers(TOP); y += FH; }
+  st.msgs.forEach(function(m){ var r = build(m); r.pos.setAttribute("transform", "translate(0," + y + ")"); if(m.faded) gsap.set(r, { opacity: 0.38 }); rows.push({ el: r, y: y }); y += rowH(m); });
+  inner.setAttribute("transform", "translate(0," + (-st.scroll) + ")");
+  var scrollTo = function(bottom, t){ var want = Math.max(0, bottom - BOTTOM);
+    if(want !== st.scroll){ fnAttrTween(inner, "transform", function(v){ return "translate(0," + (-v).toFixed(1) + ")"; }, st.scroll, want, t, 0.45, "power2.inOut"); st.scroll = want; } };
+  return { root: B.root,
+    message: function(t, a){ var m = { type: a.type || "text", text: a.text || "" }, r = build(m);
+      r.pos.setAttribute("transform", "translate(0," + y + ")"); gsap.set(r, { autoAlpha: 0 });
+      scrollTo(y + rowH(m), t);
+      tl.fromTo(r, { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: 0.35, ease: "power2.out" }, t + 0.15);
+      st.msgs.push(m); rows.push({ el: r, y: y }); y += rowH(m); },
+    bury: function(t){ var f = fillers(TOP); gsap.set(f, { autoAlpha: 0 });
+      tl.fromTo(f, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.4 }, t);
+      rows.forEach(function(rw){ var y1 = rw.y + FH;
+        fnAttrTween(rw.el.pos, "transform", function(v){ return "translate(0," + v.toFixed(1) + ")"; }, rw.y, y1, t, 0.45, "power2.inOut");
+        tl.to(rw.el, { opacity: 0.38, duration: 0.4 }, t + 0.2); rw.y = y1; });
+      y += FH; st.buried = true; st.msgs.forEach(function(m){ m.faded = true; }); } }; };
+
+FN_KINDS.envelope = function(o, ctx){ var k = FN.col, ink = k.ink, B = fnBox(o, ctx, 220, 160), g = B.g;
+  var body = sv("g", {}, g);
+  sv("rect", { x: -96, y: -62, width: 192, height: 126, rx: 8, fill: k.card, stroke: ink, "stroke-width": 4 }, body);
+  var flap = sv("path", { d: "M-96,-62 L0,12 L96,-62", fill: "none", stroke: ink, "stroke-width": 4, "stroke-linejoin": "round" }, body);
+  var open = sv("path", { d: "M-96,-62 L0,-128 L96,-62", fill: k.card, stroke: ink, "stroke-width": 4, "stroke-linejoin": "round", "data-skip": 1 }, g);
+  var dot = sv("circle", { cx: 92, cy: -62, r: 16, fill: k.ochre, stroke: ink, "stroke-width": 3, "data-skip": 1 }, g);
+  var st = o.st.state || o.def.state || "sent"; o.st.state = st;
+  var apply = function(to, t){ var op = to === "missed" ? 0.35 : 1;
+    if(t == null){ gsap.set(body, { opacity: op }); gsap.set(dot, { autoAlpha: to === "unread" ? 1 : 0 }); gsap.set(open, { autoAlpha: to === "opened" ? 1 : 0 }); return; }
+    tl.to(body, { opacity: op, duration: 0.4 }, t); tl.to(dot, { autoAlpha: to === "unread" ? 1 : 0, duration: 0.25 }, t); tl.to(open, { autoAlpha: to === "opened" ? 1 : 0, duration: 0.3 }, t); };
+  apply(st);
+  return { root: B.root, state: function(t, a){ apply(a.state, t); o.st.state = a.state; } }; };
+
+FN_KINDS.building = function(o, ctx){ var k = FN.col, ink = k.ink, B = fnBox(o, ctx, 280, 260), g = B.g;
+  sv("line", { x1: -140, y1: 110, x2: 140, y2: 110, stroke: ink, "stroke-width": 4, "stroke-linecap": "round" }, g);
+  sv("rect", { x: -112, y: -40, width: 224, height: 150, fill: k.wall, stroke: ink, "stroke-width": 4 }, g);
+  for(var i = 0; i < 7; i++) sv("rect", { x: -126 + i * 36, y: -78, width: 36, height: 38, fill: i % 2 ? k.paper : k.ochre, stroke: ink, "stroke-width": 3 }, g);
+  sv("rect", { x: -78, y: -128, width: 156, height: 42, rx: 6, fill: ink }, g);
+  if(o.def.sign) fnText(g, 0, -100, o.def.sign, { anchor: "middle", size: 18, fill: "#fff" });
+  sv("rect", { x: -26, y: 30, width: 52, height: 80, fill: k.ochre, stroke: ink, "stroke-width": 4 }, g);
+  [-92, 48].forEach(function(x){ sv("rect", { x: x, y: -16, width: 44, height: 40, fill: k.blue, stroke: ink, "stroke-width": 4 }, g); });
+  return { root: B.root }; };
+
+/* link: an arrow between two objects (points from the compiler); mark it broken or ok with a short label; pulse along it */
+FN_KINDS.link = function(o, ctx){ var d = o.def, k = FN.col, ink = k.ink, a = d.from, b = d.to;
+  var mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2, dx = b[0] - a[0], dy = b[1] - a[1], len = Math.sqrt(dx * dx + dy * dy) || 1;
+  var cx = mx - dy / len * len * (d.bend == null ? 0.18 : d.bend), cy = my + dx / len * len * (d.bend == null ? 0.18 : d.bend);
+  var path = "M" + a[0] + "," + a[1] + " Q" + cx.toFixed(1) + "," + cy.toFixed(1) + " " + b[0] + "," + b[1];
+  var root = sv("g", {}, ctx.svg), id = "fnm" + (++FN.uid);
+  var m = sv("mask", { id: id, maskUnits: "userSpaceOnUse", x: 0, y: 0, width: W, height: H }, ctx.defs);
+  var mp = sv("path", { d: path, fill: "none", stroke: "#fff", "stroke-width": 16, "stroke-linecap": "round" }, m);
+  var line = sv("path", { d: path, fill: "none", stroke: d.style === "dashed" ? k.blueStroke : ink, "stroke-width": 5, "stroke-linecap": "round", "stroke-dasharray": d.style === "dashed" ? "14 11" : "none", mask: "url(#" + id + ")", "data-skip": 1 }, root);
+  var mid = { x: 0.25 * a[0] + 0.5 * cx + 0.25 * b[0], y: 0.25 * a[1] + 0.5 * cy + 0.25 * b[1] };
+  var ang = Math.atan2(b[1] - cy, b[0] - cx) * 180 / Math.PI;
+  var head = sv("path", { d: "M-16,-11 L0,0 L-16,11", fill: "none", stroke: d.style === "dashed" ? k.blueStroke : ink, "stroke-width": 5, "stroke-linecap": "round", "stroke-linejoin": "round", transform: "translate(" + b[0] + "," + b[1] + ") rotate(" + ang.toFixed(1) + ")", "data-skip": 1 }, root);
+  var bad = sv("g", { "data-skip": 1 }, root), good = sv("g", { "data-skip": 1 }, root);
+  sv("circle", { cx: mid.x, cy: mid.y, r: 20, fill: k.ochre, stroke: ink, "stroke-width": 3 }, bad);
+  sv("path", { d: "M" + (mid.x - 8) + "," + (mid.y - 8) + " L" + (mid.x + 8) + "," + (mid.y + 8) + " M" + (mid.x + 8) + "," + (mid.y - 8) + " L" + (mid.x - 8) + "," + (mid.y + 8), stroke: "#fff", "stroke-width": 4, "stroke-linecap": "round" }, bad);
+  sv("circle", { cx: mid.x, cy: mid.y, r: 20, fill: k.sage, stroke: ink, "stroke-width": 3 }, good);
+  sv("path", { d: "M" + (mid.x - 9) + "," + mid.y + " L" + (mid.x - 2) + "," + (mid.y + 7) + " L" + (mid.x + 10) + "," + (mid.y - 7), fill: "none", stroke: "#fff", "stroke-width": 4, "stroke-linecap": "round", "stroke-linejoin": "round" }, good);
+  var st = o.st, tag = mk(ctx.html, "div", "fn-tag", esc(st.label || d.label || ""), "background:" + (st.mark === "ok" ? k.sage : k.ochre));
+  /* label beside the midpoint, or centred above it for a mostly horizontal link */
+  var above = d.labelSide === "above", lx = above ? mid.x : mid.x + (d.labelSide === "left" ? -30 : 30), ly = above ? mid.y - 34 : mid.y;
+  var place = function(el){ gsap.set(el, { x: lx, y: ly, xPercent: above ? -50 : d.labelSide === "left" ? -100 : 0, yPercent: above ? -100 : -50 }); };
+  place(tag);
+  gsap.set(bad, { autoAlpha: st.mark === "broken" ? 1 : 0 }); gsap.set(good, { autoAlpha: st.mark === "ok" ? 1 : 0 });
+  gsap.set(tag, { autoAlpha: (st.drawn && (st.label || d.label)) ? 1 : 0 });
+  if(st.mark === "broken") gsap.set(line, { attr: { stroke: k.ochre, "stroke-dasharray": "10 9" } });
+  if(st.mark === "ok") gsap.set(line, { attr: { stroke: k.sage, "stroke-dasharray": "none" } });
+  return { root: root, html: null,
+    draw: function(t, a){ tl.set(root, { autoAlpha: 1 }, t); var L = Math.ceil(mp.getTotalLength()) + 2;
+      gsap.set(mp, { strokeDasharray: L + " " + L, strokeDashoffset: L }); tl.to(mp, { strokeDashoffset: 0, duration: a.dur || 0.6, ease: "power2.inOut" }, t);
+      gsap.set(head, { opacity: 0 }); tl.to(head, { opacity: 1, duration: 0.2 }, t + (a.dur || 0.6) * 0.85);
+      if(d.label){ tl.fromTo(tag, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.3 }, t + 0.4); st.label = d.label; }
+      st.drawn = true; },
+    mark: function(t, a){ var ok = a.state === "ok", on = ok ? good : bad, off = ok ? bad : good;
+      tl.to(off, { autoAlpha: 0, duration: 0.15 }, t);
+      tl.to(line, { attr: { stroke: ok ? k.sage : k.ochre }, duration: 0.25 }, t); tl.set(line, { attr: { "stroke-dasharray": ok ? "none" : "10 9" } }, t);
+      tl.to(head, { attr: { stroke: ok ? k.sage : k.ochre }, duration: 0.25 }, t);
+      tl.fromTo(on, { autoAlpha: 0, scale: 0.6, transformOrigin: "50% 50%" }, { autoAlpha: 1, scale: 1, duration: 0.3, ease: "back.out(1.6)" }, t + 0.1);
+      if(a.label){ tl.to(tag, { autoAlpha: 0, duration: 0.15 }, t);
+        var nt = mk(ctx.html, "div", "fn-tag", esc(a.label), "background:" + (ok ? k.sage : k.ochre));
+        place(nt); gsap.set(nt, { autoAlpha: 0 });
+        tl.to(nt, { autoAlpha: 1, duration: 0.3 }, t + 0.25); }
+      st.mark = ok ? "ok" : "broken"; st.label = a.label || st.label; },
+    pulse: function(t, a){ var dot = sv("circle", { cx: 0, cy: 0, r: 12, fill: k.blueStroke, stroke: ink, "stroke-width": 3 }, root);
+      var p = sv("path", { d: path, fill: "none", stroke: "none" }, root), L = p.getTotalLength(), q = { v: 0 }, dd = a.dur || 1.2;
+      var s0 = p.getPointAtLength(0); dot.setAttribute("cx", s0.x); dot.setAttribute("cy", s0.y);
+      gsap.set(dot, { autoAlpha: 0 }); tl.set(dot, { autoAlpha: 1 }, t);
+      tl.fromTo(q, { v: 0 }, { v: 1, duration: dd, ease: "power1.inOut", onUpdate: function(){ var pt = p.getPointAtLength(q.v * L); dot.setAttribute("cx", pt.x.toFixed(1)); dot.setAttribute("cy", pt.y.toFixed(1)); } }, t);
+      tl.to(dot, { autoAlpha: 0, duration: 0.2 }, t + dd); } }; };
 
 /* html kinds (text wraps and sizes itself): callout leader in the svg, label / tag / note / card as html */
 function fnPlace(el, x, y, align){ gsap.set(el, { x: x, y: y, xPercent: align === "right" ? -100 : align === "center" ? -50 : 0, yPercent: -50 }); }

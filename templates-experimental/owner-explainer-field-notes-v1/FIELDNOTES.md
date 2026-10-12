@@ -31,16 +31,37 @@ scene, so every other project's page is byte-identical (checked against all 16 l
    `fieldnotes replan <project> <brief.txt>`. `fieldnotes rebuild <project>` re-renders the saved plan with no model call
    (the same plan gives byte-identical scene data). `fieldnotes status <project>` lists the versions.
 
-How it works: one headless model call (studio/fieldnotes_prompt.md, Claude Code on this server's login, no tools,
-throwaway directory) returns a small plan: facts, chapters, narration, and a diagram stage with events from a fixed
-vocabulary. `studio/fieldnotes_plan.py` validates it (one repair call with the problems if needed), then compiles it into
-this page's scene data, choosing every position, cue word and timing itself. The model never writes scene data or code,
-and nothing in a brief is executed. Each version keeps `brief-v<N>.txt`, `plan-v<N>.json`, `report-v<N>.json` (style,
-renderer and planner hashes, Studio commit, model usage, validation results, render settings) and `preview-v<N>.mp4`.
+How it works (composition planner, 2026-10-12): the Field Notes layout and look are fixed; the brief decides the
+illustrations. One headless model call (studio/fieldnotes_prompt.md, Claude Code on this server's login, no tools,
+throwaway directory) returns a composition plan:
 
-Diagram stages today: `home_energy` (house, outdoor AC, day timeline with a price window, thermostat, gauge) and
-`process_flow` (3 to 5 numbered steps with links that break and get fixed, a pulse, highlights). A story that needs
-anything else (maps, networks, cutaways, bar comparisons) is reported as a gap until that stage exists.
+- `cast`: 3 to 5 concrete illustrated objects from the primitive catalogue (`PRIMS` in studio/fieldnotes_compose.py),
+  each placed on a 3 x 3 layout grid (`slot` r1c1..r3c3, `span` such as 2x2 for the objects that carry the story);
+- per chapter, `events` timed to narration words: draw, state changes (chair empty or occupied, calendar booked, empty
+  or rebooked), messages on a phone, burying notifications, reminders on a calendar, connections between objects that
+  break and get fixed, pulses, callouts, a qualitative gauge, notes and the closing checklist;
+- `missing_primitives`: anything the story needs that the catalogue lacks. Essential ones stop the run and are reported;
+  non-essential ones are recorded with the stand-in used.
+
+`studio/fieldnotes_compose.py` validates the plan (facts and questions; primitives, spans, grid overlap, room for each
+callout; draw-before-change; every verb, state and parameter against the catalogue; claims; text fit; cue words;
+duration), one repair call fixes any problems, then it compiles positions, connection paths, label placement and timings
+itself. The model never writes scene data or code, and nothing in a brief is executed. Each version keeps
+`brief-v<N>.txt`, `plan-v<N>.json`, `report-v<N>.json` (style, renderer and planner hashes, Studio commit, model usage,
+first-pass and final validation, render settings) and `preview-v<N>.mp4`.
+
+### The primitive catalogue
+
+person (present, away as a dashed outline, happy); chair (an appointment chair, empty or occupied); calendar (an
+appointment day booked, empty or rebooked, and a reminder sent N days before); phone (email notification, the
+business's text, the customer's reply, burying notifications; the screen scrolls); envelope (sent, unread, missed,
+opened); building (premises with a sign); house (cooling fills it); ac_unit (fan speed); thermostat (turn up or down);
+timeline (a time or price window, activity that shifts earlier or shrinks, a moving marker); steps (an abstract numbered
+chain, only when nothing concrete can show the mechanism); plus connections, callouts, a gauge, notes and a checklist.
+
+To add a primitive: draw it in `engine/fieldnotes.js` as a `FN_KINDS.<name>` that fits its layout box (cx, cy, bw, bh)
+with its states and verbs, register its verbs in `studio/beats.py` `FN_KINDS`, and describe it in `PRIMS`. The prompt's
+catalogue, the validator and the compiler pick it up from `PRIMS`; no story is hard-coded anywhere.
 
 ## Manual planning (when writing scene data by hand)
 
@@ -95,8 +116,8 @@ the real words, then `render` (local) or `render-remote`.
 ## Remaining gaps
 
 - The prompt workflow is a local command; no Studio UI or agent API route yet.
-- Two planner stages (home energy, process flow). Other stories need new kinds and stages (map, network, cutaway, bar
-  comparison); the planner reports them as gaps rather than substituting a picture.
+- Eleven primitives so far. Stories needing others (a map, a vehicle, a tooth, a cutaway, a bar comparison) are reported as
+  missing primitives rather than drawn with an unrelated picture.
 - No dark or olive full-screen chapter card yet (only the bands wipe).
 - Not wired into the platform (agent API, wizard, Studio UI); local projects and the CLI only.
 - No owner footage, avatar or CTA sections; this renders section 3 only.

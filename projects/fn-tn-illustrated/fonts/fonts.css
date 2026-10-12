@@ -1,0 +1,5 @@
+/* Substitutes for the reference's faces (not confirmed matches); all SIL Open Font License, from Google Fonts 2026-10-11. */
+@font-face{font-family:'Inter Tight';font-style:normal;font-weight:100 900;font-display:block;src:url(inter-tight-variable.woff2) format('woff2')}
+@font-face{font-family:'Inter';font-style:normal;font-weight:100 900;font-display:block;src:url(inter-variable.woff2) format('woff2')}
+@font-face{font-family:'Instrument Serif';font-style:normal;font-weight:400;font-display:block;src:url(instrument-serif-400-normal.woff2) format('woff2')}
+@font-face{font-family:'Instrument Serif';font-style:italic;font-weight:400;font-display:block;src:url(instrument-serif-400-italic.woff2) format('woff2')}

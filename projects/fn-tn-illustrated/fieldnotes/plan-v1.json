@@ -1,0 +1,218 @@
+{
+ "facts": {
+  "business": "True North",
+  "business_type": "Local HVAC company",
+  "audience": "Orange County residents on time-of-use electricity plans",
+  "problem": "Home AC runs during the peak-price window on the timeline",
+  "cause": "Cooling activity overlaps the expensive peak hours on a time-of-use plan",
+  "solution": "Pre-cool the home before the peak window, then raise the thermostat slightly during peak hours",
+  "outcome": "Some cooling shifts away from expensive hours; check your plan's peak times",
+  "narration_supplied": true
+ },
+ "questions": [],
+ "missing_primitives": [],
+ "narration_draft": false,
+ "cast": [
+  {
+   "id": "house",
+   "kind": "house",
+   "slot": "r1c1",
+   "span": "2x1"
+  },
+  {
+   "id": "ac",
+   "kind": "ac_unit",
+   "slot": "r1c3",
+   "span": "1x1"
+  },
+  {
+   "id": "stat",
+   "kind": "thermostat",
+   "slot": "r2c1",
+   "span": "1x1"
+  },
+  {
+   "id": "day",
+   "kind": "timeline",
+   "slot": "r3c1",
+   "span": "3x1",
+   "params": {
+    "window_label": "PEAK PRICE",
+    "left": "Earlier",
+    "right": "Later"
+   }
+  }
+ ],
+ "chapters": [
+  {
+   "chapter": "THE PROBLEM",
+   "kicker": "TRUE NORTH HVAC",
+   "headline": [
+    "AC running in",
+    "the peak window"
+   ],
+   "emphasis": "ochre",
+   "emphasis_on": "plan",
+   "narration": "On a time-of-use plan?",
+   "events": [
+    {
+     "on": "start",
+     "do": "draw",
+     "obj": "house"
+    },
+    {
+     "on": "start",
+     "do": "draw",
+     "obj": "ac"
+    },
+    {
+     "on": "start",
+     "do": "draw",
+     "obj": "day"
+    },
+    {
+     "on": "start",
+     "do": "window",
+     "obj": "day"
+    },
+    {
+     "on": "start",
+     "do": "speed",
+     "obj": "ac",
+     "speed": "high"
+    },
+    {
+     "on": "plan",
+     "do": "activity",
+     "obj": "day"
+    },
+    {
+     "on": "plan",
+     "do": "playhead",
+     "obj": "day",
+     "through": "window"
+    },
+    {
+     "on": "plan",
+     "do": "gauge",
+     "label": "Cooling during peak",
+     "level": "high"
+    }
+   ]
+  },
+  {
+   "chapter": "THE CHANGE",
+   "kicker": "BEFORE THE PEAK WINDOW",
+   "headline": [
+    "Cool the house",
+    "before peak"
+   ],
+   "emphasis": "blue",
+   "emphasis_on": "before",
+   "narration": "Cool your home before peak rates,",
+   "events": [
+    {
+     "on": "Cool",
+     "do": "connect",
+     "id": "c1",
+     "from": "ac",
+     "to": "house",
+     "style": "solid",
+     "label": "Pre-cooling"
+    },
+    {
+     "on": "home",
+     "do": "cool",
+     "obj": "house",
+     "level": "full"
+    },
+    {
+     "on": "before",
+     "do": "shift_earlier",
+     "obj": "day"
+    },
+    {
+     "on": "before",
+     "do": "playhead",
+     "obj": "day",
+     "through": "before"
+    }
+   ]
+  },
+  {
+   "chapter": "THE FIX",
+   "kicker": "DURING PEAK HOURS",
+   "headline": [
+    "Nudge it up,",
+    "run less at peak"
+   ],
+   "emphasis": "sage",
+   "emphasis_on": "raise",
+   "narration": "then raise the thermostat a little. That can shift some cooling away from expensive hours. Check your plan's peak times.",
+   "events": [
+    {
+     "on": "start",
+     "do": "draw",
+     "obj": "stat"
+    },
+    {
+     "on": "raise",
+     "do": "turn",
+     "obj": "stat",
+     "direction": "up"
+    },
+    {
+     "on": "little",
+     "do": "speed",
+     "obj": "ac",
+     "speed": "low"
+    },
+    {
+     "on": "shift",
+     "do": "reduce",
+     "obj": "day",
+     "level": "low"
+    },
+    {
+     "on": "expensive",
+     "do": "playhead",
+     "obj": "day",
+     "through": "window"
+    },
+    {
+     "on": "hours",
+     "do": "gauge",
+     "label": "Cooling during peak",
+     "level": "low"
+    },
+    {
+     "on": "Check",
+     "do": "callout",
+     "obj": "stat",
+     "text": "Check your rate plan"
+    },
+    {
+     "on": "Check",
+     "do": "checklist",
+     "text": "Check your rate plan"
+    }
+   ]
+  }
+ ],
+ "checks": [
+  "Narration used word for word, split in order across three chapters",
+  "Every fact comes from the brief: no rates, times of day, numbers, savings or guarantees",
+  "No digits and no forbidden words (save, guarantee, always, never, best, lowest)",
+  "Only house, AC unit, thermostat and timeline are used; no underground cutaway or shield",
+  "Four objects: house (2x1) and timeline (3x1) are large, AC and thermostat are 1x1",
+  "No overlaps: house r1c1-r1c2, AC r1c3, thermostat r2c1, timeline r3c1-r3c3",
+  "Thermostat callout has free neighbouring cell r2c2",
+  "AC sits next to the house so the pre-cooling link is short",
+  "Every object is drawn before it is changed or connected; thermostat is drawn at start of chapter three",
+  "Each event word appears in that chapter's narration",
+  "Text limits: labels <=14, kickers <=28, headline lines <=20, callout and link labels <=22, gauge <=30, checklist <=34",
+  "No em or en dashes",
+  "Chapter order: problem (peak overlap), change (pre-cooling, shift earlier), fix and outcome (thermostat up, less peak activity, check plan)"
+ ],
+ "supplied_narration": "On a time-of-use plan? Cool your home before peak rates, then raise the thermostat a little. That can shift some cooling away from expensive hours. Check your plan's peak times."
+}

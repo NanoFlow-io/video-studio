@@ -1,0 +1,254 @@
+{
+ "facts": {
+  "business": "Harbor Lane Dental",
+  "business_type": "small family dental practice",
+  "audience": "busy parents who book check-ups for their kids",
+  "problem": "appointments get missed and the chair sits empty",
+  "cause": "the only reminder is an email sent the evening before, which many parents don't see until it is too late to rearrange (from the practice's front-desk notes)",
+  "solution": "a text reminder two days ahead that patients can reply to, to confirm or reschedule",
+  "outcome": "when someone can't make it, they can tell the practice early, so the slot can be offered to another patient",
+  "narration_supplied": false
+ },
+ "questions": [],
+ "missing_primitives": [],
+ "narration_draft": true,
+ "cast": [
+  {
+   "id": "chair",
+   "kind": "chair",
+   "slot": "r1c1",
+   "span": "1x1",
+   "state": "occupied"
+  },
+  {
+   "id": "phone",
+   "kind": "phone",
+   "slot": "r1c3",
+   "span": "1x2"
+  },
+  {
+   "id": "other",
+   "kind": "person",
+   "slot": "r2c1",
+   "span": "1x1",
+   "state": "present"
+  },
+  {
+   "id": "cal",
+   "kind": "calendar",
+   "slot": "r2c2",
+   "span": "1x1",
+   "state": "booked"
+  },
+  {
+   "id": "clinic",
+   "kind": "building",
+   "slot": "r3c1",
+   "span": "1x1",
+   "sign": "Harbor Lane"
+  },
+  {
+   "id": "parent",
+   "kind": "person",
+   "slot": "r3c3",
+   "span": "1x1",
+   "state": "present"
+  }
+ ],
+ "chapters": [
+  {
+   "chapter": "THE PROBLEM",
+   "kicker": "HARBOR LANE DENTAL",
+   "headline": [
+    "Booked check-ups",
+    "end in empty chairs"
+   ],
+   "emphasis": "ochre",
+   "emphasis_on": "missed",
+   "narration": "Appointments get missed and the chair sits empty.",
+   "events": [
+    {
+     "on": "start",
+     "do": "draw",
+     "obj": "clinic"
+    },
+    {
+     "on": "start",
+     "do": "draw",
+     "obj": "cal"
+    },
+    {
+     "on": "start",
+     "do": "draw",
+     "obj": "parent"
+    },
+    {
+     "on": "start",
+     "do": "draw",
+     "obj": "chair"
+    },
+    {
+     "on": "missed",
+     "do": "state",
+     "obj": "parent",
+     "state": "away"
+    },
+    {
+     "on": "missed",
+     "do": "state",
+     "obj": "cal",
+     "state": "empty"
+    },
+    {
+     "on": "chair",
+     "do": "state",
+     "obj": "chair",
+     "state": "empty"
+    },
+    {
+     "on": "sits",
+     "do": "callout",
+     "obj": "chair",
+     "text": "Nobody in the chair"
+    }
+   ]
+  },
+  {
+   "chapter": "THE CAUSE",
+   "kicker": "THE EVENING EMAIL",
+   "headline": [
+    "One email,",
+    "seen too late"
+   ],
+   "emphasis": "blue",
+   "emphasis_on": "evening",
+   "narration": "Our only reminder: an email the evening before, seen too late.",
+   "events": [
+    {
+     "on": "start",
+     "do": "draw",
+     "obj": "phone"
+    },
+    {
+     "on": "only",
+     "do": "remind",
+     "obj": "cal",
+     "days_before": 1,
+     "medium": "email"
+    },
+    {
+     "on": "email",
+     "do": "message",
+     "obj": "phone",
+     "type": "email",
+     "text": "Reminder: check-up tomorrow"
+    },
+    {
+     "on": "evening",
+     "do": "bury",
+     "obj": "phone"
+    },
+    {
+     "on": "seen",
+     "do": "connect",
+     "id": "c1",
+     "from": "phone",
+     "to": "parent",
+     "style": "dashed",
+     "label": "Seen too late"
+    }
+   ]
+  },
+  {
+   "chapter": "THE FIX",
+   "kicker": "TEXT AHEAD, REPLY EARLY",
+   "headline": [
+    "A text two days out",
+    "they can reply to"
+   ],
+   "emphasis": "sage",
+   "emphasis_on": "Reply",
+   "narration": "Now a text comes two days ahead. Reply early, and the slot goes to another patient.",
+   "events": [
+    {
+     "on": "text",
+     "do": "remind",
+     "obj": "cal",
+     "days_before": 2,
+     "medium": "text"
+    },
+    {
+     "on": "comes",
+     "do": "message",
+     "obj": "phone",
+     "type": "text",
+     "text": "Reply to confirm or reschedule"
+    },
+    {
+     "on": "Reply",
+     "do": "state",
+     "obj": "parent",
+     "state": "present"
+    },
+    {
+     "on": "Reply",
+     "do": "message",
+     "obj": "phone",
+     "type": "reply",
+     "text": "Sorry, we can't make it"
+    },
+    {
+     "on": "slot",
+     "do": "fix",
+     "link": "c1",
+     "label": "Told in time"
+    },
+    {
+     "on": "goes",
+     "do": "draw",
+     "obj": "other"
+    },
+    {
+     "on": "another",
+     "do": "state",
+     "obj": "chair",
+     "state": "occupied"
+    },
+    {
+     "on": "another",
+     "do": "state",
+     "obj": "cal",
+     "state": "rebooked"
+    },
+    {
+     "on": "another",
+     "do": "state",
+     "obj": "other",
+     "state": "happy"
+    },
+    {
+     "on": "another",
+     "do": "checklist",
+     "text": "Text reminder two days ahead"
+    }
+   ]
+  }
+ ],
+ "checks": [
+  "All facts come only from the brief. No prices, rates, times of day, statistics or quotes were invented.",
+  "No digits in any on-screen text or narration. 'two days' is written as words. The days_before values (1 and 2) are parameters taken from the brief.",
+  "No forbidden words (guarantee, always, never, best, lowest, save).",
+  "No em or en dashes anywhere.",
+  "All essential facts are present, so there are no questions.",
+  "No narration was supplied, so I drafted it (narration_draft true) in the owner's voice, close to the 30-word target.",
+  "Show, don't label: the abstract steps diagram is not used. Concrete objects carry the story.",
+  "Fix applied: the chair moved to r1c1 (row 1), and the cell to its right, r1c2, is now free for the 'Nobody in the chair' callout. r3c2 is also free.",
+  "Grid has no overlaps: chair r1c1, phone r1c3 to r2c3, other patient r2c1, calendar r2c2, building r3c1, parent r3c3. Free cells: r1c2 and r3c2.",
+  "Objects that interact sit next to each other: the other patient is right under the chair they take, the calendar is beside the phone, and the parent is under the phone, so c1 is short.",
+  "Every 'on' word is copied exactly from its chapter's narration.",
+  "Each object is drawn before it is changed or connected. c1 is created in THE CAUSE before it is fixed in THE FIX.",
+  "Text limits are met: labels 11, 9, 7; kickers 18, 17, 23; headline lines at most 19; callout 19; connection labels 13 and 12; messages 27, 30, 23; checklist 28; sign 11.",
+  "The chapters run problem, cause, then fix and outcome. The emphasis colours are ochre, blue and sage, and each emphasis_on word appears in its chapter's narration."
+ ],
+ "brief": null
+}

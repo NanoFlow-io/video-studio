@@ -1,0 +1,53 @@
+{
+ "version": 1,
+ "created": "2026-10-12T01:03:15+00:00",
+ "revision": null,
+ "brief_sha": "a328695a0759afbc",
+ "plan_sha": "85c5598bca2941f2",
+ "style": {
+  "template": "owner-explainer-field-notes-v1",
+  "style_sha": "a390fe1b65101e30",
+  "renderer_sha": "f2f6fb7f3b729cf1",
+  "planner_sha": "b036f5eaad39f1d3"
+ },
+ "studio_commit": "a280b4f",
+ "model_calls": [
+  {
+   "model": "claude-opus-5-5",
+   "input_tokens": 2,
+   "cache_read_input_tokens": 8544,
+   "cache_creation_input_tokens": 28153,
+   "output_tokens": 6235,
+   "equivalent_api_cost_usd": 0.3516408,
+   "billing": "Claude Code login (subscription), not a metered API key",
+   "duration_ms": 58502
+  },
+  {
+   "model": "claude-opus-5-5",
+   "input_tokens": 2,
+   "cache_read_input_tokens": 8544,
+   "cache_creation_input_tokens": 30507,
+   "output_tokens": 3214,
+   "equivalent_api_cost_usd": 0.3100528,
+   "billing": "Claude Code login (subscription), not a metered API key",
+   "duration_ms": 24857
+  }
+ ],
+ "first_pass_problems": [
+  "chapter 1 event 8 (callout chair): no free room next to chair for a callout label; free a neighbouring cell or drop it"
+ ],
+ "plan_problems": [],
+ "status": "awaiting-approval",
+ "render": {
+  "cut": "vertical",
+  "size": "1080x1920",
+  "fps": 30,
+  "quality": "looks",
+  "timings": "dry, 2.6 words/s (silent)"
+ },
+ "scene_problems": [],
+ "project_sha": "fb4970a1e0ef850a",
+ "preview": "projects/fn-dental-illustrated/fieldnotes/preview-v1.mp4",
+ "preview_sha": "f639f2a089fce0a4",
+ "duration": 17.448
+}

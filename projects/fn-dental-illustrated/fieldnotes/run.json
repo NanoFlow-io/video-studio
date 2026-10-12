@@ -1,0 +1,24 @@
+{
+ "name": "fn-dental-illustrated",
+ "versions": [
+  {
+   "version": 1,
+   "created": "2026-10-12T01:03:15+00:00",
+   "status": "awaiting-approval",
+   "revision": null,
+   "brief_sha": "a328695a0759afbc",
+   "plan_sha": "85c5598bca2941f2",
+   "preview": "projects/fn-dental-illustrated/fieldnotes/preview-v1.mp4"
+  },
+  {
+   "version": 2,
+   "created": "2026-10-12T01:06:57+00:00",
+   "status": "awaiting-approval",
+   "revision": null,
+   "brief_sha": "a328695a0759afbc",
+   "plan_sha": "52713677582eb1cc",
+   "preview": "projects/fn-dental-illustrated/fieldnotes/preview-v2.mp4"
+  }
+ ],
+ "current": 2
+}

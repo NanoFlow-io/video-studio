@@ -1,0 +1,53 @@
+{
+ "version": 2,
+ "created": "2026-10-12T01:06:57+00:00",
+ "revision": null,
+ "brief_sha": "a328695a0759afbc",
+ "plan_sha": "52713677582eb1cc",
+ "style": {
+  "template": "owner-explainer-field-notes-v1",
+  "style_sha": "a390fe1b65101e30",
+  "renderer_sha": "f2f6fb7f3b729cf1",
+  "planner_sha": "a0b53469d625094f"
+ },
+ "studio_commit": "a280b4f",
+ "model_calls": [
+  {
+   "model": "claude-opus-5-5",
+   "input_tokens": 2,
+   "cache_read_input_tokens": 8544,
+   "cache_creation_input_tokens": 28298,
+   "output_tokens": 5707,
+   "equivalent_api_cost_usd": 0.3422408,
+   "billing": "Claude Code login (subscription), not a metered API key",
+   "duration_ms": 53946
+  },
+  {
+   "model": "claude-opus-5-5",
+   "input_tokens": 2,
+   "cache_read_input_tokens": 8544,
+   "cache_creation_input_tokens": 30512,
+   "output_tokens": 3682,
+   "equivalent_api_cost_usd": 0.3194528,
+   "billing": "Claude Code login (subscription), not a metered API key",
+   "duration_ms": 31074
+  }
+ ],
+ "first_pass_problems": [
+  "the brief asks for about 15 s but this plan runs about 20.3 s; use about 29 words in total or fewer events after the last word of a chapter"
+ ],
+ "plan_problems": [],
+ "status": "awaiting-approval",
+ "render": {
+  "cut": "vertical",
+  "size": "1080x1920",
+  "fps": 30,
+  "quality": "looks",
+  "timings": "dry, 2.6 words/s (silent)"
+ },
+ "scene_problems": [],
+ "project_sha": "2d53e6d34da2b07e",
+ "preview": "projects/fn-dental-illustrated/fieldnotes/preview-v2.mp4",
+ "preview_sha": "b1bd409b73a9b46a",
+ "duration": 16.301
+}

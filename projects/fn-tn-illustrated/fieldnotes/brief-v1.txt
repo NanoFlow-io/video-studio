@@ -1,0 +1,14 @@
+TRUE NORTH: COOL BEFORE PEAK
+Business: True North, a local HVAC company.
+Audience: Orange County residents on time-of-use electricity plans.
+Duration: approximately 15 seconds, vertical 1080x1920.
+
+Beat 1: House and outdoor AC unit. Show AC activity overlapping an ochre peak-price window on a timeline.
+Beat 2: Show pre-cooling before the peak window. Blue cooling fills the house; move some cooling activity earlier along the timeline.
+Beat 3: Raise the thermostat setting slightly during peak hours and illustrate reduced AC activity then. Label: "Check your rate plan."
+
+Use the same house, AC unit and timeline consistently. Do not reuse the unrelated underground cutaway or protection shield.
+No invented rates, universal peak times, numerical savings or guarantees of lower total electricity use.
+
+NARRATION TIMING SCRIPT
+"On a time-of-use plan? Cool your home before peak rates, then raise the thermostat a little. That can shift some cooling away from expensive hours. Check your plan's peak times."

@@ -1,0 +1,223 @@
+{
+ "facts": {
+  "business": "Harbor Lane Dental",
+  "business_type": "small family dental practice",
+  "audience": "busy parents who book check-ups for their kids",
+  "problem": "appointments get missed and the chair sits empty",
+  "cause": "the only reminder is an email sent the evening before, which many parents don't see until it is too late to rearrange (from the practice's own front-desk notes)",
+  "solution": "a text reminder two days ahead that patients can reply to, to confirm or reschedule",
+  "outcome": "when someone can't make it, they can tell the practice early, so the slot can be offered to another patient",
+  "narration_supplied": false
+ },
+ "questions": [],
+ "missing_primitives": [],
+ "narration_draft": true,
+ "cast": [
+  {
+   "id": "chair",
+   "kind": "chair",
+   "slot": "r1c1",
+   "span": "2x2",
+   "state": "empty"
+  },
+  {
+   "id": "phone",
+   "kind": "phone",
+   "slot": "r1c3",
+   "span": "1x2"
+  },
+  {
+   "id": "cal",
+   "kind": "calendar",
+   "slot": "r3c1",
+   "span": "2x1",
+   "state": "booked"
+  },
+  {
+   "id": "parent",
+   "kind": "person",
+   "slot": "r3c3",
+   "span": "1x1",
+   "state": "present"
+  }
+ ],
+ "chapters": [
+  {
+   "chapter": "THE PROBLEM",
+   "kicker": "HARBOR LANE DENTAL",
+   "headline": [
+    "Booked check-ups,",
+    "empty chairs"
+   ],
+   "emphasis": "ochre",
+   "emphasis_on": "empty",
+   "narration": "Check-ups get missed. Chairs sit empty.",
+   "events": [
+    {
+     "on": "start",
+     "do": "draw",
+     "obj": "cal"
+    },
+    {
+     "on": "start",
+     "do": "draw",
+     "obj": "parent"
+    },
+    {
+     "on": "missed",
+     "do": "state",
+     "obj": "cal",
+     "state": "empty"
+    },
+    {
+     "on": "missed",
+     "do": "state",
+     "obj": "parent",
+     "state": "away"
+    },
+    {
+     "on": "Chairs",
+     "do": "draw",
+     "obj": "chair"
+    },
+    {
+     "on": "empty",
+     "do": "callout",
+     "obj": "chair",
+     "text": "Nobody in the chair"
+    }
+   ]
+  },
+  {
+   "chapter": "THE CAUSE",
+   "kicker": "THE EVENING BEFORE",
+   "headline": [
+    "One evening email,",
+    "seen late"
+   ],
+   "emphasis": "blue",
+   "emphasis_on": "late",
+   "narration": "Our only reminder: an evening email, seen late.",
+   "events": [
+    {
+     "on": "start",
+     "do": "draw",
+     "obj": "phone"
+    },
+    {
+     "on": "reminder",
+     "do": "remind",
+     "obj": "cal",
+     "days_before": 1,
+     "medium": "email"
+    },
+    {
+     "on": "email",
+     "do": "message",
+     "obj": "phone",
+     "type": "email",
+     "text": "Reminder: check-up tomorrow"
+    },
+    {
+     "on": "email",
+     "do": "connect",
+     "id": "c1",
+     "from": "phone",
+     "to": "parent",
+     "style": "dashed",
+     "label": "Evening email"
+    },
+    {
+     "on": "seen",
+     "do": "bury",
+     "obj": "phone"
+    },
+    {
+     "on": "late",
+     "do": "break",
+     "link": "c1",
+     "label": "Seen too late"
+    }
+   ]
+  },
+  {
+   "chapter": "THE FIX",
+   "kicker": "TWO DAYS AHEAD",
+   "headline": [
+    "Text early,",
+    "reply to reschedule"
+   ],
+   "emphasis": "sage",
+   "emphasis_on": "Reply",
+   "narration": "We now text two days ahead. Reply to reschedule, so we can offer the slot.",
+   "events": [
+    {
+     "on": "text",
+     "do": "message",
+     "obj": "phone",
+     "type": "text",
+     "text": "Harbor Lane: check-up in two days"
+    },
+    {
+     "on": "ahead",
+     "do": "remind",
+     "obj": "cal",
+     "days_before": 2,
+     "medium": "text"
+    },
+    {
+     "on": "ahead",
+     "do": "fix",
+     "link": "c1",
+     "label": "Text two days ahead"
+    },
+    {
+     "on": "Reply",
+     "do": "message",
+     "obj": "phone",
+     "type": "reply",
+     "text": "Can't make it. Please reschedule"
+    },
+    {
+     "on": "Reply",
+     "do": "state",
+     "obj": "parent",
+     "state": "happy"
+    },
+    {
+     "on": "offer",
+     "do": "state",
+     "obj": "cal",
+     "state": "rebooked"
+    },
+    {
+     "on": "offer",
+     "do": "checklist",
+     "text": "Text two days ahead to confirm"
+    },
+    {
+     "on": "slot",
+     "do": "state",
+     "obj": "chair",
+     "state": "occupied"
+    }
+   ]
+  }
+ ],
+ "checks": [
+  "Every fact comes from the brief. I added no prices, rates, statistics, guarantees or quotes.",
+  "No digits appear in on-screen text or narration. days_before 1 and 2 are compiler settings for 'evening before' and 'two days ahead', and they are never shown as text.",
+  "No forbidden words (guarantee, always, never, best, lowest, save) and no em or en dashes.",
+  "All six essential facts are present, so there are no questions.",
+  "Duration fix: the narration is now 29 words (6 + 8 + 15), down from 37. The pulse event is gone. Only one event (the chair becoming occupied) falls on the last word, 'slot', and nothing comes after it.",
+  "'Confirm' is kept in the checklist text and 'reschedule' in the narration and reply message, so the whole solution is still shown.",
+  "There are 4 objects. The chair (2x2), calendar (2x1) and phone (1x2) are large. The parent is 1x1. No overlaps: chair r1-2 c1-2, phone r1-2 c3, calendar r3 c1-2, parent r3c3.",
+  "The only callout is on the chair, which sits in row 1.",
+  "The phone-to-parent link is short (c3, vertically adjacent). The calendar remind arrow shows the reminder moving from the evening before to two days ahead.",
+  "Every object is drawn before it is changed or connected. c1 is created before it is broken or fixed.",
+  "Every 'on' word appears exactly in its chapter's narration: missed, Chairs, empty, reminder, email, seen, late, text, ahead, Reply, offer, slot. Each emphasis_on word (empty, late, Reply) is in its narration.",
+  "Text lengths are within limits: kickers up to 18 characters, headline lines up to 19, callout 19, link labels up to 19, messages up to 33, checklist 30.",
+  "Outcome: the narration keeps the brief's hedge ('so we can offer the slot'). The calendar's rebooked check and the filled chair show the freed slot going to another patient."
+ ],
+ "brief": null
+}

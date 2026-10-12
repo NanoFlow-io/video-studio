@@ -1,0 +1,41 @@
+{
+ "version": 1,
+ "created": "2026-10-12T01:09:06+00:00",
+ "revision": null,
+ "brief_sha": "985c0b9142adf569",
+ "plan_sha": "89262c7a71de83df",
+ "style": {
+  "template": "owner-explainer-field-notes-v1",
+  "style_sha": "a390fe1b65101e30",
+  "renderer_sha": "f2f6fb7f3b729cf1",
+  "planner_sha": "a0b53469d625094f"
+ },
+ "studio_commit": "a280b4f",
+ "model_calls": [
+  {
+   "model": "claude-opus-5-5",
+   "input_tokens": 2,
+   "cache_read_input_tokens": 8544,
+   "cache_creation_input_tokens": 32973,
+   "output_tokens": 3771,
+   "equivalent_api_cost_usd": 0.3409208,
+   "billing": "Claude Code login (subscription), not a metered API key",
+   "duration_ms": 32909
+  }
+ ],
+ "first_pass_problems": [],
+ "plan_problems": [],
+ "status": "awaiting-approval",
+ "render": {
+  "cut": "vertical",
+  "size": "1080x1920",
+  "fps": 30,
+  "quality": "looks",
+  "timings": "dry, 2.6 words/s (silent)"
+ },
+ "scene_problems": [],
+ "project_sha": "030c400b0052ccb5",
+ "preview": "projects/fn-tn-illustrated/fieldnotes/preview-v1.mp4",
+ "preview_sha": "d6b8afe7a26869f8",
+ "duration": 16.646
+}

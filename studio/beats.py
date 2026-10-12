@@ -54,7 +54,10 @@ def headline_problems(sid, h, layout):
 # field-notes scene data (engine/fieldnotes.js). Kinds and the actions each accepts; "draw", "show" and "hide" work on any
 # object, and timeline parts ("timeline.peak") take show / hide / seg; the playhead also takes playhead.
 FN_KINDS = {"house": {"fill"}, "ac_unit": {"run"}, "timeline": {"seg", "playhead"}, "gauge": {"set"},
-            "thermostat": {"turn"}, "arrow": {"flow"}, "callout": set(), "note": set(), "card": set(), "flow": {"pulse"}}
+            "thermostat": {"turn"}, "arrow": {"flow"}, "callout": set(), "note": set(), "card": set(), "flow": {"pulse"},
+            # illustration primitives (2026-10-12)
+            "person": {"state"}, "chair": {"state"}, "calendar": {"state", "remind"}, "phone": {"message", "bury"},
+            "envelope": {"state"}, "building": set(), "link": {"mark", "pulse"}}
 # kinds with named parts ("timeline.peak", "flow.l2") and the actions a part takes
 FN_PART_VERBS = {"timeline": {"show", "hide", "seg", "playhead"}, "flow": {"show", "hide", "highlight", "mark"}}
 FN_LOCAL = {"callout", "note", "card"}
