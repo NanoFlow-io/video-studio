@@ -24,7 +24,8 @@
    "part": 3,
    "role": "field_notes_explanation",
    "changeable": true,
-   "source": "an accepted narrated Field Notes render (project + sha256), reused unchanged with its audio, or a new one made with the fieldnotes workflow first"
+   "default": "NEW topic-specific Field Notes story and animation for every reel (fieldnotes workflow: brief -> validated storyboard -> silent preview -> owner narration), same Field Notes visual style",
+   "optional_variant": "reuse an earlier accepted narrated Field Notes render unchanged, only when the person explicitly asks for it"
   },
   {
    "part": 4,
@@ -70,5 +71,12 @@
   "sha256": "1172023909e9bb0fe1c64bd65332212a6428ca705ea1430a17504e728b4f7c4f",
   "review": "projects/tn-summer-bill-shock-v4-music",
   "approved": "Bob, 2026-10-12, including the music balance"
- }
+ },
+ "reuse_default": [
+  "Field Notes visual style",
+  "approved owner look",
+  "approved owner voice",
+  "approved business close",
+  "approved music bed and treatment"
+ ]
 }

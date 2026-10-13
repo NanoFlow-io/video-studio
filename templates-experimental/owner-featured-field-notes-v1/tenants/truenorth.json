@@ -13,7 +13,8 @@
    "style": 0.35,
    "speed": 1.12
   },
-  "source": "techbots-truenorth content-engine/reel-builder/approved-assets/truenorth/voice-contract.json (+ speed 1.12, brisk)"
+  "source": "techbots-truenorth content-engine/reel-builder/approved-assets/truenorth/voice-contract.json (+ speed 1.12, brisk)",
+  "contract_file": "/home/adam/techbots-data/video-studio/voices/truenorth-dmitriy.json"
  },
  "argil": {
   "actor": "Dimitry",

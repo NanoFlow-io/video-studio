@@ -11,6 +11,11 @@ Title: Thermostat Wars
 3. Field Notes explainer: reuse project tn-oc-precool-peak-v4-voiced
 4. Close: standard
 '''
+FRESH = '''Make an Owner Featured reel for truenorth: Filter Day.
+1. Customer reaction: a homeowner pulls out a grey, clogged AC filter and winces. Owner voiceover: "When did you last check your filter?"
+2. Owner intro: "A clogged filter makes your system work harder."
+3. Explainer: problem, a clogged return filter; cause, it restricts airflow; fix, check it monthly in summer and replace it when it looks grey; outcome, the system can run more easily.
+'''
 
 
 class Draft(unittest.TestCase):
@@ -23,10 +28,25 @@ class Draft(unittest.TestCase):
             self.assertEqual(p["music"]["bed_gain_db"], -14)
             self.assertTrue(p["parts"][3]["reuse"]["sha256_ok"] and p["music"]["sha256_ok"])
             self.assertEqual(p["parts"][2]["reuse"]["project"], "tn-oc-precool-peak-v4-voiced")
-            self.assertEqual(p["quote"]["higgsfield_credits"], 10.75)
+            self.assertEqual(p["quote"]["prepaid_usage"]["higgsfield_credits"], 10.75)
+            self.assertEqual(p["quote"]["variant"], "reused middle (optional variant)")
             self.assertEqual(p["problems"], [])
             self.assertTrue(Path(d, "tn-thermostat-wars", "draft.json").exists())
             self.assertTrue(any("time-stretch" in r for r in p["rules"]))
+
+    def test_a_new_field_notes_middle_is_the_default(self):
+        with tempfile.TemporaryDirectory() as d:
+            p = of.draft("truenorth", "tn-filter-day", FRESH, work=d)
+            self.assertEqual(p["problems"], [])
+            self.assertEqual(p["title"], "Filter Day")
+            self.assertIsNone(p["parts"][2]["reuse"]); self.assertIn("clogged return filter", p["parts"][2]["brief"])
+            steps = [g["step"] for g in p["generate"]]
+            self.assertIn("Field Notes story and storyboard (new topic)", steps)
+            self.assertIn("Field Notes owner narration", steps)
+            q = p["quote"]; self.assertEqual(q["variant"], "new Field Notes middle (default)")
+            self.assertEqual(q["provider_charges_usd"], 0.0)
+            self.assertGreater(q["prepaid_usage"]["elevenlabs_credits"][0], 100)        # owner lines + middle narration
+            self.assertEqual(q["subscription_funded"]["planner_calls"], (1, 2))
 
     def test_missing_lines_and_unknown_business_are_reported(self):
         with tempfile.TemporaryDirectory() as d:
