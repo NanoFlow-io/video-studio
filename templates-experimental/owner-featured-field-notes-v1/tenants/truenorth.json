@@ -1,0 +1,47 @@
+{
+ "tenant": "truenorth",
+ "business_name": "True North Heating & Air",
+ "owner": "Dmitriy (Dim) Zagorodnyuk",
+ "voice": {
+  "provider": "elevenlabs",
+  "voice_id": "BiXJTK87XydG7IwdiQ9G",
+  "name": "Dmitriy True North",
+  "model": "eleven_turbo_v2_5",
+  "settings": {
+   "stability": 0.4,
+   "similarity_boost": 0.85,
+   "style": 0.35,
+   "speed": 1.12
+  },
+  "source": "techbots-truenorth content-engine/reel-builder/approved-assets/truenorth/voice-contract.json (+ speed 1.12, brisk)"
+ },
+ "argil": {
+  "actor": "Dimitry",
+  "look": "Truck 1",
+  "avatar_id": "7073cbb5-44c1-4a7a-9f91-f4eefa64c368",
+  "approved": "Bob, 2026-10-12",
+  "api_key_location": "True North server /opt/content-engine/.env (run the one-off Argil call there)"
+ },
+ "logo": {
+  "file": "/home/adam/video-studio/owner-featured/closes/truenorth-close-v1/logo.png",
+  "sha256_prefix": "bee13bdf7336"
+ },
+ "contact_number": {
+  "display": "949 669 7337",
+  "spoken": "nine four nine, six six nine, seven three three seven",
+  "source": "hvactruenorth.com main number"
+ },
+ "close": {
+  "id": "truenorth-close-v1",
+  "dir": "/home/adam/video-studio/owner-featured/closes/truenorth-close-v1",
+  "clip": "close-v1.mp4",
+  "sha256": "e99ac65eabf7c996aaf49ef8f8fe771c5da4784026ce29d4fabb87ad4040bd7e",
+  "approved": "Bob, 2026-10-12 (Summer Bill Shock v4)"
+ },
+ "music": {
+  "file": "/home/adam/techbots-data/nano-3d/reels/audio/bed_b.mp3",
+  "sha256": "b3c9140445f752ccf1f29ee5fae6616bb3bd264cc3666f08688a6ce68281a664",
+  "description": "NanoFlow upbeat bed (ElevenLabs Music, 'bright upbeat friendly product launch, 112 bpm'), 66 s",
+  "approved": "Bob, 2026-10-12 at bed_gain_db -14"
+ }
+}

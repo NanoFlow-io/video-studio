@@ -1,77 +1,74 @@
 {
  "format": "owner-featured-field-notes-v1",
  "name": "Owner Featured: Field Notes v1",
- "status": "draft for review (2026-10-12); no paid assets made",
- "extends": "owner-explainer-field-notes-v1 (part 3 is an accepted narrated Field Notes render, reused byte for byte)",
- "aspect": "9:16, 1080x1920, 30 fps",
- "pace": "owner talking to a customer: brisk, conversational; Dim voice speed 1.12 (as the accepted animation)",
+ "status": "locked 2026-10-12 (Bob approved the Summer Bill Shock v4 reference)",
+ "extends": "owner-explainer-field-notes-v1: part 3 is an accepted narrated Field Notes render, reused byte for byte",
+ "aspect": "9:16, 1080x1920, 30 fps; every part encoded to the explainer's stream format and joined by stream copy",
  "parts": [
   {
    "part": 1,
-   "role": "customer_problem",
+   "role": "customer_reaction_hook",
    "changeable": true,
-   "visual": "realistic customer-problem footage (Higgsfield keyframe, reviewed, then Kling animation from it)",
-   "audio": "owner voiceover (ElevenLabs, owner voice contract)",
-   "length": "set by footage hold and voiceover, not a fixed clip length"
+   "picture": "realistic customer moment: Higgsfield nano_banana_2 keyframe (person reviews it), then kling3_0 5 s from the approved keyframe; nothing printed is legible",
+   "audio": "owner voiceover, one take, intended pace set at generation",
+   "length": "about 4 s: voiceover then the reaction held"
   },
   {
    "part": 2,
    "role": "owner_intro",
    "changeable": true,
-   "visual": "owner talking head (Argil look of the owner's actor; same look as the close)",
-   "audio": "owner voice (ElevenLabs), lip-synced by Argil"
+   "picture": "owner's Argil talking head in the business's approved look (same look as the close)",
+   "audio": "owner voice, one take; Argil lip-syncs that exact audio"
   },
   {
    "part": 3,
-   "role": "explainer",
+   "role": "field_notes_explanation",
    "changeable": true,
-   "source": "an accepted narrated Field Notes render (project + sha256), reused unchanged including its audio"
+   "source": "an accepted narrated Field Notes render (project + sha256), reused unchanged with its audio, or a new one made with the fieldnotes workflow first"
   },
   {
    "part": 4,
-   "role": "business_close",
+   "role": "branded_owner_close",
    "changeable": false,
    "selectable": true,
-   "source": "a saved, versioned business close asset (clip, audio, overlay layout, final frame); reused, never regenerated per reel"
+   "source": "the business's saved, approved close (clip, audio, overlay layout, final frame); reused unchanged, never regenerated"
   }
  ],
- "tenant_fields": [
-  "owner name, voice contract, Argil actor + look",
-  "logo file + sha256",
-  "business name",
-  "contact number (verified)"
- ],
- "rules": [
-  "no invented branding, vehicles or contact details",
-  "no readable invented bills, amounts or customer details",
-  "close: logo + business name across the top clear of the face, number large and high-contrast beneath, both persistent to the last frame, about 2 s hold after speech, no fade to black",
-  "every paid item quoted and approved before generation; retakes only on request"
- ],
- "tenants": {
-  "truenorth": {
-   "business_name": "True North Heating & Air",
-   "owner": "Dmitriy (Dim) Zagorodnyuk",
-   "voice_contract": "techbots-truenorth content-engine/reel-builder/approved-assets/truenorth/voice-contract.json (Dmitriy True North, eleven_turbo_v2_5, stability 0.4, similarity 0.85, style 0.35) at speed 1.12",
-   "logo": "tenants/truenorth/identity/logo.png sha256 bee13bdf7336... (= website Logo_TrueNorth_Blue-1.png)",
-   "contact_number": "949 669 7337 (matches hvactruenorth.com main number)",
-   "spoken_number": "nine four nine, six six nine, seven three three seven",
-   "saved_closes": [
-    {
-     "id": "truenorth-close-v1",
-     "path": "/home/adam/video-studio/owner-featured/closes/truenorth-close-v1/",
-     "clip": "close-v1.mp4",
-     "sha256": "e99ac65eabf7c996aaf49ef8f8fe771c5da4784026ce29d4fabb87ad4040bd7e",
-     "argil_look": "Truck 1",
-     "status": "draft until Bob approves the first reel"
-    }
-   ],
-   "argil_look": "Truck 1 (7073cbb5-44c1-4a7a-9f91-f4eefa64c368), approved by Bob 2026-10-12"
-  }
+ "music": {
+  "treatment": "one continuous bed under all four parts, added last over the assembled reel",
+  "bed_gain_db": -14,
+  "duck": {
+   "filter": "sidechaincompress",
+   "threshold": 0.04,
+   "ratio": 3,
+   "attack_ms": 25,
+   "release_ms": 450,
+   "knee": 4,
+   "key": "the reel's own speech"
+  },
+  "fade_in_s": 0.6,
+  "fade_out": "from 0.15 s after the last spoken word to the final frame",
+  "voices": "mixed at their exact level (no normaliser or limiter on speech)",
+  "checks": "speech over bed per word, phone number span, sample peak <= -1 dBFS, joins"
  },
- "assembly_notes": [
-  "Argil returns portrait looks pillarboxed in 2560x1440: crop the 808x1438 picture and scale to 1080x1920",
-  "Encode new parts to the explainer's exact stream format and concat with stream copy so the accepted explainer is not re-encoded",
-  "Turbo voice at speed 1.12 reads short single lines at about 5 words/s: check pace per line and slow with a pitch-preserving stretch if needed",
-  "Level each new part to the explainer's integrated loudness; measure the final close clip, not its source audio"
- ]
+ "rules": [
+  "No time-stretching of narration. Set pace at generation (voice speed setting) and review by listening; retime the talking-head video to the audio if timing must change.",
+  "No automatic retakes: every paid item (keyframe, animation, voice, Argil) is quoted and approved before generation.",
+  "No invented branding, vehicles, contact details, bill amounts or customer details.",
+  "Close: logo (with the business name) across the top clear of the face, number large beneath it, both held through the final frame, about 2 s hold after speech, no fade to black.",
+  "Business specifics (owner voice, Argil look, logo, number, close, music bed) live in tenants/<slug>.json, never in this format."
+ ],
+ "assembly": [
+  "verify every reused file by sha256 before assembly",
+  "Argil returns portrait looks pillarboxed in 2560x1440: crop the 808x1438 picture, scale to 1080x1920",
+  "new parts: fixed gain to the explainer's loudness (no loudnorm, no limiter); stream-copy the explainer and the close",
+  "join by concat stream copy; then add the music bed per 'music'"
+ ],
+ "reference_build": {
+  "title": "True North: Summer Bill Shock v4",
+  "file": "/home/adam/video-studio/owner-featured/tn-summer-bill-shock/music-v4/tn-summer-bill-shock-v4-music.mp4",
+  "sha256": "1172023909e9bb0fe1c64bd65332212a6428ca705ea1430a17504e728b4f7c4f",
+  "review": "projects/tn-summer-bill-shock-v4-music",
+  "approved": "Bob, 2026-10-12, including the music balance"
+ }
 }
