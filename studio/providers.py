@@ -1,7 +1,7 @@
 """Image (mascot poses) and video (transition clips) providers.
 
 google      GEMINI_API_KEY. Poses: Gemini image model ("Nano Banana", reference image + prompt; no alpha, so the
-            background is removed locally with rembg). Transitions: Veo (image-to-video, polled, downloaded).
+            background is removed locally with rembg). Transitions: Gemini Omni Flash (image-to-video; Veo until 2026-10-22).
 higgsfield  Official Higgsfield CLI (`hf`), signed in once with `hf auth login` (browser). Higgsfield's
             key-based REST API only takes images by public URL and has no upload endpoint, so a local mascot
             file has to go through the CLI, which uploads it. Poses: gpt_image_2_5 with a transparent
@@ -19,7 +19,7 @@ class Google:
         self.key = env.get("GEMINI_API_KEY") or sys.exit("GEMINI_API_KEY is missing (python studio.py setup)")
         self.h = {"x-goog-api-key": self.key}
         self.image_model = env.get("GOOGLE_IMAGE_MODEL", "gemini-3.1-flash-image")
-        self.video_model = env.get("GOOGLE_VIDEO_MODEL", "veo-3.1-fast-generate-preview")
+        self.video_model = env.get("GOOGLE_VIDEO_MODEL", "gemini-omni-1.1-flash")
 
     def check(self):
         d = http("GET", f"{G_API}/models?pageSize=200", self.h)
@@ -37,18 +37,22 @@ class Google:
         raise RuntimeError("Gemini returned no image: " + json.dumps(d)[:400])
 
     def video(self, start_png, prompt, dst, aspect="16:9", seconds=4):
-        body = {"instances": [{"prompt": prompt, "image": {"inlineData": {"mimeType": "image/png", "data": base64.b64encode(Path(start_png).read_bytes()).decode()}}}],
-                "parameters": {"aspectRatio": aspect, "durationSeconds": str(seconds), "resolution": "1080p" if aspect == "16:9" else "720p"}}
-        op = http("POST", f"{G_API}/models/{self.video_model}:predictLongRunning", self.h, body)
-        name = op["name"]
-        for _ in range(120):
-            time.sleep(10)
-            op = http("GET", f"{G_API}/{name}", self.h)
-            if op.get("done"): break
-        if not op.get("done"): raise RuntimeError("Veo timed out: " + name)
-        if op.get("error"): raise RuntimeError("Veo error: " + json.dumps(op["error"]))
-        uri = op["response"]["generateVideoResponse"]["generatedSamples"][0]["video"]["uri"]
-        return download(uri, dst, self.h)
+        """Gemini Omni Flash image-to-video (2026-10-22: Google shut the Veo 3.1 previews down). Returns about 10 s with
+        audio whatever `seconds` asks; trim downstream. Billed per output video token."""
+        body = {"model": self.video_model, "background": False, "store": True, "stream": False,
+                "input": [{"type": "image", "mime_type": "image/png", "data": base64.b64encode(Path(start_png).read_bytes()).decode()},
+                          {"type": "text", "text": prompt}],
+                "response_format": {"type": "video", "delivery": "uri", "aspect_ratio": aspect,
+                                    "resolution": "1080p" if aspect == "16:9" else "720p"}}
+        r = http("POST", f"{G_API}/interactions", self.h, body, timeout=900)
+        uri = next((c.get("uri") for st in r.get("steps", []) for c in (st.get("content") if isinstance(st.get("content"), list) else [st.get("content") or {}])
+                    if isinstance(c, dict) and c.get("type") == "video" and c.get("uri")), None)
+        if not uri: raise RuntimeError("Omni returned no video: " + json.dumps({k: v for k, v in r.items() if k != "steps"})[:400])
+        name = uri.split("/v1beta/")[-1].split(":")[0]
+        for _ in range(60):
+            if http("GET", f"{G_API}/{name}", self.h).get("state", "ACTIVE") == "ACTIVE": break
+            time.sleep(5)
+        return download(f"{G_API}/{name}:download?alt=media", dst, self.h)
 
 
 HF_VERSION = "1.1.26"
