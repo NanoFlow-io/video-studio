@@ -1,0 +1,75 @@
+{
+ "tenant": "truenorth",
+ "business_name": "True North Heating & Air",
+ "owner": "Dmitriy (Dim) Zagorodnyuk",
+ "voice": {
+  "provider": "elevenlabs",
+  "voice_id": "BiXJTK87XydG7IwdiQ9G",
+  "name": "Dmitriy True North",
+  "model": "eleven_turbo_v2_5",
+  "settings": {
+   "stability": 0.4,
+   "similarity_boost": 0.85,
+   "style": 0.35,
+   "speed": 1.12
+  },
+  "source": "techbots-truenorth content-engine/reel-builder/approved-assets/truenorth/voice-contract.json (+ speed 1.12, brisk)",
+  "contract_file": "/home/adam/techbots-data/video-studio/voices/truenorth-dmitriy.json",
+  "approved": "Bob, 2026-10-12 (Summer Bill Shock)"
+ },
+ "argil": {
+  "actor": "Dimitry",
+  "look": "Truck 1",
+  "avatar_id": "7073cbb5-44c1-4a7a-9f91-f4eefa64c368",
+  "approved": "Bob, 2026-10-12",
+  "api_key_location": "True North server /opt/content-engine/.env (run the one-off Argil call there)",
+  "runner": {
+   "ssh": "nanoflow-io@195.26.251.102",
+   "ssh_key": "/home/adam/.ssh/techbots_master",
+   "env_file": "/opt/content-engine/.env",
+   "env_key": "ARGIL_API_KEY",
+   "media_dir": "/opt/nanoflow/media/nf-reel-uploads/owner-featured",
+   "media_url": "https://truenorth.techbots.io/nf-reel-uploads/owner-featured"
+  }
+ },
+ "logo": {
+  "file": "/home/adam/video-studio/owner-featured/closes/truenorth-close-v1/logo.png",
+  "sha256_prefix": "bee13bdf7336"
+ },
+ "contact_number": {
+  "display": "949 669 7337",
+  "spoken": "nine four nine, six six nine, seven three three seven",
+  "source": "hvactruenorth.com main number"
+ },
+ "close": {
+  "id": "truenorth-close-v1",
+  "dir": "/home/adam/video-studio/owner-featured/closes/truenorth-close-v1",
+  "clip": "close-v1.mp4",
+  "sha256": "e99ac65eabf7c996aaf49ef8f8fe771c5da4784026ce29d4fabb87ad4040bd7e",
+  "approved": "Bob, 2026-10-12 (Summer Bill Shock v4)",
+  "timing": {
+   "logo_in_s": 2.17,
+   "number_in_s": 3.87,
+   "speech_end_s": 6.64,
+   "duration_s": 8.64
+  }
+ },
+ "music": null,
+ "brand": {
+  "colors": {
+   "primary": "#11265B",
+   "accent": "#94263A",
+   "card": "#FFFFFF"
+  },
+  "colors_source": "sampled from the logo (navy and red), 2026-10-23",
+  "card_style": null,
+  "card_style_note": "null = the approved close-v1 card (plain number); a new style makes close-v2 from the same talking head, for approval"
+ },
+ "aliases": [
+  "True North",
+  "True North Heating and Air",
+  "TN",
+  "hvactruenorth"
+ ],
+ "website": "https://hvactruenorth.com/"
+}

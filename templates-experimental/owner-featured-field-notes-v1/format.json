@@ -1,0 +1,100 @@
+{
+ "format": "owner-featured-field-notes-v1",
+ "name": "Owner Featured: Field Notes v1",
+ "status": "locked 2026-10-12 (Bob approved the Summer Bill Shock v4 reference)",
+ "extends": "owner-explainer-field-notes-v1: part 3 is an accepted narrated Field Notes render, reused byte for byte",
+ "aspect": "9:16, 1080x1920, 30 fps; every part encoded to the explainer's stream format and joined by stream copy",
+ "parts": [
+  {
+   "part": 1,
+   "role": "customer_reaction_hook",
+   "changeable": true,
+   "picture": "realistic customer moment: Higgsfield nano_banana_2 keyframe (person reviews it), then kling3_0 5 s from the approved keyframe; nothing printed is legible",
+   "audio": "owner voiceover, one take, intended pace set at generation",
+   "length": "about 4 s: voiceover then the reaction held"
+  },
+  {
+   "part": 2,
+   "role": "owner_intro",
+   "changeable": true,
+   "picture": "owner's Argil talking head in the business's approved look (same look as the close)",
+   "audio": "owner voice, one take; Argil lip-syncs that exact audio"
+  },
+  {
+   "part": 3,
+   "role": "field_notes_explanation",
+   "changeable": true,
+   "default": "NEW topic-specific Field Notes story and animation for every reel (fieldnotes workflow: brief -> validated storyboard -> silent preview -> owner narration), same Field Notes visual style",
+   "optional_variant": "reuse an earlier accepted narrated Field Notes render unchanged, only when the person explicitly asks for it"
+  },
+  {
+   "part": 4,
+   "role": "branded_owner_close",
+   "changeable": false,
+   "selectable": true,
+   "source": "the business's saved, approved close (clip, audio, overlay layout, final frame); reused unchanged, never regenerated"
+  }
+ ],
+ "music": {
+  "treatment": "one continuous bed under all four parts, added last over the assembled reel",
+  "bed_gain_db": -14,
+  "duck": {
+   "filter": "sidechaincompress",
+   "threshold": 0.04,
+   "ratio": 3,
+   "attack_ms": 25,
+   "release_ms": 450,
+   "knee": 4,
+   "key": "the reel's own speech"
+  },
+  "fade_in_s": 0.6,
+  "fade_out": "from 0.15 s after the last spoken word to the final frame",
+  "voices": "mixed at their exact level (no normaliser or limiter on speech)",
+  "checks": "speech over bed per word, phone number span, sample peak <= -1 dBFS, joins",
+  "default_bed": {
+   "file": "/home/adam/techbots-data/nano-3d/reels/audio/bed_b.mp3",
+   "sha256": "b3c9140445f752ccf1f29ee5fae6616bb3bd264cc3666f08688a6ce68281a664",
+   "description": "NanoFlow upbeat bed (ElevenLabs Music, 'bright upbeat friendly product launch, 112 bpm'), 66 s",
+   "approved": "Bob, 2026-10-12 at bed_gain_db -14; template default for every business (Bob, 2026-10-23)"
+  },
+  "override": "a business profile may set its own music (file, sha256, approval); otherwise default_bed is used"
+ },
+ "rules": [
+  "No time-stretching of narration. Set pace at generation (voice speed setting) and review by listening; retime the talking-head video to the audio if timing must change.",
+  "No automatic retakes: every paid item (keyframe, animation, voice, Argil) is quoted and approved before generation.",
+  "No invented branding, vehicles, contact details, bill amounts or customer details.",
+  "Close: logo (with the business name) across the top clear of the face, number large beneath it, both held through the final frame, about 2 s hold after speech, no fade to black.",
+  "Business specifics (owner voice, Argil look, logo, number, brand colours, close, optional music override) live in tenants/<slug>.json, never in this format."
+ ],
+ "assembly": [
+  "verify every reused file by sha256 before assembly",
+  "Argil returns portrait looks pillarboxed in 2560x1440: crop the 808x1438 picture, scale to 1080x1920",
+  "new parts: fixed gain to the explainer's loudness (no loudnorm, no limiter); stream-copy the explainer and the close",
+  "join by concat stream copy; then add the music bed per 'music'"
+ ],
+ "reference_build": {
+  "title": "True North: Summer Bill Shock v4",
+  "file": "/home/adam/video-studio/owner-featured/tn-summer-bill-shock/music-v4/tn-summer-bill-shock-v4-music.mp4",
+  "sha256": "1172023909e9bb0fe1c64bd65332212a6428ca705ea1430a17504e728b4f7c4f",
+  "review": "projects/tn-summer-bill-shock-v4-music",
+  "approved": "Bob, 2026-10-12, including the music balance"
+ },
+ "reuse_default": [
+  "Field Notes visual style",
+  "approved owner look",
+  "approved owner voice",
+  "approved business close",
+  "approved music bed and treatment"
+ ],
+ "close_card": {
+  "styles": [
+   "bar",
+   "italic",
+   "split"
+  ],
+  "renderer": "studio/owner_card.py",
+  "fonts": "card/fonts (SIL Open Font License)",
+  "colors": "business profile brand.colors (sampled from the logo by default)",
+  "band": "top of frame, card bottom at or above y 326, clear of the presenter's face"
+ }
+}
