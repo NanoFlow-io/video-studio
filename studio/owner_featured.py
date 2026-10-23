@@ -62,6 +62,11 @@ def draft(tenant, project, prompt_text, work=WORK):
     fmt = json.loads((FORMAT_DIR / "format.json").read_text(encoding="utf-8"))
     tpath = FORMAT_DIR / "tenants" / f"{tenant}.json"
     if not tpath.exists():
+        from .owner_profile import find
+        match, _ = find(tenant)
+        if match:
+            tenant, tpath = match["tenant"], FORMAT_DIR / "tenants" / f"{match['tenant']}.json"
+    if not tpath.exists():
         raise SystemExit(f"no business profile {tpath.name}: add tenants/{tenant}.json (voice, Argil look, logo, number, close, music)")
     tn = json.loads(tpath.read_text(encoding="utf-8"))
     b = parse_prompt(prompt_text)
@@ -71,8 +76,10 @@ def draft(tenant, project, prompt_text, work=WORK):
     reuse = {}
     close = Path(tn["close"]["dir"]) / tn["close"]["clip"]
     reuse["close"] = {"file": str(close), "sha256_ok": close.exists() and sha256(close) == tn["close"]["sha256"], "id": tn["close"]["id"]}
-    music = Path(tn["music"]["file"])
-    reuse["music"] = {"file": str(music), "sha256_ok": music.exists() and sha256(music) == tn["music"]["sha256"]}
+    mus = tn.get("music") or fmt["music"]["default_bed"]      # the shared NanoFlow bed unless the business overrides it
+    music = Path(mus["file"])
+    reuse["music"] = {"file": str(music), "sha256_ok": music.exists() and sha256(music) == mus["sha256"],
+                      "source": "business override" if tn.get("music") else "template default"}
     if b["explainer_reuse"]:
         r = explainer_render(b["explainer_reuse"])
         reuse["explainer"] = {"project": b["explainer_reuse"], "file": str(r) if r else None, "sha256": sha256(r) if r else None}
@@ -121,7 +128,7 @@ def draft(tenant, project, prompt_text, work=WORK):
                 {"part": 2, "role": "owner_intro", "line": b["intro_line"], "look": tn["argil"]["look"], "make": ["owner voice", "owner intro talking head"]},
                 {"part": 3, "role": "field_notes_explanation", "reuse": reuse.get("explainer"), "brief": b["explainer_brief"]},
                 {"part": 4, "role": "branded_owner_close", "reuse": reuse["close"], "number": tn["contact_number"]["display"]}],
-            "music": {**fmt["music"], "file": reuse["music"]["file"], "sha256_ok": reuse["music"]["sha256_ok"]},
+            "music": {**{k: v for k, v in fmt["music"].items() if k != "default_bed"}, "file": reuse["music"]["file"], "sha256_ok": reuse["music"]["sha256_ok"], "source": reuse["music"]["source"]},
             "rules": fmt["rules"], "generate": generate, "quote": quote,
             "problems": problems}
     out = Path(work) / project

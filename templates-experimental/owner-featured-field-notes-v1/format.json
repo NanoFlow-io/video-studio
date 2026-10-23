@@ -50,14 +50,21 @@
   "fade_in_s": 0.6,
   "fade_out": "from 0.15 s after the last spoken word to the final frame",
   "voices": "mixed at their exact level (no normaliser or limiter on speech)",
-  "checks": "speech over bed per word, phone number span, sample peak <= -1 dBFS, joins"
+  "checks": "speech over bed per word, phone number span, sample peak <= -1 dBFS, joins",
+  "default_bed": {
+   "file": "/home/adam/techbots-data/nano-3d/reels/audio/bed_b.mp3",
+   "sha256": "b3c9140445f752ccf1f29ee5fae6616bb3bd264cc3666f08688a6ce68281a664",
+   "description": "NanoFlow upbeat bed (ElevenLabs Music, 'bright upbeat friendly product launch, 112 bpm'), 66 s",
+   "approved": "Bob, 2026-10-12 at bed_gain_db -14; template default for every business (Bob, 2026-10-23)"
+  },
+  "override": "a business profile may set its own music (file, sha256, approval); otherwise default_bed is used"
  },
  "rules": [
   "No time-stretching of narration. Set pace at generation (voice speed setting) and review by listening; retime the talking-head video to the audio if timing must change.",
   "No automatic retakes: every paid item (keyframe, animation, voice, Argil) is quoted and approved before generation.",
   "No invented branding, vehicles, contact details, bill amounts or customer details.",
   "Close: logo (with the business name) across the top clear of the face, number large beneath it, both held through the final frame, about 2 s hold after speech, no fade to black.",
-  "Business specifics (owner voice, Argil look, logo, number, close, music bed) live in tenants/<slug>.json, never in this format."
+  "Business specifics (owner voice, Argil look, logo, number, brand colours, close, optional music override) live in tenants/<slug>.json, never in this format."
  ],
  "assembly": [
   "verify every reused file by sha256 before assembly",
@@ -78,5 +85,16 @@
   "approved owner voice",
   "approved business close",
   "approved music bed and treatment"
- ]
+ ],
+ "close_card": {
+  "styles": [
+   "bar",
+   "italic",
+   "split"
+  ],
+  "renderer": "studio/owner_card.py",
+  "fonts": "card/fonts (SIL Open Font License)",
+  "colors": "business profile brand.colors (sampled from the logo by default)",
+  "band": "top of frame, card bottom at or above y 326, clear of the presenter's face"
+ }
 }

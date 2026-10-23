@@ -14,7 +14,8 @@ needed: the draft command and the skill are read on each use. Nothing here gener
 ## Rollout
 
 1. `git merge --no-ff work/owner-featured-20261012 -m "Owner Featured: Field Notes v1"` in the live checkout. The
-   merge touches only branch files (studio/owner_featured.py, tests, templates-experimental/owner-featured-field-notes-v1);
+   merge touches only branch files (studio/owner_featured.py, owner_profile.py, owner_steps.py, owner_card.py, tests,
+   templates-experimental/owner-featured-field-notes-v1 incl. card fonts under the SIL Open Font License);
    none of them are the uncommitted brand files, so git leaves those alone. If git refuses, stop; do not stash or reset.
 2. Install the skill by copying it: `cp -r templates-experimental/owner-featured-field-notes-v1/nano-skill ~/.claude/skills/owner-featured-reel`.
 
@@ -37,7 +38,8 @@ needed: the draft command and the skill are read on each use. Nothing here gener
 
 ## Still manual after rollout
 
-- Hook keyframe and animation (Higgsfield), owner voice (ElevenLabs), the Argil run on the business server and
-  assembly are run by Nano following the skill and `format.json`; there is no single command for them yet.
-- A new business needs its own `tenants/<business>.json` profile, a saved close and approved music before use.
+- Each paid step is one command (studio.owner_steps) behind its approval gate; Nano still writes the prompts and
+  relays each result for review.
+- A new business needs a ready profile first (owner_profile init fills logo, colours and number; a person picks the
+  presenter and voice and approves the saved close). Music defaults to the shared NanoFlow bed.
 - Account prices still unverified: the Higgsfield Pro plan, the Argil plan and the Claude plan.
