@@ -76,7 +76,7 @@ On approval: `gate <project> final --words ...`. That is the end: publishing and
 2. The person chooses the presenter (Argil avatar) and ElevenLabs voice; record their ids, the runner (server with the
    business's Argil key) and the approvals in the profile.
 3. Saved close: `owner_steps close-draft <slug> <project> --line "<close line with the number spoken digit by digit>"`,
-   quote, `gate quote`, `voice`, `gate voice`, `argil`, `close-compose <project> --style bar|italic|split`, `review`,
+   quote, `gate quote`, `voice`, `gate voice`, `argil`, `close-compose <project>` (Split card by default), `review`,
    and after the person approves, `gate close` then `close-save`.
 
 ## Restyle a close's number card (free)

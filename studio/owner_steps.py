@@ -422,7 +422,7 @@ def close_layers_and_compose(p_or_tenant, raw, out_dir, style, speech_words=None
 def close_compose(p, style=None):
     p.need("close-compose")
     raw_src = p.file("argil") or fail("argil has not run")
-    style = style or (p.tenant.get("brand") or {}).get("card_style") or "bar"
+    style = style or (p.tenant.get("brand") or {}).get("card_style") or "split"
     out = p.dir / "close"; out.mkdir(exist_ok=True)
     raw = out / "talking-head-raw.mp4"
     ff("-i", raw_src, "-i", p.state["steps"]["voice"]["files"]["close"], "-filter_complex",

@@ -95,6 +95,8 @@
   "renderer": "studio/owner_card.py",
   "fonts": "card/fonts (SIL Open Font License)",
   "colors": "business profile brand.colors (sampled from the logo by default)",
-  "band": "top of frame, card bottom at or above y 326, clear of the presenter's face"
+  "band": "top of frame, card bottom at or above y 326, clear of the presenter's face",
+  "default_style": "split",
+  "chosen": "Bobby, 2026-10-24: Split card (white logo top, navy number band, thin accent line)"
  }
 }
