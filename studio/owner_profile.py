@@ -166,7 +166,7 @@ def init(tenant, name, website=None, number=None, logo=None):
          "contact_number": {"display": number, "spoken": spoken(number) if number else None, "source": found["number"]},
          "close": {"id": None, "dir": str(folder / f"{tenant}-close-v0"), "clip": None, "sha256": None, "approved": None,
                    "line": f"For help with <service>, call {name} on <spoken number>."},
-         "brand": {"colors": colors_from_logo(dst) if dst else None, "colors_source": "sampled from the logo" if dst else None, "card_style": "bar"},
+         "brand": {"colors": colors_from_logo(dst) if dst else None, "colors_source": "sampled from the logo" if dst else None, "card_style": "split"},
          "music": None}
     path.write_text(json.dumps(p, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
     return {"profile": str(path), "found": found, **check(tenant)}

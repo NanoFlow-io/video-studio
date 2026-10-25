@@ -17,6 +17,7 @@ FONTS = CARD_DIR / "fonts"
 W, H = 1080, 1920
 CARD = (40, 36, 1040, 326)      # card box; its bottom stays above the presenter's hair (Truck 1 close: about y 344)
 STYLES = ("bar", "italic", "split")
+DEFAULT_STYLE = "split"   # Bobby, 2026-10-24: the Split card is the house style for every business
 DEFAULT_COLORS = {"primary": "#102058", "accent": "#C8102E", "card": "#FFFFFF"}
 
 
@@ -67,7 +68,7 @@ def logo_on(layer, logo, width, top):
     return top + lg.height
 
 
-def layers(profile, style="bar"):
+def layers(profile, style=DEFAULT_STYLE):
     """Two transparent 1080x1920 layers: the card with the logo, and the number element (animated in separately)."""
     if style not in STYLES:
         raise SystemExit(f"card style must be one of {', '.join(STYLES)}")
@@ -167,7 +168,7 @@ def main(argv=None):
         frame = opt.get("--frame") or str(Path(prof["close"]["dir"]) / "speaker-frame.png")
         print(json.dumps([str(p) for p in mockups(prof, a[2], frame)], indent=1))
     else:
-        style = opt.get("--style") or (prof.get("brand") or {}).get("card_style") or "bar"
+        style = opt.get("--style") or (prof.get("brand") or {}).get("card_style") or DEFAULT_STYLE
         print(json.dumps([str(p) for p in save_layers(prof, a[2], style)], indent=1))
 
 
