@@ -42,11 +42,11 @@
   "source": "hvactruenorth.com main number"
  },
  "close": {
-  "id": "truenorth-close-v1",
-  "dir": "/home/adam/video-studio/owner-featured/closes/truenorth-close-v1",
-  "clip": "close-v1.mp4",
-  "sha256": "e99ac65eabf7c996aaf49ef8f8fe771c5da4784026ce29d4fabb87ad4040bd7e",
-  "approved": "Bob, 2026-10-12 (Summer Bill Shock v4)",
+  "id": "truenorth-close-v2",
+  "dir": "/home/adam/video-studio/owner-featured/closes/truenorth-close-v2",
+  "clip": "close-v2.mp4",
+  "sha256": "578cd93b8379c4d99b82a5e46ab3d4462309a7c83e1867648792edf7e7919e8c",
+  "approved": "approved for reuse: Bobby, 2026-10-24: 3 (Split card), chosen from the rendered preview tn-number-card-styles; this render's frames are identical to that preview (2026-10-25)",
   "timing": {
    "logo_in_s": 2.17,
    "number_in_s": 3.87,
@@ -62,7 +62,7 @@
    "card": "#FFFFFF"
   },
   "colors_source": "sampled from the logo (navy and red), 2026-10-23",
-  "card_style": null,
+  "card_style": "split",
   "card_style_note": "null = the approved close-v1 card (plain number); a new style makes close-v2 from the same talking head, for approval"
  },
  "aliases": [
@@ -71,5 +71,14 @@
   "TN",
   "hvactruenorth"
  ],
- "website": "https://hvactruenorth.com/"
+ "website": "https://hvactruenorth.com/",
+ "close_history": [
+  {
+   "id": "truenorth-close-v1",
+   "dir": "/home/adam/video-studio/owner-featured/closes/truenorth-close-v1",
+   "clip": "close-v1.mp4",
+   "sha256": "e99ac65eabf7c996aaf49ef8f8fe771c5da4784026ce29d4fabb87ad4040bd7e",
+   "approved": "Bob, 2026-10-12 (Summer Bill Shock v4)"
+  }
+ ]
 }
