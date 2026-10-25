@@ -10,6 +10,13 @@ Bill Shock v4, approved by Bob 2026-10-12). The format is generic. Each business
 `tenants/<slug>.json`: presenter (Argil look), voice, logo, number, brand colours, saved close, optional music (the
 shared NanoFlow bed is the default). Run everything from `/home/adam/video-studio` with `.venv/bin/python`.
 
+## Two ready-made entry points
+
+- **True North:** "Make a True North Owner Featured reel about <topic>." Everything fixed is in TRUE-NORTH.md
+  (Dim, Truck 1, his voice, the Split-card close v2, shared music).
+- **Any other business:** "Use the Owner Featured template for <business> and make it about <topic>." See
+  GENERAL.md; a business without a ready profile gets the setup below first.
+
 ## What the person says
 
 One line is enough: **"Use the Owner Featured template for <business> and make it about <topic>."**

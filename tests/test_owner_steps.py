@@ -128,8 +128,8 @@ class CloseSaveTests(unittest.TestCase):
             old = d / "closes" / "truenorth-close-v1"
             old.mkdir(parents=True)
             src = Path(prof["close"]["dir"])
-            for f in ("close-v1.mp4", "dim-truck1-close-raw.mp4", "speech.json"):
-                shutil.copy(src / f, old / f)
+            for f in [src / prof["close"]["clip"], src / "speech.json", *src.glob("*-raw.mp4")]:
+                shutil.copy(f, old / f.name)
             prof["close"]["dir"] = str(old)
             (d / "fmt" / "tenants" / "truenorth.json").write_text(json.dumps(prof))
             with mock.patch.object(os_, "FORMAT_DIR", d / "fmt"):
@@ -142,6 +142,6 @@ class CloseSaveTests(unittest.TestCase):
             new = json.loads((d / "fmt" / "tenants" / "truenorth.json").read_text())
             self.assertEqual(new["close"]["id"], "truenorth-close-v2")
             self.assertEqual(new["brand"]["card_style"], "split")
-            self.assertEqual(new["close_history"][-1]["id"], "truenorth-close-v1")
-            self.assertTrue((old / "close-v1.mp4").exists())
+            self.assertEqual(new["close_history"][-1]["id"], prof["close"]["id"])
+            self.assertTrue((old / prof["close"]["clip"]).exists())
             self.assertTrue(Path(r["saved_close"], "close-v2.mp4").exists())

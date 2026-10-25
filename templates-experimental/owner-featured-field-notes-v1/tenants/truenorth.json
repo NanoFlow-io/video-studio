@@ -80,5 +80,12 @@
    "sha256": "e99ac65eabf7c996aaf49ef8f8fe771c5da4784026ce29d4fabb87ad4040bd7e",
    "approved": "Bob, 2026-10-12 (Summer Bill Shock v4)"
   }
- ]
+ ],
+ "reference_reel": {
+  "title": "Summer Bill Shock v5 (approved v4 with the Split-card close v2)",
+  "file": "/home/adam/video-studio/owner-featured/tn-summer-bill-shock/close-v2-ref/tn-summer-bill-shock-v5.mp4",
+  "sha256": "b4bb37d4fab04cc7d1b21f1526cff2df876ffc9b256946aee7ab0108f486fcb0",
+  "review": "projects/tn-summer-bill-shock-v5-split-close",
+  "note": "what a True North Owner Featured reel looks like now; only the close differs from Bob's approved v4"
+ }
 }
